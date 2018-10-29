@@ -1,0 +1,293 @@
+#include "bwindow.h"
+
+#include <vector>
+#include <list>
+#include <windowsx.h>
+#include <iostream>
+#include <tchar.h>
+
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/register/point.hpp>
+#include <boost/geometry/geometries/register/linestring.hpp>
+
+#include "segment.h"
+
+using namespace std;
+
+namespace bg = boost::geometry;
+namespace bgi = boost::geometry::index;
+
+BOOST_GEOMETRY_REGISTER_POINT_2D(Vertex, double, cs::cartesian, m_x, m_y);
+BOOST_GEOMETRY_REGISTER_LINESTRING(Segment);
+
+std::vector<Segment> segments;
+
+Segment *highlighted_segment;
+
+Vertex v1, v2;
+std::vector<Shape*> shapes;
+
+double lastx;
+double lasty;
+
+bool mousedown;
+bool painting;
+
+HPEN hpen_highlght = CreatePen(PS_SOLID,2,RGB(50,0,205));
+HBRUSH hbrush_background = CreateSolidBrush(RGB(200,200,200));
+
+int operation_mode = 0;
+
+void BWindow::setMode(int mode)
+{
+    operation_mode = mode;
+}
+
+LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int x, y;
+
+    switch (message)                  /* handle the messages */
+    {
+    case WM_LBUTTONDOWN:
+        mousedown = TRUE;
+        lastx=    x = GET_X_LPARAM( lParam );
+        lasty=    y = GET_Y_LPARAM( lParam );
+        if (operation_mode==0) // start rectangle
+        {
+            x = GET_X_LPARAM( lParam );
+            y = GET_Y_LPARAM( lParam );
+            v1.set(x,y);
+            v2.set(x,y);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        else if (operation_mode==1) // add vertex
+        {
+            if(highlighted_segment)
+            {
+                double Cx = GET_X_LPARAM( lParam );
+                double Cy = GET_Y_LPARAM( lParam );
+
+                highlighted_segment->splitAt(Cx, Cy);
+                highlighted_segment = NULL;
+
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
+        }
+        SetCapture(hwnd);
+        break;
+    case WM_LBUTTONUP:
+        ReleaseCapture();
+        if (mousedown && operation_mode==0)
+        {
+            x = GET_X_LPARAM( lParam );
+            y = GET_Y_LPARAM( lParam );
+            v2.set(x,y);
+            Shape *shape = new Shape(v1,v2);
+            shapes.push_back(shape);
+
+            Segment line1(shape);
+            line1.push_back(shape->m_vertices[0]);
+            line1.push_back(shape->m_vertices[1]);
+            segments.push_back(line1);
+            Segment line2(shape);
+            line2.push_back(shape->m_vertices[1]);
+            line2.push_back(shape->m_vertices[2]);
+            segments.push_back(line2);
+            Segment line3(shape);
+            line3.push_back(shape->m_vertices[2]);
+            line3.push_back(shape->m_vertices[3]);
+            segments.push_back(line3);
+            Segment line4(shape);
+            line4.push_back(shape->m_vertices[3]);
+            line4.push_back(shape->m_vertices[0]);
+            segments.push_back(line4);
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        mousedown = FALSE;
+        break;
+    case WM_MOUSEMOVE:
+        x = GET_X_LPARAM( lParam );
+        y = GET_Y_LPARAM( lParam );
+
+        // create rectangle
+        if (mousedown && operation_mode==0)
+        {
+            v2.set(x,y);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        // highlight segments
+        else if (!mousedown && (operation_mode==1 || operation_mode==2))
+        {
+            Vertex mouse_point(x, y);
+
+            double min_dist = 10000000;
+            Segment *nearest;
+            for (Shape *shape: shapes)
+            {
+                for (Segment *seg: shape->m_segments)
+                {
+                    double comp_dist = boost::geometry::comparable_distance(mouse_point, *seg);
+                    if (comp_dist<min_dist)
+                    {
+                        min_dist = comp_dist;
+                        nearest = seg;
+                    }
+                };
+            }
+            if (min_dist<=16)
+            {
+                highlighted_segment = nearest;
+            }
+            else
+            {
+                highlighted_segment = NULL;
+            }
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        // move segments
+        else if (highlighted_segment && mousedown && operation_mode==2)
+        {
+            highlighted_segment->addPoint(x-lastx,y-lasty);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        lastx=x;
+        lasty=y;
+        break;
+    case WM_PAINT:
+    {
+        if(painting)
+        {
+            cout<<"break"<<endl;
+            break;
+        }
+        painting = TRUE;
+
+        RECT Client_Rect;
+        GetClientRect(hwnd,&Client_Rect);
+        int win_width = Client_Rect.right - Client_Rect.left;
+        int win_height = Client_Rect.bottom + Client_Rect.left;
+        HDC memhdc;
+        HBITMAP membitmap;
+        PAINTSTRUCT ps;
+
+        HDC hdc = BeginPaint(hwnd, &ps);
+        memhdc = CreateCompatibleDC(hdc);
+        membitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
+        SelectObject(memhdc, membitmap);
+
+        FillRect(memhdc,&Client_Rect, hbrush_background);
+
+        SelectObject(memhdc, GetStockBrush(NULL_BRUSH));
+        SelectObject(memhdc, GetStockObject(BLACK_PEN));
+
+        // all shapes
+        for (Shape *shape: shapes)
+        {
+            for (Segment *seg: shape->m_segments)
+            {
+                MoveToEx(memhdc, seg->getx(0), seg->gety(0), NULL);
+                LineTo(memhdc,seg->getx(1), seg->gety(1));
+            };
+
+            if (operation_mode==2 || operation_mode==1)
+            {
+                for (Vertex *v: shape->m_vertices)
+                {
+                    Ellipse(memhdc, v->m_x-3, v->m_y-3,v->m_x+3, v->m_y+3);
+                }
+            }
+        }
+
+        // highlighted segment
+        if(highlighted_segment && (operation_mode==1 || operation_mode==2))
+        {
+            SelectObject(memhdc, hpen_highlght);
+
+            double x1 = highlighted_segment->getx(0);
+            double y1 = highlighted_segment->gety(0);
+            double x2 = highlighted_segment->getx(1);
+            double y2 = highlighted_segment->gety(1);
+
+            MoveToEx(memhdc, x1,y1, NULL);
+            LineTo(memhdc, x2,y2);
+        }
+
+        // temporary rectangle
+        if (mousedown && operation_mode==0)
+        {
+            Rectangle(memhdc, v1.m_x, v1.m_y, v2.m_x, v2.m_y);
+        }
+
+        BitBlt(hdc, 0, 0, win_width, win_height, memhdc, 0, 0, SRCCOPY);
+        DeleteObject(membitmap);
+        DeleteDC    (memhdc);
+        DeleteDC    (hdc);
+        EndPaint(hwnd, &ps);
+
+        painting = FALSE;
+    }
+    break;
+
+    case WM_DESTROY:
+        for (Shape *s: shapes)
+            delete s;
+
+    //case WM_DRAWITEM:
+    case WM_ERASEBKGND:
+        return (LRESULT)1;// to avoid flicker
+
+    default:
+        return DefWindowProc (hwnd, message, wParam, lParam);
+    }
+
+    return 0;
+}
+
+
+HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
+{
+    TCHAR szClassName[ ] = L"Canvas";
+
+    WNDCLASSEX wincl;        /* Data structure for the windowclass */
+
+    /* The Window structure */
+    wincl.hInstance = hInstance;
+    wincl.lpszClassName = szClassName;
+    wincl.lpfnWndProc = CanvasProcedure;      /* This function is called by windows */
+    wincl.style = CS_DBLCLKS|CS_OWNDC;                 /* Catch double-clicks */
+    wincl.cbSize = sizeof (WNDCLASSEX);
+
+    /* Use default icon and mouse-pointer */
+    wincl.hIcon = LoadIcon (NULL, IDI_APPLICATION);
+    wincl.hIconSm = LoadIcon (NULL, IDI_APPLICATION);
+    wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
+    wincl.lpszMenuName = NULL;                 /* No menu */
+    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0;                      /* structure or the window instance */
+    /* Use Windows's default colour as the background of the window */
+    wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
+
+    /* Register the window class, and if it fails quit the program */
+    RegisterClassEx (&wincl);
+
+    HWND hwnd = this->hwnd = CreateWindowEx (
+                    WS_EX_CLIENTEDGE,
+                    szClassName,
+                    szClassName,
+                    WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+                    x,
+                    y,
+                    w,                 /* The programs width */
+                    h,                 /* and height in pixels */
+                    hWndParent,        /* The window is a child-window */
+                    NULL,
+                    GetModuleHandle(NULL),       /* Program Instance handler */
+                    NULL                 /* No Window Creation data */
+                );
+    ShowWindow (hwnd, SW_SHOWDEFAULT);
+
+    return hwnd;
+}

@@ -1,0 +1,10 @@
+1. ability to move vertices
+2. create corresponding 3d shapes as the shape in 2d section
+3. delaunay-efy the 3d shapes
+4. CLOTHIFY!!!
+5. add 3d view
+6. add lights
+7. CODE CLEANUP!!!
+8. 2D grid
+9. 3D grid
+
