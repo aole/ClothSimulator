@@ -7,4 +7,6 @@
 7. CODE CLEANUP!!!
 8. 2D grid
 9. 3D grid
-
+10. undo/redo
+11. move the whole 2d shape
+12. create and fill shape

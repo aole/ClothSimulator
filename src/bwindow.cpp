@@ -47,9 +47,14 @@ void BWindow::setMode(int mode)
 LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int x, y;
+    BWindow *wndptr = (BWindow*) GetWindowLongPtr(hwnd, GWL_USERDATA);
 
     switch (message)                  /* handle the messages */
     {
+    case WM_NCCREATE:
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) ((CREATESTRUCT*)lParam)->lpCreateParams);
+        return DefWindowProc (hwnd, message, wParam, lParam);
+
     case WM_LBUTTONDOWN:
         mousedown = TRUE;
         lastx=    x = GET_X_LPARAM( lParam );
@@ -285,7 +290,7 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
                     hWndParent,        /* The window is a child-window */
                     NULL,
                     GetModuleHandle(NULL),       /* Program Instance handler */
-                    NULL                 /* No Window Creation data */
+                    this                 // object reference
                 );
     ShowWindow (hwnd, SW_SHOWDEFAULT);
 

@@ -40,7 +40,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glBindVertexArray(uiVAOid);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
 
     SDL_GL_SwapWindow(sdlWnd);
 }

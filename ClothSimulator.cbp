@@ -65,6 +65,7 @@
 		</ExtraCommands>
 		<Unit filename="include/btoolbar.h" />
 		<Unit filename="include/bwindow.h" />
+		<Unit filename="include/controller.h" />
 		<Unit filename="include/glwindow.h" />
 		<Unit filename="include/segment.h" />
 		<Unit filename="main.cpp" />
@@ -73,7 +74,6 @@
 		<Unit filename="src/bwindow.cpp" />
 		<Unit filename="src/glwindow.cpp" />
 		<Unit filename="src/segment.cpp" />
-		<Unit filename="todo.txt" />
 		<Extensions>
 			<code_completion />
 			<envvars />

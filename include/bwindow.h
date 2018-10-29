@@ -2,6 +2,7 @@
 #define BWINDOW_H
 
 #include <windows.h>
+#include <iostream>
 
 class BWindow
 {
@@ -13,6 +14,8 @@ public:
     void setSize(int x, int y, int w, int h){ this->x=x; this->y=y; this->w=w; this->h=h; };
 
     HWND getHandle() { return hwnd; }
+
+    void test() { std::cout<<"BWindow.test()\n"; }
 protected:
 
 private:
