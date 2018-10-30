@@ -42,6 +42,7 @@
 			<Add directory="C:/boost_1_68_0" />
 			<Add directory="C:/SDL2-2.0.8/i686-w64-mingw32/include" />
 			<Add directory="C:/glew-2.1.0/include" />
+			<Add directory="C:/Projects/FreeImage/Dist/x32" />
 		</Compiler>
 		<Linker>
 			<Add option="-m32" />
@@ -58,8 +59,11 @@
 			<Add library="SDL2_test" />
 			<Add library="glu32" />
 			<Add library="Comdlg32" />
+			<Add library="FreeImage" />
+			<Add library="msimg32" />
 			<Add directory="C:/SDL2-2.0.8/i686-w64-mingw32/lib" />
 			<Add directory="C:/glew-2.1.0/lib/Release/Win32" />
+			<Add directory="C:/Projects/FreeImage/Dist/x32" />
 		</Linker>
 		<ExtraCommands>
 			<Add after="XCOPY $(#sdl2)\bin\*.dll $(TARGET_OUTPUT) /D /Y" />

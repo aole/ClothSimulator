@@ -38,6 +38,8 @@ double lasty;
 bool mousedown;
 bool painting;
 
+BLENDFUNCTION blendFn = {0};
+
 HPEN hpen_highlght = CreatePen(PS_SOLID,2,RGB(50,0,205));
 HBRUSH hbrush_background = CreateSolidBrush(RGB(200,200,200));
 
@@ -53,19 +55,21 @@ void BWindow::loadBackground(wchar_t* filename)
 {
     FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 
-	// check the file signature and deduce its format
-	// (the second argument is currently not used by FreeImage)
-	fif = FreeImage_GetFileTypeU(filename, 0);
-	if(fif == FIF_UNKNOWN) {
-		// no signature ?
-		// try to guess the file format from the file extension
-		fif = FreeImage_GetFIFFromFilenameU(filename);
-	}
-	// check that the plugin has reading capabilities ...
-	if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif)) {
-		// ok, let's load the file
-		background_image = FreeImage_LoadU(fif, filename, 0);
-	}
+    // check the file signature and deduce its format
+    // (the second argument is currently not used by FreeImage)
+    fif = FreeImage_GetFileTypeU(filename, 0);
+    if(fif == FIF_UNKNOWN)
+    {
+        // no signature ?
+        // try to guess the file format from the file extension
+        fif = FreeImage_GetFIFFromFilenameU(filename);
+    }
+    // check that the plugin has reading capabilities ...
+    if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif))
+    {
+        // ok, let's load the file
+        background_image = FreeImage_LoadU(fif, filename, 0);
+    }
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
@@ -92,6 +96,12 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     switch (message)                  /* handle the messages */
     {
     case WM_NCCREATE:
+
+        blendFn.BlendOp = AC_SRC_OVER;
+        blendFn.BlendFlags = 0;
+        blendFn.SourceConstantAlpha = 155;
+        blendFn.AlphaFormat = 0; //AC_SRC_ALPHA;
+
         SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) ((CREATESTRUCT*)lParam)->lpCreateParams);
         return DefWindowProc (hwnd, message, wParam, lParam);
     case WM_KEYDOWN:
@@ -280,11 +290,20 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             int w = FreeImage_GetWidth(background_image);
             int h = FreeImage_GetHeight(background_image);
 
-            SetStretchBltMode(memhdc, COLORONCOLOR);
-            StretchDIBits(memhdc, 0, 0,
-                w, h,
-                0, 0, w, h,
-                FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
+            HDC bithdc = CreateCompatibleDC(hdc);
+            HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, w, h);
+            SelectObject(bithdc, bitbitmap);
+            SetStretchBltMode(bithdc, COLORONCOLOR);
+            StretchDIBits(bithdc, 0, 0,
+                          w, h,
+                          0, 0, w, h,
+                          FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
+
+            //BitBlt(memhdc, 0, 0, w, h, bithdc, 0, 0, SRCCOPY);
+
+            AlphaBlend(memhdc, 0,0,w,h,bithdc,0,0,w,h,blendFn);
+            DeleteObject(bitbitmap);
+            DeleteDC(bithdc);
         }
         SelectObject(memhdc, GetStockBrush(NULL_BRUSH));
         SelectObject(memhdc, GetStockObject(BLACK_PEN));
