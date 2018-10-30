@@ -13,6 +13,8 @@
 
 #include "segment.h"
 
+#define MIN_DISTANCE_SQUARE 16
+
 using namespace std;
 
 namespace bg = boost::geometry;
@@ -23,7 +25,8 @@ BOOST_GEOMETRY_REGISTER_LINESTRING(Segment);
 
 std::vector<Segment> segments;
 
-Segment *highlighted_segment;
+Segment *highlighted_segment = NULL;
+Vertex *highlighted_vertex = NULL;
 
 Vertex v1, v2;
 std::vector<Shape*> shapes;
@@ -44,6 +47,19 @@ void BWindow::setMode(int mode)
     operation_mode = mode;
 }
 
+void cleanUp()
+{
+    for (Shape *s: shapes)
+        delete s;
+    shapes.clear();
+}
+
+void BWindow::reset()
+{
+    cleanUp();
+    InvalidateRect(hwnd, NULL, TRUE);
+}
+
 LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int x, y;
@@ -57,12 +73,10 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
     case WM_LBUTTONDOWN:
         mousedown = TRUE;
-        lastx=    x = GET_X_LPARAM( lParam );
-        lasty=    y = GET_Y_LPARAM( lParam );
+        lastx = x = GET_X_LPARAM( lParam );
+        lasty = y = GET_Y_LPARAM( lParam );
         if (operation_mode==0) // start rectangle
         {
-            x = GET_X_LPARAM( lParam );
-            y = GET_Y_LPARAM( lParam );
             v1.set(x,y);
             v2.set(x,y);
             InvalidateRect(hwnd, NULL, TRUE);
@@ -71,13 +85,39 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         {
             if(highlighted_segment)
             {
-                double Cx = GET_X_LPARAM( lParam );
-                double Cy = GET_Y_LPARAM( lParam );
+                // check if near any already existing vertex.
+                // if so grab it.
+                Vertex mouse_point(x, y);
+                double min_dist = 10000000;
+                Vertex *nearest;
 
-                highlighted_segment->splitAt(Cx, Cy);
-                highlighted_segment = NULL;
+                // TODO: Optimize ... get the first within range
+                for (Shape *shape: shapes)
+                {
+                    for (Vertex *v: shape->m_vertices)
+                    {
+                        double comp_dist = boost::geometry::comparable_distance(mouse_point, *v);
+                        if (comp_dist<min_dist)
+                        {
+                            min_dist = comp_dist;
+                            nearest = v;
+                        }
+                    }
+                }
 
-                InvalidateRect(hwnd, NULL, TRUE);
+                if(min_dist<=MIN_DISTANCE_SQUARE)
+                {
+                    highlighted_vertex = nearest;
+                }
+                else
+                {
+                    // if not near any vertex, split the segment
+                    // grab the new vertex
+                    highlighted_vertex =highlighted_segment->splitAt(x, y);
+                    highlighted_segment = NULL;
+
+                    InvalidateRect(hwnd, NULL, TRUE);
+                }
             }
         }
         SetCapture(hwnd);
@@ -112,6 +152,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             InvalidateRect(hwnd, NULL, TRUE);
         }
         mousedown = FALSE;
+        highlighted_vertex = NULL;
         break;
     case WM_MOUSEMOVE:
         x = GET_X_LPARAM( lParam );
@@ -130,6 +171,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
             double min_dist = 10000000;
             Segment *nearest;
+            // TODO: Optimize ... get the first within range
             for (Shape *shape: shapes)
             {
                 for (Segment *seg: shape->m_segments)
@@ -142,7 +184,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     }
                 };
             }
-            if (min_dist<=16)
+            if (min_dist<=MIN_DISTANCE_SQUARE)
             {
                 highlighted_segment = nearest;
             }
@@ -156,6 +198,12 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         else if (highlighted_segment && mousedown && operation_mode==2)
         {
             highlighted_segment->addPoint(x-lastx,y-lasty);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        // move vertices
+        else if (highlighted_vertex && mousedown && operation_mode==1)
+        {
+            highlighted_vertex->addPoint(x-lastx,y-lasty);
             InvalidateRect(hwnd, NULL, TRUE);
         }
         lastx=x;
@@ -237,8 +285,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     break;
 
     case WM_DESTROY:
-        for (Shape *s: shapes)
-            delete s;
+        cleanUp();
 
     //case WM_DRAWITEM:
     case WM_ERASEBKGND:
@@ -279,19 +326,19 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
     RegisterClassEx (&wincl);
 
     HWND hwnd = this->hwnd = CreateWindowEx (
-                    WS_EX_CLIENTEDGE,
-                    szClassName,
-                    szClassName,
-                    WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-                    x,
-                    y,
-                    w,                 /* The programs width */
-                    h,                 /* and height in pixels */
-                    hWndParent,        /* The window is a child-window */
-                    NULL,
-                    GetModuleHandle(NULL),       /* Program Instance handler */
-                    this                 // object reference
-                );
+                                 WS_EX_CLIENTEDGE,
+                                 szClassName,
+                                 szClassName,
+                                 WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+                                 x,
+                                 y,
+                                 w,                 /* The programs width */
+                                 h,                 /* and height in pixels */
+                                 hWndParent,        /* The window is a child-window */
+                                 NULL,
+                                 GetModuleHandle(NULL),       /* Program Instance handler */
+                                 this                 // object reference
+                             );
     ShowWindow (hwnd, SW_SHOWDEFAULT);
 
     return hwnd;

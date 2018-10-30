@@ -1,5 +1,6 @@
 # ClothSimulator
-Cloth Simulator
+
+![Screenshot](screenshots\screenshot02.jpg?raw=true)
 
 How to Compile
 --------------

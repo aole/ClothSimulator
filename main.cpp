@@ -22,6 +22,10 @@
 #define ID_ADD_VERTEX   10002
 #define ID_MOVE_SEGMENT 10003
 
+#define ID_FILE         20000
+#define ID_FILE_EXIT    20001
+#define ID_FILE_RESET   20002
+
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK CanvasProcedure (HWND, UINT, WPARAM, LPARAM);
@@ -55,7 +59,6 @@ void readPreferencesFile()
         else if (key=="height")
             window_height = boost::lexical_cast<int>(value);
     }
-    cout<<"width,height: "<<window_width<<","<<window_height<<endl;
 }
 
 int WINAPI WinMain (HINSTANCE hThisInstance,
@@ -129,6 +132,18 @@ GLWindow glwindow;
 
 void CreateUI(HWND hWndParent)
 {
+    // menubar
+    HMENU hMenu, hMenuFile;
+
+    hMenu  = CreateMenu();
+    hMenuFile = CreatePopupMenu();
+    AppendMenu(hMenu, MF_POPUP, (UINT)hMenuFile, L"&File");
+
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_RESET, L"&Reset");
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_EXIT, L"E&xit");
+
+    SetMenu(hWndParent, hMenu);
+
     // toolbar
     toolbar.addCheckGroup(STD_FILENEW, ID_CREATE_RECT, TRUE);
     toolbar.addCheckGroup(STD_DELETE, ID_ADD_VERTEX, FALSE);
@@ -193,6 +208,12 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             break;
         case ID_MOVE_SEGMENT:
             canvas.setMode(2);
+            break;
+        case ID_FILE_RESET:
+            canvas.reset();
+            break;
+        case ID_FILE_EXIT:
+            PostQuitMessage(0);
             break;
         }
         InvalidateRect(hwnd, NULL, TRUE);

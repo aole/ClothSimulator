@@ -22,6 +22,12 @@ public:
         m_x=x;
         m_y=y;
     }
+
+    void addPoint(double x, double y)
+    {
+        m_x += x;
+        m_y += y;
+    }
 };
 
 class Segment : public std::vector <Vertex*>
@@ -55,7 +61,7 @@ public:
         this->at(1)->m_x += x;
         this->at(1)->m_y += y;
     }
-    void splitAt(double Cx, double Cy);
+    Vertex *splitAt(double Cx, double Cy);
 };
 
 class Shape

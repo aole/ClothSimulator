@@ -1,6 +1,6 @@
 #include "segment.h"
 
-void Segment::splitAt(double Cx, double Cy)
+Vertex *Segment::splitAt(double Cx, double Cy)
 {
     double Ax = getx(0);
     double Ay = gety(0);
@@ -17,4 +17,6 @@ void Segment::splitAt(double Cx, double Cy)
     shape->addSegment(new Segment(nv, at(1), shape));
 
     at(1) = nv;
+
+    return nv;
 }

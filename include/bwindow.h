@@ -15,7 +15,8 @@ public:
 
     HWND getHandle() { return hwnd; }
 
-    void test() { std::cout<<"BWindow.test()\n"; }
+    void reset();
+
 protected:
 
 private:
