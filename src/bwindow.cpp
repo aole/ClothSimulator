@@ -70,8 +70,25 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     case WM_NCCREATE:
         SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) ((CREATESTRUCT*)lParam)->lpCreateParams);
         return DefWindowProc (hwnd, message, wParam, lParam);
+    case WM_KEYDOWN:
+        switch(wParam)
+        {
+        case VK_DELETE:
+            if (highlighted_vertex)
+            {
+                Shape *s = highlighted_vertex->shape;
+                s->removeVertex(highlighted_vertex);
+                highlighted_vertex = NULL;
+                highlighted_segment = NULL;
 
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
+            break;
+        }
+        break;
     case WM_LBUTTONDOWN:
+        SetFocus(hwnd);
+
         mousedown = TRUE;
         lastx = x = GET_X_LPARAM( lParam );
         lasty = y = GET_Y_LPARAM( lParam );

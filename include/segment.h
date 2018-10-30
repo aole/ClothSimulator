@@ -3,6 +3,9 @@
 
 #include <windows.h>
 #include <vector>
+#include <algorithm>
+
+using namespace std;
 
 class Shape;
 
@@ -95,6 +98,54 @@ public:
     void addSegment(Segment *s)
     {
         m_segments.push_back(s);
+    }
+
+    void removeVertex(Vertex *v)
+    {
+        Segment *a = NULL;
+        int ai = -1;
+        Segment *b = NULL;
+        int bi = -1;
+        for(Segment *seg: m_segments)
+        {
+            if(seg->at(0)==v)
+            {
+                if (!a)
+                {
+                    a = seg;
+                    ai = 1;
+                }
+                else
+                {
+                    b=seg;
+                    bi=1;
+                    break;
+                }
+            }
+            else if(seg->at(1)==v)
+            {
+                if (!a)
+                {
+                    a = seg;
+                    ai = 0;
+                }
+                else
+                {
+                    b=seg;
+                    bi = 0;
+                    break;
+                }
+            }
+        }
+
+        m_segments.push_back(new Segment(a->at(ai), b->at(bi), this));
+        m_segments.erase(std::remove(m_segments.begin(), m_segments.end(), a), m_segments.end());
+        m_segments.erase(std::remove(m_segments.begin(), m_segments.end(), b), m_segments.end());
+        delete a;
+        delete b;
+
+        m_vertices.erase(std::remove(m_vertices.begin(), m_vertices.end(), v), m_vertices.end());
+        delete v;
     }
 
     virtual ~Shape()

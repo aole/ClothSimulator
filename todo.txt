@@ -16,6 +16,7 @@ $$$$ 1. ability to move vertices
 16. save/load 2d shapes
 $$$$ 17. reset menu
 18. box select and move
-19. dissolve vertices
-20.
+$$$$ 19. dissolve/delete vertices
+20. permanant and multiple vertex selection
+21. pan and zoom 2d window
 
