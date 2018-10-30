@@ -11,10 +11,11 @@
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/linestring.hpp>
 
+#include <FreeImage.h>
+
 #include "segment.h"
 
 #define MIN_DISTANCE_SQUARE 16
-
 using namespace std;
 
 namespace bg = boost::geometry;
@@ -41,10 +42,31 @@ HPEN hpen_highlght = CreatePen(PS_SOLID,2,RGB(50,0,205));
 HBRUSH hbrush_background = CreateSolidBrush(RGB(200,200,200));
 
 int operation_mode = 0;
+FIBITMAP *background_image = NULL;
 
 void BWindow::setMode(int mode)
 {
     operation_mode = mode;
+}
+
+void BWindow::loadBackground(wchar_t* filename)
+{
+    FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+
+	// check the file signature and deduce its format
+	// (the second argument is currently not used by FreeImage)
+	fif = FreeImage_GetFileTypeU(filename, 0);
+	if(fif == FIF_UNKNOWN) {
+		// no signature ?
+		// try to guess the file format from the file extension
+		fif = FreeImage_GetFIFFromFilenameU(filename);
+	}
+	// check that the plugin has reading capabilities ...
+	if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif)) {
+		// ok, let's load the file
+		background_image = FreeImage_LoadU(fif, filename, 0);
+	}
+    InvalidateRect(hwnd, NULL, TRUE);
 }
 
 void cleanUp()
@@ -52,6 +74,8 @@ void cleanUp()
     for (Shape *s: shapes)
         delete s;
     shapes.clear();
+    if (background_image)
+        FreeImage_Unload(background_image);
 }
 
 void BWindow::reset()
@@ -230,7 +254,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     {
         if(painting)
         {
-            cout<<"break"<<endl;
+            cout<<"painting break"<<endl;
             break;
         }
         painting = TRUE;
@@ -250,6 +274,18 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         FillRect(memhdc,&Client_Rect, hbrush_background);
 
+        // render background image
+        if (background_image)
+        {
+            int w = FreeImage_GetWidth(background_image);
+            int h = FreeImage_GetHeight(background_image);
+
+            SetStretchBltMode(memhdc, COLORONCOLOR);
+            StretchDIBits(memhdc, 0, 0,
+                w, h,
+                0, 0, w, h,
+                FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
+        }
         SelectObject(memhdc, GetStockBrush(NULL_BRUSH));
         SelectObject(memhdc, GetStockObject(BLACK_PEN));
 

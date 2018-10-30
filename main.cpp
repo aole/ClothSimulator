@@ -25,6 +25,7 @@
 #define ID_FILE         20000
 #define ID_FILE_EXIT    20001
 #define ID_FILE_RESET   20002
+#define ID_FILE_BACKIMG 20003
 
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
@@ -45,7 +46,8 @@ void readPreferencesFile()
 {
     ifstream pref_file("pref.txt");
     string line;
-    while(getline(pref_file,line)){
+    while(getline(pref_file,line))
+    {
         int pos = line.find("=");
         if(pos<1)
             continue;
@@ -140,6 +142,7 @@ void CreateUI(HWND hWndParent)
     AppendMenu(hMenu, MF_POPUP, (UINT)hMenuFile, L"&File");
 
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_RESET, L"&Reset");
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMG, L"Background &Image...");
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_EXIT, L"E&xit");
 
     SetMenu(hWndParent, hMenu);
@@ -215,6 +218,24 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         case ID_FILE_EXIT:
             PostQuitMessage(0);
             break;
+        case ID_FILE_BACKIMG:
+        {
+            wchar_t filename[256];
+
+            OPENFILENAME ofn;
+            ZeroMemory(&ofn, sizeof(ofn));
+            ofn.lStructSize = sizeof (OPENFILENAME);
+            ofn.hwndOwner = hwnd;
+            ofn.nMaxFile = sizeof(filename);
+            ofn.lpstrFile = filename;
+            ofn.lpstrFile[0] = '\0';
+            ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+            if (GetOpenFileName(&ofn)==TRUE){
+                canvas.loadBackground(ofn.lpstrFile);
+            }
+        }
+        break;
         }
         InvalidateRect(hwnd, NULL, TRUE);
         break;

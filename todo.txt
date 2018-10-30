@@ -1,4 +1,8 @@
 $$$$ 1. ability to move vertices
+$$$$ 17. reset menu
+$$$$ 19. dissolve/delete vertices
+$$$$ 13. add background image in 2d window using menu
+
 2. create corresponding 3d shapes as the shape in 2d section
 3. delaunay-efy the 3d shapes
 4. CLOTHIFY!!!
@@ -9,14 +13,11 @@ $$$$ 1. ability to move vertices
 9. 3D grid
 10. undo/redo
 11. move the whole 2d shape
-12. create and fill shape
-13. add background image in 2d window using menu
+12. fill shape
 14. mirror?
 15. snap to grid
 16. save/load 2d shapes
-$$$$ 17. reset menu
 18. box select and move
-$$$$ 19. dissolve/delete vertices
 20. permanant and multiple vertex selection
 21. pan and zoom 2d window
-
+22. change background opacity

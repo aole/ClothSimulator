@@ -17,6 +17,8 @@ public:
 
     void reset();
 
+    void loadBackground(wchar_t *filename);
+
 protected:
 
 private:
