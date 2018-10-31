@@ -33,19 +33,15 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
-			<Add option="-m32" />
 			<Add option="-fexceptions" />
 			<Add option="-DUNICODE" />
 			<Add option="-DGLEW_STATIC" />
-			<Add option="-D_GLIBCXX_USE_WCHAR_T" />
-			<Add option="-D_GLIBCXX_USE_C99_WCHAR" />
 			<Add directory="C:/boost_1_68_0" />
 			<Add directory="C:/SDL2-2.0.8/i686-w64-mingw32/include" />
 			<Add directory="C:/glew-2.1.0/include" />
 			<Add directory="C:/Projects/FreeImage/Dist/x32" />
 		</Compiler>
 		<Linker>
-			<Add option="-m32" />
 			<Add library="glew32s" />
 			<Add library="opengl32" />
 			<Add library="mingw32" />
@@ -74,7 +70,6 @@
 		<Unit filename="include/glwindow.h" />
 		<Unit filename="include/segment.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="pref.txt" />
 		<Unit filename="src/btoolbar.cpp" />
 		<Unit filename="src/bwindow.cpp" />
 		<Unit filename="src/glwindow.cpp" />

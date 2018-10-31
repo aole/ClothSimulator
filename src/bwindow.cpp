@@ -16,6 +16,7 @@
 #include "segment.h"
 
 #define MIN_DISTANCE_SQUARE 16
+
 using namespace std;
 
 namespace bg = boost::geometry;
@@ -42,16 +43,20 @@ BLENDFUNCTION blendFn = {0};
 
 HPEN hpen_highlght = CreatePen(PS_SOLID,2,RGB(50,0,205));
 HBRUSH hbrush_background = CreateSolidBrush(RGB(200,200,200));
+HBRUSH hbrush_fill = CreateSolidBrush(RGB(255,255,255));
 
 int operation_mode = 0;
+
 FIBITMAP *background_image = NULL;
+int bg_width = 0;
+int bg_height = 0;
 
 void BWindow::setMode(int mode)
 {
     operation_mode = mode;
 }
 
-void BWindow::loadBackground(wchar_t* filename)
+void BWindow::loadBackground(wchar_t* filename, int background_opacity)
 {
     FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 
@@ -68,23 +73,46 @@ void BWindow::loadBackground(wchar_t* filename)
     if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif))
     {
         // ok, let's load the file
+        blendFn.BlendOp = AC_SRC_OVER;
+        blendFn.BlendFlags = 0;
+        blendFn.SourceConstantAlpha = background_opacity;
+        blendFn.AlphaFormat = 0; //AC_SRC_ALPHA;
+
         background_image = FreeImage_LoadU(fif, filename, 0);
+        bg_width = FreeImage_GetWidth(background_image);
+        bg_height = FreeImage_GetHeight(background_image);
     }
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
+void BWindow::clearBackground()
+{
+    if (background_image)
+    {
+        FreeImage_Unload(background_image);
+        background_image = NULL;
+    }
+    InvalidateRect(hwnd, NULL, TRUE);
+}
 void cleanUp()
 {
     for (Shape *s: shapes)
         delete s;
     shapes.clear();
+
     if (background_image)
+    {
         FreeImage_Unload(background_image);
+        background_image = NULL;
+    }
 }
 
 void BWindow::reset()
 {
-    cleanUp();
+    for (Shape *s: shapes)
+        delete s;
+    shapes.clear();
+
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
@@ -97,13 +125,9 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     {
     case WM_NCCREATE:
 
-        blendFn.BlendOp = AC_SRC_OVER;
-        blendFn.BlendFlags = 0;
-        blendFn.SourceConstantAlpha = 155;
-        blendFn.AlphaFormat = 0; //AC_SRC_ALPHA;
-
         SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) ((CREATESTRUCT*)lParam)->lpCreateParams);
         return DefWindowProc (hwnd, message, wParam, lParam);
+
     case WM_KEYDOWN:
         switch(wParam)
         {
@@ -284,38 +308,26 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         FillRect(memhdc,&Client_Rect, hbrush_background);
 
-        // render background image
-        if (background_image)
-        {
-            int w = FreeImage_GetWidth(background_image);
-            int h = FreeImage_GetHeight(background_image);
 
-            HDC bithdc = CreateCompatibleDC(hdc);
-            HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, w, h);
-            SelectObject(bithdc, bitbitmap);
-            SetStretchBltMode(bithdc, COLORONCOLOR);
-            StretchDIBits(bithdc, 0, 0,
-                          w, h,
-                          0, 0, w, h,
-                          FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
-
-            //BitBlt(memhdc, 0, 0, w, h, bithdc, 0, 0, SRCCOPY);
-
-            AlphaBlend(memhdc, 0,0,w,h,bithdc,0,0,w,h,blendFn);
-            DeleteObject(bitbitmap);
-            DeleteDC(bithdc);
-        }
-        SelectObject(memhdc, GetStockBrush(NULL_BRUSH));
+        SelectObject(memhdc, hbrush_fill);
         SelectObject(memhdc, GetStockObject(BLACK_PEN));
 
         // all shapes
         for (Shape *shape: shapes)
         {
+            int num_points = shape->m_segments.size()+1;
+            POINT points[num_points];
+            int i=0;
             for (Segment *seg: shape->m_segments)
             {
-                MoveToEx(memhdc, seg->getx(0), seg->gety(0), NULL);
-                LineTo(memhdc,seg->getx(1), seg->gety(1));
+                if(!i)
+                    //MoveToEx(memhdc, seg->getx(0), seg->gety(0), NULL);
+                    points[i++] = {seg->getx(0), seg->gety(0)};
+
+                //LineTo(memhdc,seg->getx(1), seg->gety(1));
+                points[i++] = {seg->getx(1), seg->gety(1)};
             };
+            Polygon(memhdc, points, num_points);
 
             if (operation_mode==2 || operation_mode==1)
             {
@@ -344,6 +356,23 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         if (mousedown && operation_mode==0)
         {
             Rectangle(memhdc, v1.m_x, v1.m_y, v2.m_x, v2.m_y);
+        }
+
+        // render background image
+        if (background_image)
+        {
+            HDC bithdc = CreateCompatibleDC(hdc);
+            HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, bg_height, bg_height);
+            SelectObject(bithdc, bitbitmap);
+            SetStretchBltMode(bithdc, COLORONCOLOR);
+            StretchDIBits(bithdc, 0, 0,
+                          bg_height, bg_height,
+                          0, 0, bg_height, bg_height,
+                          FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
+
+            AlphaBlend(memhdc, 0,0,bg_height,bg_height,bithdc,0,0,bg_height,bg_height,blendFn);
+            DeleteObject(bitbitmap);
+            DeleteDC(bithdc);
         }
 
         BitBlt(hdc, 0, 0, win_width, win_height, memhdc, 0, 0, SRCCOPY);

@@ -1,2 +1,4 @@
 width=1280
 height=720
+background_opacity=100
+shape_opacity=255

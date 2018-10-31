@@ -14,7 +14,7 @@ Vertex *Segment::splitAt(double Cx, double Cy)
     Vertex *nv = new Vertex(Dx,Dy, shape);
 
     shape->addVertex(nv);
-    shape->addSegment(new Segment(nv, at(1), shape));
+    shape->addSegment(new Segment(nv, at(1), shape), this);
 
     at(1) = nv;
 

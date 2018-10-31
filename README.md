@@ -1,6 +1,6 @@
 # ClothSimulator
 
-![Screenshot](screenshots/screenshot03.jpg?raw=true)
+![Screenshot](screenshots/screenshot04.jpg?raw=true)
 
 How to Compile
 --------------
@@ -13,3 +13,9 @@ Point to include and lib in your project.
 
 Download FreeImage(binaries): http://freeimage.sourceforge.net/download.html
 Point to include and lib in your project.
+
+Troubleshooting
+---------------
+UNICODE
+GLEW_STATIC
+WINVER>=0x0501 (for use of AlphaBlend)

@@ -17,10 +17,14 @@ public:
 
     void reset();
 
-    void loadBackground(wchar_t *filename);
+    void setShapeOpacity(int shape_opacity) { this->shape_opacity = shape_opacity; }
+    void loadBackground(wchar_t *filename, int background_opacity);
+    void clearBackground();
+
+    int shape_opacity = 255;
+    int background_opacity = 255;
 
 protected:
-
 private:
     int x=0,y=0,w=100,h=100;
     HWND hwnd;

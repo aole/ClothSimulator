@@ -75,10 +75,15 @@ public:
 
     Shape(Vertex &v1, Vertex &v2)
     {
-        Vertex *a = new Vertex(v1.m_x,v1.m_y, this);
-        Vertex *b = new Vertex(v2.m_x,v1.m_y, this);
-        Vertex *c = new Vertex(v2.m_x,v2.m_y, this);
-        Vertex *d = new Vertex(v1.m_x,v2.m_y, this);
+        double minx = min(v1.m_x, v2.m_x);
+        double maxx = max(v1.m_x, v2.m_x);
+        double miny = min(v1.m_y, v2.m_y);
+        double maxy = max(v1.m_y, v2.m_y);
+
+        Vertex *a = new Vertex(minx, miny, this);
+        Vertex *b = new Vertex(maxx, miny, this);
+        Vertex *c = new Vertex(maxx, maxy, this);
+        Vertex *d = new Vertex(minx, maxy, this);
         m_vertices.push_back(a);
         m_vertices.push_back(b);
         m_vertices.push_back(c);
@@ -98,6 +103,12 @@ public:
     void addSegment(Segment *s)
     {
         m_segments.push_back(s);
+    }
+
+    void addSegment(Segment *s, Segment *after)
+    {
+        auto it = std::find(m_segments.begin(),m_segments.end(), after);
+        m_segments.insert(it+1, s);
     }
 
     void removeVertex(Vertex *v)
