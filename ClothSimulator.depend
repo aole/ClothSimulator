@@ -15108,7 +15108,7 @@
 
 1533160258 c:\boost_1_68_0\boost\program_options\version.hpp
 
-1540995748 source:c:\projects\clothsimulator\main.cpp
+1541023137 source:c:\projects\clothsimulator\main.cpp
 	<tchar.h>
 	<windows.h>
 	<commctrl.h>
@@ -15125,7 +15125,7 @@
 	<windows.h>
 	<vector>
 
-1541000590 c:\projects\clothsimulator\include\bwindow.h
+1541022981 c:\projects\clothsimulator\include\bwindow.h
 	<windows.h>
 	<iostream>
 
@@ -15137,13 +15137,15 @@
 	<commctrl.h>
 	<iostream>
 
-1541000628 source:c:\projects\clothsimulator\src\bwindow.cpp
+1541023152 source:c:\projects\clothsimulator\src\bwindow.cpp
 	"bwindow.h"
 	<vector>
 	<list>
 	<windowsx.h>
 	<iostream>
 	<tchar.h>
+	<fstream>
+	<string>
 	<boost/geometry.hpp>
 	<boost/geometry/geometries/linestring.hpp>
 	<boost/geometry/geometries/register/point.hpp>
@@ -15152,10 +15154,12 @@
 	<FreeImage.h>
 	"segment.h"
 
-1540997347 c:\projects\clothsimulator\include\segment.h
+1541022846 c:\projects\clothsimulator\include\segment.h
 	<windows.h>
 	<vector>
 	<algorithm>
+	<fstream>
+	<string>
 
 1540848591 source:c:\projects\clothsimulator\src\glwindow.cpp
 	"glwindow.h"
@@ -15164,11 +15168,12 @@
 	<SDL2/SDL.h>
 	<gl/glew.h>
 
-1540999613 source:c:\projects\clothsimulator\src\segment.cpp
+1541022858 source:c:\projects\clothsimulator\src\segment.cpp
 	"segment.h"
 	<boost/geometry.hpp>
 	<boost/geometry/geometries/geometries.hpp>
 	<boost/geometry/geometries/polygon.hpp>
+	<sstream>
 
 1540918682 c:\projects\freeimage\dist\x32\freeimage.h
 	<wchar.h>

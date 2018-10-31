@@ -5,6 +5,8 @@
 #include <windowsx.h>
 #include <iostream>
 #include <tchar.h>
+#include <fstream>
+#include <string>
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
@@ -53,13 +55,95 @@ FIBITMAP *background_image = NULL;
 int bg_width = 0;
 int bg_height = 0;
 
+void cleanUp()
+{
+    for (Shape *s: shapes)
+        delete s;
+    shapes.clear();
+
+    if (background_image)
+    {
+        FreeImage_Unload(background_image);
+        background_image = NULL;
+    }
+}
+
+void BWindow::save(wchar_t* filename)
+{
+    std::wstring wsf(filename);
+    std::string sf(wsf.begin(), wsf.end());
+    std::wofstream outfile;
+    outfile.open(sf.c_str());
+    if(!outfile.is_open())
+    {
+        std::wcerr << "Couldn't open "<< filename << std::endl;
+        return;
+    }
+
+    outfile << L"image=" << std::wstring(image_file) << std::endl;
+    for(Shape *s: shapes)
+    {
+        outfile << L"shape=" << s->getName() << std::endl;
+        s->save(outfile);
+    }
+    outfile.close();
+}
+
+void BWindow::load(wchar_t* filename)
+{
+    std::wstring wsf(filename);
+    std::string sf(wsf.begin(), wsf.end());
+    std::wifstream outfile;
+    outfile.open(sf.c_str());
+    if(!outfile.is_open())
+    {
+        std::wcerr << "Couldn't open "<< filename << std::endl;
+        return;
+    }
+
+    cleanUp();
+
+    std::wstring line;
+    Shape *shape = NULL;
+    while(std::getline(outfile,line))
+    {
+
+        int pos = line.find(L"=");
+        if(pos<1)
+            continue;
+        wstring key = line.substr(0,pos);
+        boost::trim(key);
+        wstring value = line.substr(pos+1,-1);
+        boost::trim(value);
+        if (key==L"shape")
+        {
+            shape = new Shape();
+            shapes.push_back(shape);
+        }
+        else if (key==L"image")
+        {
+            if(value.size())
+            {
+                wcsncpy(image_file, value.c_str(), 256);
+                loadImage(image_file);
+            }
+        } else {
+            if(shape){
+                shape->process(key, value);
+            }
+        }
+    }
+}
+
 void BWindow::setMode(int mode)
 {
     operation_mode = mode;
 }
 
-void BWindow::loadImage(wchar_t* filename, int background_opacity)
+void BWindow::loadImage(wchar_t* filename)
 {
+    wcsncpy(image_file, filename, 256);
+
     FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 
     // check the file signature and deduce its format
@@ -77,7 +161,7 @@ void BWindow::loadImage(wchar_t* filename, int background_opacity)
         // ok, let's load the file
         blendFn.BlendOp = AC_SRC_OVER;
         blendFn.BlendFlags = 0;
-        blendFn.SourceConstantAlpha = background_opacity;
+        blendFn.SourceConstantAlpha = image_opacity;
         blendFn.AlphaFormat = 0; //AC_SRC_ALPHA;
 
         background_image = FreeImage_LoadU(fif, filename, 0);
@@ -95,18 +179,6 @@ void BWindow::clearImage()
         background_image = NULL;
     }
     InvalidateRect(hwnd, NULL, TRUE);
-}
-void cleanUp()
-{
-    for (Shape *s: shapes)
-        delete s;
-    shapes.clear();
-
-    if (background_image)
-    {
-        FreeImage_Unload(background_image);
-        background_image = NULL;
-    }
 }
 
 void BWindow::reset()

@@ -17,19 +17,24 @@ public:
 
     void reset();
 
+    void save(wchar_t *filename);
+    void load(wchar_t *filename);
+
     void setShapeFill(int shape_fill) { this->shape_fill = shape_fill; }
     void setShapeOpacity(int shape_opacity) { this->shape_opacity = shape_opacity; }
-    void loadImage(wchar_t *filename, int background_opacity);
+    void setImageOpacity(int image_opacity) { this->image_opacity = image_opacity; }
+    void loadImage(wchar_t *filename);
     void clearImage();
 
     int shape_fill = 1;
     int shape_opacity = 255;
-    int background_opacity = 255;
+    int image_opacity = 255;
 
 protected:
 private:
     int x=0,y=0,w=100,h=100;
     HWND hwnd;
+    wchar_t image_file[256];
 };
 
 #endif // BWINDOW_H

@@ -20,7 +20,8 @@ $$$$ 11. move the whole 2d shape
 16. save/load 2d shapes
 18. box select and move
 20. permanent and multiple vertex selection
-21. pan and zoom 2d window
+21. pan 2d view with MMB
 23. icons!
 25. non-modal dialog to change preferences.
 26. shape opacity
+27. zoom 2d view

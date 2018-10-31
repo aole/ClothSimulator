@@ -1,6 +1,6 @@
 # ClothSimulator
 
-![Screenshot](screenshots/screenshot04.jpg?raw=true)
+![Screenshot](screenshots/screenshot05.jpg?raw=true)
 
 Features
 --------
@@ -8,14 +8,17 @@ Create Rectangle / Move:
 Click and Drag LMB on an empty area to create a rectangle in the 2D window.
 Click and Drag LMB on a shape to move it.
 
-Create / Move Vertices:
+Create / Move / Delete Vertices:
 Click and Drag LMB over an existing vertex to move it.
 Click on a segment to create a vertex there (the new vertex will be in drag mode).
+Click and Hold LMB over the vertex and click Delete key to dissolve the vertex.
 
 Move Segments:
 Click and Drag LMB over a line segment to move it.
 
 Open an image file to display it over the 2D window.
+
+Save and Load 2D Shapes (with background) to a text file.
 
 Preferences file: set background image opacity. set shape fill/no fill.
 

@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <vector>
 #include <algorithm>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -73,6 +75,12 @@ public:
     std::vector<Vertex*> m_vertices;
     std::vector<Segment*> m_segments;
 
+    wstring getName() { return L"SHAPE"; }
+
+    void save(std::wofstream &stream);
+
+    Shape() {}
+
     Shape(Vertex &v1, Vertex &v2)
     {
         double minx = min(v1.m_x, v2.m_x);
@@ -94,6 +102,8 @@ public:
         m_segments.push_back(new Segment(c, d, this));
         m_segments.push_back(new Segment(d, a, this));
     }
+
+    void process(std::wstring key, std::wstring value);
 
     void addVertex(Vertex *v)
     {

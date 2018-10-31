@@ -27,6 +27,8 @@
 #define ID_FILE_RESET       20002
 #define ID_FILE_BACKIMG     20003
 #define ID_FILE_BACKIMGREM  20004
+#define ID_FILE_SAVE        20005
+#define ID_FILE_LOAD        20006
 
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
@@ -151,6 +153,9 @@ void CreateUI(HWND hWndParent)
     hMenuFile = CreatePopupMenu();
     AppendMenu(hMenu, MF_POPUP, (UINT)hMenuFile, L"&File");
 
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_LOAD, L"&Load...");
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_SAVE, L"&Save...");
+
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_RESET, L"&Reset");
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMG, L"&Image...");
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMGREM, L"Remove Image");
@@ -225,6 +230,45 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
         case ID_MOVE_SEGMENT:
             canvas.setMode(2);
             break;
+        case ID_FILE_SAVE:
+        {
+            wchar_t filename[256];
+
+            OPENFILENAME ofn;
+            ZeroMemory(&ofn, sizeof(ofn));
+            ofn.lStructSize = sizeof (OPENFILENAME);
+            ofn.hwndOwner = hwnd;
+            ofn.nMaxFile = sizeof(filename);
+            ofn.lpstrFile = filename;
+            ofn.lpstrFile[0] = '\0';
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_HIDEREADONLY |OFN_NOREADONLYRETURN;
+
+            if (GetOpenFileName(&ofn)==TRUE)
+            {
+                canvas.save(ofn.lpstrFile);
+            }
+        }
+        break;
+        case ID_FILE_LOAD:
+        {
+            wchar_t filename[256];
+
+            OPENFILENAME ofn;
+            ZeroMemory(&ofn, sizeof(ofn));
+            ofn.lStructSize = sizeof (OPENFILENAME);
+            ofn.hwndOwner = hwnd;
+            ofn.nMaxFile = sizeof(filename);
+            ofn.lpstrFile = filename;
+            ofn.lpstrFile[0] = '\0';
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+            if (GetOpenFileName(&ofn)==TRUE)
+            {
+                canvas.setImageOpacity(image_opacity);
+                canvas.load(ofn.lpstrFile);
+            }
+        }
+        break;
         case ID_FILE_RESET:
             canvas.reset();
             break;
@@ -247,8 +291,10 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             ofn.lpstrFile[0] = '\0';
             ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
 
-            if (GetOpenFileName(&ofn)==TRUE){
-                canvas.loadImage(ofn.lpstrFile, image_opacity);
+            if (GetOpenFileName(&ofn)==TRUE)
+            {
+                canvas.setImageOpacity(image_opacity);
+                canvas.loadImage(ofn.lpstrFile);
             }
         }
         break;
