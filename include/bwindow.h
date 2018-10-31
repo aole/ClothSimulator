@@ -17,10 +17,12 @@ public:
 
     void reset();
 
+    void setShapeFill(int shape_fill) { this->shape_fill = shape_fill; }
     void setShapeOpacity(int shape_opacity) { this->shape_opacity = shape_opacity; }
-    void loadBackground(wchar_t *filename, int background_opacity);
-    void clearBackground();
+    void loadImage(wchar_t *filename, int background_opacity);
+    void clearImage();
 
+    int shape_fill = 1;
     int shape_opacity = 255;
     int background_opacity = 255;
 

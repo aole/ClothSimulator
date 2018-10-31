@@ -111,6 +111,13 @@ public:
         m_segments.insert(it+1, s);
     }
 
+    void translate(double x, double y) {
+        for(Vertex *v: m_vertices)
+            v->addPoint(x, y);
+    }
+
+    bool within(Vertex *p);
+
     void removeVertex(Vertex *v)
     {
         Segment *a = NULL;

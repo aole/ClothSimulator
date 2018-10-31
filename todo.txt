@@ -4,6 +4,7 @@ $$$$ 19. dissolve/delete vertices
 $$$$ 13. add background image in 2d window using menu
 $$$$ 22. change background opacity (changed in pref.txt)
 $$$$ 12. fill shape
+$$$$ 11. move the whole 2d shape
 
 2. create corresponding 3d shapes as the shape in 2d section
 3. delaunay-efy the 2/3d shapes
@@ -14,7 +15,6 @@ $$$$ 12. fill shape
 8. 2D grid
 9. 3D grid
 10. undo/redo
-11. move the whole 2d shape
 14. mirror?
 15. snap to grid
 16. save/load 2d shapes

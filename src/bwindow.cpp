@@ -10,6 +10,7 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/register/linestring.hpp>
+#include <boost/foreach.hpp>
 
 #include <FreeImage.h>
 
@@ -27,6 +28,7 @@ BOOST_GEOMETRY_REGISTER_LINESTRING(Segment);
 
 std::vector<Segment> segments;
 
+Shape *highlighted_shape = NULL;
 Segment *highlighted_segment = NULL;
 Vertex *highlighted_vertex = NULL;
 
@@ -56,7 +58,7 @@ void BWindow::setMode(int mode)
     operation_mode = mode;
 }
 
-void BWindow::loadBackground(wchar_t* filename, int background_opacity)
+void BWindow::loadImage(wchar_t* filename, int background_opacity)
 {
     FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 
@@ -85,7 +87,7 @@ void BWindow::loadBackground(wchar_t* filename, int background_opacity)
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
-void BWindow::clearBackground()
+void BWindow::clearImage()
 {
     if (background_image)
     {
@@ -152,9 +154,24 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         lasty = y = GET_Y_LPARAM( lParam );
         if (operation_mode==0) // start rectangle
         {
-            v1.set(x,y);
-            v2.set(x,y);
-            InvalidateRect(hwnd, NULL, TRUE);
+            Vertex mouse_point(x, y);
+            // check if inside a shape, then start move
+            highlighted_shape = NULL;
+            BOOST_REVERSE_FOREACH(Shape *shape, shapes)
+            {
+                if(shape->within(&mouse_point))
+                {
+                    highlighted_shape = shape;
+                    break;
+                }
+            }
+            if (!highlighted_shape)
+            {
+                // start creating rectangle shape
+                v1.set(x,y);
+                v2.set(x,y);
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
         }
         else if (operation_mode==1) // add vertex
         {
@@ -199,7 +216,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         break;
     case WM_LBUTTONUP:
         ReleaseCapture();
-        if (mousedown && operation_mode==0)
+        if (mousedown && operation_mode==0 && !highlighted_shape)
         {
             x = GET_X_LPARAM( lParam );
             y = GET_Y_LPARAM( lParam );
@@ -236,7 +253,11 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         // create rectangle
         if (mousedown && operation_mode==0)
         {
-            v2.set(x,y);
+            if(highlighted_shape)
+                highlighted_shape->translate(x-lastx, y-lasty);
+            else
+                v2.set(x,y);
+
             InvalidateRect(hwnd, NULL, TRUE);
         }
         // highlight segments
@@ -320,14 +341,20 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             int i=0;
             for (Segment *seg: shape->m_segments)
             {
-                if(!i)
-                    //MoveToEx(memhdc, seg->getx(0), seg->gety(0), NULL);
-                    points[i++] = {seg->getx(0), seg->gety(0)};
-
-                //LineTo(memhdc,seg->getx(1), seg->gety(1));
-                points[i++] = {seg->getx(1), seg->gety(1)};
+                if(wndptr->shape_fill)
+                {
+                    if(!i)
+                        points[i++] = {seg->getx(0), seg->gety(0)};
+                    points[i++] = {seg->getx(1), seg->gety(1)};
+                }
+                else
+                {
+                    MoveToEx(memhdc, seg->getx(0), seg->gety(0), NULL);
+                    LineTo(memhdc,seg->getx(1), seg->gety(1));
+                }
             };
-            Polygon(memhdc, points, num_points);
+            if(wndptr->shape_fill)
+                Polygon(memhdc, points, num_points);
 
             if (operation_mode==2 || operation_mode==1)
             {
@@ -352,10 +379,19 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             LineTo(memhdc, x2,y2);
         }
 
-        // temporary rectangle
-        if (mousedown && operation_mode==0)
+        // temporary (while creating) rectangle
+        if (mousedown && operation_mode==0 && !highlighted_shape)
         {
-            Rectangle(memhdc, v1.m_x, v1.m_y, v2.m_x, v2.m_y);
+            if(wndptr->shape_fill)
+                Rectangle(memhdc, v1.m_x, v1.m_y, v2.m_x, v2.m_y);
+            else
+            {
+                MoveToEx(memhdc, v1.m_x, v1.m_y, NULL);
+                LineTo(memhdc, v2.m_x, v1.m_y);
+                LineTo(memhdc, v2.m_x, v2.m_y);
+                LineTo(memhdc, v1.m_x, v2.m_y);
+                LineTo(memhdc, v1.m_x, v1.m_y);
+            }
         }
 
         // render background image

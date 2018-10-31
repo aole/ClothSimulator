@@ -42,8 +42,9 @@ using namespace std;
 
 int window_width = 800;
 int window_height = 600;
-int background_opacity = 255;
+int image_opacity = 255;
 int shape_opacity = 255;
+int shape_fill=1;
 
 void readPreferencesFile()
 {
@@ -63,10 +64,12 @@ void readPreferencesFile()
             window_width = boost::lexical_cast<int>(value);
         else if (key=="height")
             window_height = boost::lexical_cast<int>(value);
-        else if (key=="background_opacity")
-            background_opacity = boost::lexical_cast<int>(value);
+        else if (key=="image_opacity")
+            image_opacity = boost::lexical_cast<int>(value);
         else if (key=="shape_opacity")
             shape_opacity = boost::lexical_cast<int>(value);
+        else if (key=="shape_fill")
+            shape_fill = boost::lexical_cast<int>(value);
     }
 }
 
@@ -149,8 +152,8 @@ void CreateUI(HWND hWndParent)
     AppendMenu(hMenu, MF_POPUP, (UINT)hMenuFile, L"&File");
 
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_RESET, L"&Reset");
-    AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMG, L"Background &Image...");
-    AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMGREM, L"Remove Background");
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMG, L"&Image...");
+    AppendMenu(hMenuFile, MF_STRING, ID_FILE_BACKIMGREM, L"Remove Image");
     AppendMenu(hMenuFile, MF_STRING, ID_FILE_EXIT, L"E&xit");
 
     SetMenu(hWndParent, hMenu);
@@ -172,6 +175,7 @@ void CreateUI(HWND hWndParent)
                    wrect.right-wrect.left,
                    wrect.bottom-wrect.top-(tbrect.bottom-tbrect.top));
     canvas.create(hWndParent, hInstance);
+    canvas.setShapeFill(shape_fill);
     canvas.setShapeOpacity(shape_opacity);
 
     // opengl window
@@ -228,7 +232,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             PostQuitMessage(0);
             break;
         case ID_FILE_BACKIMGREM:
-            canvas.clearBackground();
+            canvas.clearImage();
             break;
         case ID_FILE_BACKIMG:
         {
@@ -244,7 +248,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
 
             if (GetOpenFileName(&ofn)==TRUE){
-                canvas.loadBackground(ofn.lpstrFile, background_opacity);
+                canvas.loadImage(ofn.lpstrFile, image_opacity);
             }
         }
         break;
