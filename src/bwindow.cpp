@@ -46,6 +46,8 @@ bool painting;
 BLENDFUNCTION blendFn = {0};
 
 HPEN hpen_highlght = CreatePen(PS_SOLID,2,RGB(50,0,205));
+HPEN hpen_shape_grid = CreatePen(PS_SOLID, 1, RGB(150, 150, 150));
+
 HBRUSH hbrush_background = CreateSolidBrush(RGB(200,200,200));
 HBRUSH hbrush_fill = CreateSolidBrush(RGB(255,255,255));
 
@@ -138,6 +140,7 @@ void BWindow::load(wchar_t* filename)
 void BWindow::setMode(int mode)
 {
     operation_mode = mode;
+    InvalidateRect(hwnd, NULL, TRUE);
 }
 
 void BWindow::loadImage(wchar_t* filename)
@@ -408,6 +411,13 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         // all shapes
         for (Shape *shape: shapes)
         {
+            // render shape grid
+            SelectObject(memhdc, hpen_shape_grid);
+            shape->RenderGrid(memhdc);
+
+            // render shape outline
+            SelectObject(memhdc, GetStockObject(BLACK_PEN));
+
             int num_points = shape->m_segments.size()+1;
             POINT points[num_points];
             int i=0;
@@ -416,15 +426,16 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 if(wndptr->shape_fill)
                 {
                     if(!i)
-                        points[i++] = {seg->getx(0), seg->gety(0)};
-                    points[i++] = {seg->getx(1), seg->gety(1)};
+                        points[i++] = {(int)seg->getx(0), (int)seg->gety(0)};
+                    points[i++] = {(int)seg->getx(1), (int)seg->gety(1)};
                 }
                 else
                 {
-                    MoveToEx(memhdc, seg->getx(0), seg->gety(0), NULL);
-                    LineTo(memhdc,seg->getx(1), seg->gety(1));
+                    MoveToEx(memhdc, (int)seg->getx(0), (int)seg->gety(0), NULL);
+                    LineTo(memhdc, (int)seg->getx(1), (int)seg->gety(1));
                 }
             };
+
             if(wndptr->shape_fill)
                 Polygon(memhdc, points, num_points);
 
@@ -432,9 +443,10 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             {
                 for (Vertex *v: shape->m_vertices)
                 {
-                    Ellipse(memhdc, v->m_x-3, v->m_y-3,v->m_x+3, v->m_y+3);
+                    Ellipse(memhdc, (int)v->m_x-3, (int)v->m_y-3, (int)v->m_x+3, (int)v->m_y+3);
                 }
             }
+
         }
 
         // highlighted segment
@@ -455,14 +467,14 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         if (mousedown && operation_mode==0 && !highlighted_shape)
         {
             if(wndptr->shape_fill)
-                Rectangle(memhdc, v1.m_x, v1.m_y, v2.m_x, v2.m_y);
+                Rectangle(memhdc, (int)v1.m_x, (int)v1.m_y, (int)v2.m_x, (int)v2.m_y);
             else
             {
-                MoveToEx(memhdc, v1.m_x, v1.m_y, NULL);
-                LineTo(memhdc, v2.m_x, v1.m_y);
-                LineTo(memhdc, v2.m_x, v2.m_y);
-                LineTo(memhdc, v1.m_x, v2.m_y);
-                LineTo(memhdc, v1.m_x, v1.m_y);
+                MoveToEx(memhdc, (int)v1.m_x, (int)v1.m_y, NULL);
+                LineTo(memhdc, (int)v2.m_x, (int)v1.m_y);
+                LineTo(memhdc, (int)v2.m_x, (int)v2.m_y);
+                LineTo(memhdc, (int)v1.m_x, (int)v2.m_y);
+                LineTo(memhdc, (int)v1.m_x, (int)v1.m_y);
             }
         }
 

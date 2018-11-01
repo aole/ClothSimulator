@@ -103,6 +103,8 @@ public:
         m_segments.push_back(new Segment(d, a, this));
     }
 
+    void RenderGrid(HDC hdc);
+
     void process(std::wstring key, std::wstring value);
 
     void addVertex(Vertex *v)

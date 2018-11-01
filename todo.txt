@@ -5,23 +5,28 @@ $$$$ 13. add background image in 2d window using menu
 $$$$ 22. change background opacity (changed in pref.txt)
 $$$$ 12. fill shape
 $$$$ 11. move the whole 2d shape
+$$$$ 16. save/load 2d shapes
+$$$$ 8. 2D grid
 
+28. add a ground plane.
+5. 3d view
 2. create corresponding 3d shapes as the shape in 2d section
-3. delaunay-efy the 2/3d shapes
 4. CLOTHIFY!!!
-5. add 3d view
+29. run simulation
+30. stitch edges
+31. export obj
+21. pan 2d view with MMB
+10. undo/redo
 6. add lights
 7. CODE CLEANUP!!!
-8. 2D grid
-9. 3D grid
-10. undo/redo
 14. mirror?
 15. snap to grid
-16. save/load 2d shapes
 18. box select and move
 20. permanent and multiple vertex selection
-21. pan 2d view with MMB
 23. icons!
-25. non-modal dialog to change preferences.
-26. shape opacity
-27. zoom 2d view
+24. non-modal dialog to change preferences.
+25. shape opacity
+26. zoom 2d view
+27. delete whole shape
+32. CODE EFFICIENCY!!!
+33. 

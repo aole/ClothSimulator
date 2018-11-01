@@ -4,6 +4,8 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+#include <boost/foreach.hpp>
+
 #include <sstream>
 
 typedef boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> point_t;
@@ -68,5 +70,62 @@ void Shape::process(std::wstring key, std::wstring value)
         stm >> a >> b;
 
         m_segments.push_back(new Segment(m_vertices[a], m_vertices[b], this));
+    }
+}
+
+void Shape::RenderGrid(HDC hdc)
+{
+    // create grid
+    Vertex *x0, *y0, *xe, *ye;
+    x0 = y0 = xe = ye = NULL;
+    // find left most point = x0
+    // find top most point = y0
+    // find right most point = xe
+    // find bottom most point = ye
+    for(Vertex *v: m_vertices) {
+        if(!x0) {
+            x0 = y0 = xe = ye = v;
+            continue;
+        }
+        if(v->m_x < x0->m_x)
+            x0 = v;
+        if(v->m_x > xe->m_x)
+            xe = v;
+        if(v->m_y < y0->m_y)
+            y0 = v;
+        if(v->m_y > ye->m_y)
+            ye = v;
+    }
+    polygon_type main_shape;
+    for(Segment *s: m_segments){
+        boost::geometry::append(main_shape.outer(), point_t(s->at(0)->m_x, s->at(0)->m_y));
+    }
+
+    // distance between points = d
+    double d = 20;
+
+    // find intersecting polygons between each cell and the main shape
+    for(double y=y0->m_y; y<ye->m_y; y += d) {
+        for(double x=x0->m_x; x<xe->m_x; x += d) {
+            polygon_type cell;
+            boost::geometry::append(cell.outer(), point_t(x, y));
+            boost::geometry::append(cell.outer(), point_t(x+d, y));
+            boost::geometry::append(cell.outer(), point_t(x+d, y+d));
+            boost::geometry::append(cell.outer(), point_t(x, y+d));
+
+            std::vector<polygon_type> intersected_polys;
+            boost::geometry::intersection(main_shape, cell, intersected_polys);
+
+            for(polygon_type poly: intersected_polys) {
+                auto itb = boost::begin(boost::geometry::exterior_ring(poly));
+                MoveToEx(hdc, (int)boost::geometry::get<0>(*itb), (int)boost::geometry::get<1>(*itb), NULL);
+                for(auto it = boost::begin(boost::geometry::exterior_ring(poly))+1; it != boost::end(boost::geometry::exterior_ring(poly)); ++it)
+                {
+                    double px = boost::geometry::get<0>(*it);
+                    double py = boost::geometry::get<1>(*it);
+                    LineTo(hdc, (int)(px), (int)(py));
+                }
+            }
+        }
     }
 }
