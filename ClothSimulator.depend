@@ -15161,7 +15161,7 @@
 	<fstream>
 	<string>
 
-1541086956 source:c:\projects\clothsimulator\src\glwindow.cpp
+1541088724 source:c:\projects\clothsimulator\src\glwindow.cpp
 	"glwindow.h"
 	<iostream>
 	<cstdio>
@@ -15170,6 +15170,10 @@
 	<sstream>
 	<SDL2/SDL.h>
 	<gl/glew.h>
+	<glm/vec3.hpp>
+	<glm/vec4.hpp>
+	<glm/mat4x4.hpp>
+	<glm/gtc/matrix_transform.hpp>
 
 1541079459 source:c:\projects\clothsimulator\src\segment.cpp
 	"segment.h"
@@ -15182,4 +15186,625 @@
 1540918682 c:\projects\freeimage\dist\x32\freeimage.h
 	<wchar.h>
 	<inttypes.h>
+
+1533822423 c:\projects\glm\glm\vec3.hpp
+	"./ext/vector_bool3.hpp"
+	"./ext/vector_bool3_precision.hpp"
+	"./ext/vector_float3.hpp"
+	"./ext/vector_float3_precision.hpp"
+	"./ext/vector_double3.hpp"
+	"./ext/vector_double3_precision.hpp"
+	"./ext/vector_int3.hpp"
+	"./ext/vector_int3_precision.hpp"
+	"./ext/vector_uint3.hpp"
+	"./ext/vector_uint3_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_bool3.hpp
+	"../detail/type_vec3.hpp"
+
+1540995841 c:\projects\glm\glm\detail\type_vec3.hpp
+	"qualifier.hpp"
+	"_swizzle.hpp"
+	"_swizzle_func.hpp"
+	<cstddef>
+	"type_vec3.inl"
+
+1537206526 c:\projects\glm\glm\detail\qualifier.hpp
+	"setup.hpp"
+
+1540995841 c:\projects\glm\glm\detail\setup.hpp
+	<cassert>
+	<cstddef>
+	"../simd/platform.h"
+	<cstdint>
+	<type_traits>
+
+1535535170 c:\projects\glm\glm\simd\platform.h
+	<cuda.h>
+	<immintrin.h>
+	<immintrin.h>
+	<popcntintrin.h>
+	<nmmintrin.h>
+	<smmintrin.h>
+	<tmmintrin.h>
+	<pmmintrin.h>
+	<emmintrin.h>
+
+1535535170 c:\projects\glm\glm\detail\_swizzle.hpp
+
+1535535170 c:\projects\glm\glm\detail\_swizzle_func.hpp
+
+1540995841 c:\projects\glm\glm\detail\type_vec3.inl
+	"compute_vector_relational.hpp"
+
+1533822421 c:\projects\glm\glm\detail\compute_vector_relational.hpp
+	"setup.hpp"
+	<limits>
+
+1537180351 c:\projects\glm\glm\ext\vector_bool3_precision.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_float3.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_float3_precision.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_double3.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_double3_precision.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_int3.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_int3_precision.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_uint3.hpp
+	"../detail/type_vec3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_uint3_precision.hpp
+	"../detail/type_vec3.hpp"
+
+1533822423 c:\projects\glm\glm\vec4.hpp
+	"./ext/vector_bool4.hpp"
+	"./ext/vector_bool4_precision.hpp"
+	"./ext/vector_float4.hpp"
+	"./ext/vector_float4_precision.hpp"
+	"./ext/vector_double4.hpp"
+	"./ext/vector_double4_precision.hpp"
+	"./ext/vector_int4.hpp"
+	"./ext/vector_int4_precision.hpp"
+	"./ext/vector_uint4.hpp"
+	"./ext/vector_uint4_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_bool4.hpp
+	"../detail/type_vec4.hpp"
+
+1540995841 c:\projects\glm\glm\detail\type_vec4.hpp
+	"qualifier.hpp"
+	"_swizzle.hpp"
+	"_swizzle_func.hpp"
+	<cstddef>
+	"type_vec4.inl"
+
+1540995841 c:\projects\glm\glm\detail\type_vec4.inl
+	"compute_vector_relational.hpp"
+	"type_vec4_simd.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_vec4_simd.inl
+
+1537180351 c:\projects\glm\glm\ext\vector_bool4_precision.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_float4.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_float4_precision.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_double4.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_double4_precision.hpp
+	"../detail/setup.hpp"
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_int4.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_int4_precision.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_uint4.hpp
+	"../detail/type_vec4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_uint4_precision.hpp
+	"../detail/type_vec4.hpp"
+
+1533822422 c:\projects\glm\glm\mat4x4.hpp
+	"./ext/matrix_double4x4.hpp"
+	"./ext/matrix_double4x4_precision.hpp"
+	"./ext/matrix_float4x4.hpp"
+	"./ext/matrix_float4x4_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double4x4.hpp
+	"../detail/type_mat4x4.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat4x4.hpp
+	"type_vec4.hpp"
+	<limits>
+	<cstddef>
+	"type_mat4x4.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat4x4.inl
+	"../matrix.hpp"
+	"type_mat4x4_simd.inl"
+
+1537180351 c:\projects\glm\glm\matrix.hpp
+	"detail/qualifier.hpp"
+	"detail/setup.hpp"
+	"vec2.hpp"
+	"vec3.hpp"
+	"vec4.hpp"
+	"mat2x2.hpp"
+	"mat2x3.hpp"
+	"mat2x4.hpp"
+	"mat3x2.hpp"
+	"mat3x3.hpp"
+	"mat3x4.hpp"
+	"mat4x2.hpp"
+	"mat4x3.hpp"
+	"mat4x4.hpp"
+	"detail/func_matrix.inl"
+
+1533822423 c:\projects\glm\glm\vec2.hpp
+	"./ext/vector_bool2.hpp"
+	"./ext/vector_bool2_precision.hpp"
+	"./ext/vector_float2.hpp"
+	"./ext/vector_float2_precision.hpp"
+	"./ext/vector_double2.hpp"
+	"./ext/vector_double2_precision.hpp"
+	"./ext/vector_int2.hpp"
+	"./ext/vector_int2_precision.hpp"
+	"./ext/vector_uint2.hpp"
+	"./ext/vector_uint2_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_bool2.hpp
+	"../detail/type_vec2.hpp"
+
+1540995841 c:\projects\glm\glm\detail\type_vec2.hpp
+	"qualifier.hpp"
+	"_swizzle.hpp"
+	"_swizzle_func.hpp"
+	<cstddef>
+	"type_vec2.inl"
+
+1540995841 c:\projects\glm\glm\detail\type_vec2.inl
+	"./compute_vector_relational.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_bool2_precision.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_float2.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_float2_precision.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_double2.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_double2_precision.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_int2.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_int2_precision.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_uint2.hpp
+	"../detail/type_vec2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\vector_uint2_precision.hpp
+	"../detail/type_vec2.hpp"
+
+1533822422 c:\projects\glm\glm\mat2x2.hpp
+	"./ext/matrix_double2x2.hpp"
+	"./ext/matrix_double2x2_precision.hpp"
+	"./ext/matrix_float2x2.hpp"
+	"./ext/matrix_float2x2_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double2x2.hpp
+	"../detail/type_mat2x2.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat2x2.hpp
+	"type_vec2.hpp"
+	<limits>
+	<cstddef>
+	"type_mat2x2.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat2x2.inl
+	"../matrix.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double2x2_precision.hpp
+	"../detail/type_mat2x2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float2x2.hpp
+	"../detail/type_mat2x2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float2x2_precision.hpp
+	"../detail/type_mat2x2.hpp"
+
+1533822422 c:\projects\glm\glm\mat2x3.hpp
+	"./ext/matrix_double2x3.hpp"
+	"./ext/matrix_double2x3_precision.hpp"
+	"./ext/matrix_float2x3.hpp"
+	"./ext/matrix_float2x3_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double2x3.hpp
+	"../detail/type_mat2x3.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat2x3.hpp
+	"type_vec2.hpp"
+	"type_vec3.hpp"
+	<limits>
+	<cstddef>
+	"type_mat2x3.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat2x3.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double2x3_precision.hpp
+	"../detail/type_mat2x3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float2x3.hpp
+	"../detail/type_mat2x3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float2x3_precision.hpp
+	"../detail/type_mat2x3.hpp"
+
+1533822422 c:\projects\glm\glm\mat2x4.hpp
+	"./ext/matrix_double2x4.hpp"
+	"./ext/matrix_double2x4_precision.hpp"
+	"./ext/matrix_float2x4.hpp"
+	"./ext/matrix_float2x4_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double2x4.hpp
+	"../detail/type_mat2x4.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat2x4.hpp
+	"type_vec2.hpp"
+	"type_vec4.hpp"
+	<limits>
+	<cstddef>
+	"type_mat2x4.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat2x4.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double2x4_precision.hpp
+	"../detail/type_mat2x4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float2x4.hpp
+	"../detail/type_mat2x4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float2x4_precision.hpp
+	"../detail/type_mat2x4.hpp"
+
+1533822422 c:\projects\glm\glm\mat3x2.hpp
+	"./ext/matrix_double3x2.hpp"
+	"./ext/matrix_double3x2_precision.hpp"
+	"./ext/matrix_float3x2.hpp"
+	"./ext/matrix_float3x2_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double3x2.hpp
+	"../detail/type_mat3x2.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat3x2.hpp
+	"type_vec2.hpp"
+	"type_vec3.hpp"
+	<limits>
+	<cstddef>
+	"type_mat3x2.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat3x2.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double3x2_precision.hpp
+	"../detail/type_mat3x2.hpp"
+
+1535535170 c:\projects\glm\glm\ext\matrix_float3x2.hpp
+	"../detail/type_mat3x2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float3x2_precision.hpp
+	"../detail/type_mat3x2.hpp"
+
+1533822422 c:\projects\glm\glm\mat3x3.hpp
+	"./ext/matrix_double3x3.hpp"
+	"./ext/matrix_double3x3_precision.hpp"
+	"./ext/matrix_float3x3.hpp"
+	"./ext/matrix_float3x3_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double3x3.hpp
+	"../detail/type_mat3x3.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat3x3.hpp
+	"type_vec3.hpp"
+	<limits>
+	<cstddef>
+	"type_mat3x3.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat3x3.inl
+	"../matrix.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double3x3_precision.hpp
+	"../detail/type_mat3x3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float3x3.hpp
+	"../detail/type_mat3x3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float3x3_precision.hpp
+	"../detail/type_mat3x3.hpp"
+
+1533822422 c:\projects\glm\glm\mat3x4.hpp
+	"./ext/matrix_double3x4.hpp"
+	"./ext/matrix_double3x4_precision.hpp"
+	"./ext/matrix_float3x4.hpp"
+	"./ext/matrix_float3x4_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double3x4.hpp
+	"../detail/type_mat3x4.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat3x4.hpp
+	"type_vec3.hpp"
+	"type_vec4.hpp"
+	<limits>
+	<cstddef>
+	"type_mat3x4.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat3x4.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double3x4_precision.hpp
+	"../detail/type_mat3x4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float3x4.hpp
+	"../detail/type_mat3x4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float3x4_precision.hpp
+	"../detail/type_mat3x4.hpp"
+
+1533822422 c:\projects\glm\glm\mat4x2.hpp
+	"./ext/matrix_double4x2.hpp"
+	"./ext/matrix_double4x2_precision.hpp"
+	"./ext/matrix_float4x2.hpp"
+	"./ext/matrix_float4x2_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double4x2.hpp
+	"../detail/type_mat4x2.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat4x2.hpp
+	"type_vec2.hpp"
+	"type_vec4.hpp"
+	<limits>
+	<cstddef>
+	"type_mat4x2.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat4x2.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double4x2_precision.hpp
+	"../detail/type_mat4x2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float4x2.hpp
+	"../detail/type_mat4x2.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float4x2_precision.hpp
+	"../detail/type_mat2x2.hpp"
+
+1533822422 c:\projects\glm\glm\mat4x3.hpp
+	"./ext/matrix_double4x3.hpp"
+	"./ext/matrix_double4x3_precision.hpp"
+	"./ext/matrix_float4x3.hpp"
+	"./ext/matrix_float4x3_precision.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_double4x3.hpp
+	"../detail/type_mat4x3.hpp"
+
+1533822422 c:\projects\glm\glm\detail\type_mat4x3.hpp
+	"type_vec3.hpp"
+	"type_vec4.hpp"
+	<limits>
+	<cstddef>
+	"type_mat4x3.inl"
+
+1535535170 c:\projects\glm\glm\detail\type_mat4x3.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double4x3_precision.hpp
+	"../detail/type_mat4x3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float4x3.hpp
+	"../detail/type_mat4x3.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float4x3_precision.hpp
+	"../detail/type_mat4x3.hpp"
+
+1535535170 c:\projects\glm\glm\detail\func_matrix.inl
+	"../geometric.hpp"
+	<limits>
+	"func_matrix_simd.inl"
+
+1537180351 c:\projects\glm\glm\geometric.hpp
+	"detail/type_vec3.hpp"
+	"detail/func_geometric.inl"
+
+1537180351 c:\projects\glm\glm\detail\func_geometric.inl
+	"../exponential.hpp"
+	"../common.hpp"
+	"func_geometric_simd.inl"
+
+1537180351 c:\projects\glm\glm\exponential.hpp
+	"detail/type_vec1.hpp"
+	"detail/type_vec2.hpp"
+	"detail/type_vec3.hpp"
+	"detail/type_vec4.hpp"
+	<cmath>
+	"detail/func_exponential.inl"
+
+1540995841 c:\projects\glm\glm\detail\type_vec1.hpp
+	"qualifier.hpp"
+	"_swizzle.hpp"
+	"_swizzle_func.hpp"
+	<cstddef>
+	"type_vec1.inl"
+
+1540995841 c:\projects\glm\glm\detail\type_vec1.inl
+	"./compute_vector_relational.hpp"
+
+1533822421 c:\projects\glm\glm\detail\func_exponential.inl
+	"../vector_relational.hpp"
+	"_vectorize.hpp"
+	<limits>
+	<cmath>
+	<cassert>
+	"func_exponential_simd.inl"
+
+1537180351 c:\projects\glm\glm\vector_relational.hpp
+	"detail/qualifier.hpp"
+	"detail/setup.hpp"
+	"detail/func_vector_relational.inl"
+
+1535535170 c:\projects\glm\glm\detail\func_vector_relational.inl
+	"func_vector_relational_simd.inl"
+
+1535535170 c:\projects\glm\glm\detail\func_vector_relational_simd.inl
+
+1535535170 c:\projects\glm\glm\detail\_vectorize.hpp
+
+1533822421 c:\projects\glm\glm\detail\func_exponential_simd.inl
+	"../simd/exponential.h"
+
+1531735568 c:\projects\glm\glm\simd\exponential.h
+	"platform.h"
+
+1537180351 c:\projects\glm\glm\common.hpp
+	"detail/qualifier.hpp"
+	"detail/_fixes.hpp"
+	"detail/func_common.inl"
+
+1535535170 c:\projects\glm\glm\detail\_fixes.hpp
+	<cmath>
+
+1537180351 c:\projects\glm\glm\detail\func_common.inl
+	"../vector_relational.hpp"
+	"compute_common.hpp"
+	"type_vec2.hpp"
+	"type_vec3.hpp"
+	"type_vec4.hpp"
+	"_vectorize.hpp"
+	<limits>
+	"func_common_simd.inl"
+
+1537180351 c:\projects\glm\glm\detail\compute_common.hpp
+	"setup.hpp"
+	<limits>
+
+1535535170 c:\projects\glm\glm\detail\func_common_simd.inl
+	"../simd/common.h"
+	<immintrin.h>
+
+1531735568 c:\projects\glm\glm\simd\common.h
+	"platform.h"
+
+1525699382 c:\projects\glm\glm\detail\func_geometric_simd.inl
+	"../simd/geometric.h"
+
+1525699382 c:\projects\glm\glm\simd\geometric.h
+	"common.h"
+
+1535535170 c:\projects\glm\glm\detail\func_matrix_simd.inl
+	"type_mat4x4.hpp"
+	"../geometric.hpp"
+	"../simd/matrix.h"
+	<cstring>
+
+1525699382 c:\projects\glm\glm\simd\matrix.h
+	"geometric.h"
+
+1533822422 c:\projects\glm\glm\detail\type_mat4x4_simd.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_double4x4_precision.hpp
+	"../detail/type_mat4x4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float4x4.hpp
+	"../detail/type_mat4x4.hpp"
+
+1537180351 c:\projects\glm\glm\ext\matrix_float4x4_precision.hpp
+	"../detail/type_mat4x4.hpp"
+
+1535535170 c:\projects\glm\glm\gtc\matrix_transform.hpp
+	"../mat4x4.hpp"
+	"../vec2.hpp"
+	"../vec3.hpp"
+	"../vec4.hpp"
+	"../ext/matrix_projection.hpp"
+	"../ext/matrix_clip_space.hpp"
+	"../ext/matrix_transform.hpp"
+	"matrix_transform.inl"
+
+1537180351 c:\projects\glm\glm\ext\matrix_projection.hpp
+	"../gtc/constants.hpp"
+	"../geometric.hpp"
+	"../trigonometric.hpp"
+	"../matrix.hpp"
+	"matrix_projection.inl"
+
+1535535170 c:\projects\glm\glm\gtc\constants.hpp
+	"../ext/scalar_constants.hpp"
+	"constants.inl"
+
+1537180351 c:\projects\glm\glm\ext\scalar_constants.hpp
+	"../detail/setup.hpp"
+	"scalar_constants.inl"
+
+1535535170 c:\projects\glm\glm\ext\scalar_constants.inl
+	<limits>
+
+1535535170 c:\projects\glm\glm\gtc\constants.inl
+
+1537180351 c:\projects\glm\glm\trigonometric.hpp
+	"detail/setup.hpp"
+	"detail/qualifier.hpp"
+	"detail/func_trigonometric.inl"
+
+1535535170 c:\projects\glm\glm\detail\func_trigonometric.inl
+	"_vectorize.hpp"
+	<cmath>
+	<limits>
+	"func_trigonometric_simd.inl"
+
+1464689061 c:\projects\glm\glm\detail\func_trigonometric_simd.inl
+
+1535535170 c:\projects\glm\glm\ext\matrix_projection.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_clip_space.hpp
+	"../ext/scalar_constants.hpp"
+	"../geometric.hpp"
+	"../trigonometric.hpp"
+	"matrix_clip_space.inl"
+
+1535535170 c:\projects\glm\glm\ext\matrix_clip_space.inl
+
+1537180351 c:\projects\glm\glm\ext\matrix_transform.hpp
+	"../gtc/constants.hpp"
+	"../geometric.hpp"
+	"../trigonometric.hpp"
+	"../matrix.hpp"
+	"matrix_transform.inl"
+
+1535535170 c:\projects\glm\glm\ext\matrix_transform.inl
+
+1535535170 c:\projects\glm\glm\gtc\matrix_transform.inl
+	"../geometric.hpp"
+	"../trigonometric.hpp"
+	"../matrix.hpp"
 

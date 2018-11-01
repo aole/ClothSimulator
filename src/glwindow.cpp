@@ -9,14 +9,18 @@
 #include <SDL2/SDL.h>
 #include <gl/glew.h>
 
+#include <glm/vec3.hpp> // glm::vec3
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+
 SDL_Window* sdlWnd = NULL;
 SDL_Window *dummyWnd = NULL;
 
-//UINT uiVAOid, uiVBOid;
+int glwindow_width = 300;
+int glwindow_height = 400;
 
 bool initialized = FALSE;
-
-GLuint programID;
 
 static const GLfloat g_vertex_buffer_data[] = {
    -.5, 0, 0.0,
@@ -26,6 +30,25 @@ static const GLfloat g_vertex_buffer_data[] = {
 
 GLuint VertexArrayID;
 GLuint vertexbuffer; // vertex buffer identifier
+
+// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+glm::mat4 Projection;
+
+// Camera matrix
+glm::mat4 View = glm::lookAt(
+    glm::vec3(0,0,-5), // Camera position, in World Space
+    glm::vec3(0,0,0), // and looks at the origin
+    glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+    );
+
+// Model matrix : an identity matrix (model will be at the origin)
+glm::mat4 Model = glm::mat4(1.0f);
+
+// Our ModelViewProjection : multiplication of our 3 matrices
+glm::mat4 mvp;
+
+GLuint programID;
+GLuint MatrixID;
 
 GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path){
 
@@ -117,6 +140,15 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 void init()
 {
+    programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
+
+	// Get a handle for our "MVP" uniform
+	// Only during the initialisation
+	MatrixID = glGetUniformLocation(programID, "MVP");
+
+	Projection = glm::perspective(glm::radians(45.0f), (float) 4 / (float) 3, 0.1f, 100.0f);
+	mvp = Projection * View * Model;
+
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
@@ -125,6 +157,7 @@ void init()
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	// pass to OpenGL
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
 }
 
 void display()
@@ -138,6 +171,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programID);
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -169,6 +203,11 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
             display();
         break;
     case WM_SIZE:
+        RECT r;
+        GetClientRect(hwnd,&r);
+        glwindow_width = r.right - r.left;
+        glwindow_height = r.bottom - r.top;
+
         PostMessage(hwnd, WM_PAINT, 0, 0);
         return 0;
 
@@ -261,7 +300,6 @@ HWND GLWindow::create(HWND hWndParent, HINSTANCE hInstance)
     initialized = TRUE;
 
     init();
-    programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
 
     ShowWindow (hwnd, SW_SHOWDEFAULT);
 

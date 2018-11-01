@@ -38,6 +38,9 @@ Point to include and lib in your project.
 Download FreeImage(binaries): http://freeimage.sourceforge.net/download.html
 Point to include and lib in your project.
 
+Download GLM header files: https://github.com/g-truc/glm/tags
+Point to include in your project
+
 Troubleshooting
 ---------------
 UNICODE
