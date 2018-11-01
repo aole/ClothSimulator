@@ -20,6 +20,9 @@ Click and Hold LMB over the vertex and click Delete key to dissolve the vertex.
 Move Segments:
 Click and Drag LMB over a line segment to move it.
 
+Pan 3D Window:
+Click and Drag RMB
+
 Open an image file to display it over the 2D window.
 
 Save and Load 2D Shapes (with background) to a text file.

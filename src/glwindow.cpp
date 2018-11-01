@@ -5,6 +5,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <windowsx.h>
 
 #include <SDL2/SDL.h>
 #include <gl/glew.h>
@@ -22,24 +23,34 @@ int glwindow_height = 400;
 
 bool initialized = FALSE;
 
-static const GLfloat g_vertex_buffer_data[] = {
-   -.5, 0, 0.0,
-   0.5, 0, 0.0,
-   0.0,  0.5, 0.0,
+static const GLfloat g_vertex_buffer_data[] =
+{
+    -.5, 0, 0.0,
+    0.5, 0, 0.0,
+    0.0,  0.5, 0.0,
 };
 
 GLuint VertexArrayID;
 GLuint vertexbuffer; // vertex buffer identifier
 
-// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+// horizontal angle : toward -Z
+float horizontalAngle = 0;
+// vertical angle : 0, look at the horizon
+float verticalAngle = 0.0f;
+
 glm::mat4 Projection;
+glm::vec3 CameraPosition = glm::vec3(0, 0, -5);
+glm::vec3 CameraLookAt = glm::vec3(0,0,0);
+glm::vec3 CameraDirection = glm::vec3(0,0,0);
+glm::vec3 CameraRight = glm::vec3(1,0,0);
+glm::vec3 CameraUp = glm::vec3(0,0,1);
 
 // Camera matrix
 glm::mat4 View = glm::lookAt(
-    glm::vec3(0,0,-5), // Camera position, in World Space
-    glm::vec3(0,0,0), // and looks at the origin
-    glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
-    );
+                     CameraPosition, // Camera position, in World Space
+                     glm::vec3(0,0,0), // and looks at the origin
+                     glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+                 );
 
 // Model matrix : an identity matrix (model will be at the origin)
 glm::mat4 Model = glm::mat4(1.0f);
@@ -50,118 +61,26 @@ glm::mat4 mvp;
 GLuint programID;
 GLuint MatrixID;
 
-GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path){
-
-	// Create the shaders
-	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	// Read the Vertex Shader code from the file
-	std::string VertexShaderCode;
-	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-	if(VertexShaderStream.is_open()){
-		std::stringstream sstr;
-		sstr << VertexShaderStream.rdbuf();
-		VertexShaderCode = sstr.str();
-		VertexShaderStream.close();
-	}else{
-		std::cout<<"Cannot to open '"<<vertex_file_path <<"'.\n" << std::endl;
-		getchar();
-		return 0;
-	}
-
-	// Read the Fragment Shader code from the file
-	std::string FragmentShaderCode;
-	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-	if(FragmentShaderStream.is_open()){
-		std::stringstream sstr;
-		sstr << FragmentShaderStream.rdbuf();
-		FragmentShaderCode = sstr.str();
-		FragmentShaderStream.close();
-	}
-
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
-
-	// Compile Vertex Shader
-	std::cout<<"Compiling shader : "<<vertex_file_path<<std::endl;
-	char const * VertexSourcePointer = VertexShaderCode.c_str();
-	glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
-	glCompileShader(VertexShaderID);
-
-	// Check Vertex Shader
-	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if ( InfoLogLength > 0 ){
-		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
-		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-		std::cout<<&VertexShaderErrorMessage[0]<<std::endl;
-	}
-
-	// Compile Fragment Shader
-	std::cout<<"Compiling shader : "<<fragment_file_path<<std::endl;
-	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
-	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
-	glCompileShader(FragmentShaderID);
-
-	// Check Fragment Shader
-	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if ( InfoLogLength > 0 ){
-		std::vector<char> FragmentShaderErrorMessage(InfoLogLength+1);
-		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-		std::cout<< &FragmentShaderErrorMessage[0]<<std::endl;
-	}
-
-	// Link the program
-	std::cout<<"Linking program\n";
-	GLuint ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
-	glLinkProgram(ProgramID);
-
-	// Check the program
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if ( InfoLogLength > 0 ){
-		std::vector<char> ProgramErrorMessage(InfoLogLength+1);
-		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-		std::cout<<&ProgramErrorMessage[0]<<std::endl;
-	}
-
-	glDetachShader(ProgramID, VertexShaderID);
-	glDetachShader(ProgramID, FragmentShaderID);
-
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
-
-	return ProgramID;
-}
-
-void init()
-{
-    programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
-
-	// Get a handle for our "MVP" uniform
-	// Only during the initialisation
-	MatrixID = glGetUniformLocation(programID, "MVP");
-
-	Projection = glm::perspective(glm::radians(45.0f), (float) 4 / (float) 3, 0.1f, 100.0f);
-	mvp = Projection * View * Model;
-
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
-
-	// generate 1 buffer
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	// pass to OpenGL
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-}
-
 void display()
 {
+    CameraDirection = glm::vec3( std::cos(verticalAngle) * std::sin(horizontalAngle),
+                        std::sin(verticalAngle),
+                        std::cos(verticalAngle) * std::cos(horizontalAngle));
+
+    CameraRight = glm::vec3(
+        std::sin(horizontalAngle - 3.14f/2.0f),
+        0,
+        std::cos(horizontalAngle - 3.14f/2.0f)
+    );
+    CameraUp = glm::cross( CameraRight, CameraDirection );
+
+    View = glm::lookAt(
+               CameraPosition, // Camera position, in World Space
+               CameraPosition + CameraDirection, // and looks at the origin
+               CameraUp  // Head is up (set to 0,-1,0 to look upside-down)
+           );
+    mvp = Projection * View * Model;
+
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -171,17 +90,143 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programID);
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(0);
 
     SDL_GL_SwapWindow(sdlWnd);
 }
 
+GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path)
+{
+
+    // Create the shaders
+    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+    // Read the Vertex Shader code from the file
+    std::string VertexShaderCode;
+    std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+    if(VertexShaderStream.is_open())
+    {
+        std::stringstream sstr;
+        sstr << VertexShaderStream.rdbuf();
+        VertexShaderCode = sstr.str();
+        VertexShaderStream.close();
+    }
+    else
+    {
+        std::cout<<"Cannot to open '"<<vertex_file_path <<"'.\n" << std::endl;
+        getchar();
+        return 0;
+    }
+
+    // Read the Fragment Shader code from the file
+    std::string FragmentShaderCode;
+    std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+    if(FragmentShaderStream.is_open())
+    {
+        std::stringstream sstr;
+        sstr << FragmentShaderStream.rdbuf();
+        FragmentShaderCode = sstr.str();
+        FragmentShaderStream.close();
+    }
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+
+    // Compile Vertex Shader
+    std::cout<<"Compiling shader : "<<vertex_file_path<<std::endl;
+    char const * VertexSourcePointer = VertexShaderCode.c_str();
+    glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
+    glCompileShader(VertexShaderID);
+
+    // Check Vertex Shader
+    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if ( InfoLogLength > 0 )
+    {
+        std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
+        glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+        std::cout<<&VertexShaderErrorMessage[0]<<std::endl;
+    }
+
+    // Compile Fragment Shader
+    std::cout<<"Compiling shader : "<<fragment_file_path<<std::endl;
+    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+    glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
+    glCompileShader(FragmentShaderID);
+
+    // Check Fragment Shader
+    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if ( InfoLogLength > 0 )
+    {
+        std::vector<char> FragmentShaderErrorMessage(InfoLogLength+1);
+        glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+        std::cout<< &FragmentShaderErrorMessage[0]<<std::endl;
+    }
+
+    // Link the program
+    std::cout<<"Linking program\n";
+    GLuint ProgramID = glCreateProgram();
+    glAttachShader(ProgramID, VertexShaderID);
+    glAttachShader(ProgramID, FragmentShaderID);
+    glLinkProgram(ProgramID);
+
+    // Check the program
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if ( InfoLogLength > 0 )
+    {
+        std::vector<char> ProgramErrorMessage(InfoLogLength+1);
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+        std::cout<<&ProgramErrorMessage[0]<<std::endl;
+    }
+
+    glDetachShader(ProgramID, VertexShaderID);
+    glDetachShader(ProgramID, FragmentShaderID);
+
+    glDeleteShader(VertexShaderID);
+    glDeleteShader(FragmentShaderID);
+
+    return ProgramID;
+}
+
+void init()
+{
+    programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
+
+    // Get a handle for our "MVP" uniform
+    // Only during the initialisation
+    MatrixID = glGetUniformLocation(programID, "MVP");
+
+    // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    Projection = glm::perspective(glm::radians(45.0f), (float) glwindow_width / (float) glwindow_height, 0.1f, 100.0f);
+
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
+
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
+    // generate 1 buffer
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    // pass to OpenGL
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+}
+
 LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static int lastx, lasty;
+    static bool mousedown;
+
     switch(message)
     {
     case WM_DESTROY:
@@ -209,10 +254,40 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
         glwindow_height = r.bottom - r.top;
 
         PostMessage(hwnd, WM_PAINT, 0, 0);
-        return 0;
+        InvalidateRect(hwnd, NULL, TRUE);
 
-    case WM_LBUTTONDOWN:
-        std::cout<<"mouse down"<<std::endl;
+        break;
+
+    case WM_RBUTTONDOWN:
+        lastx = GET_X_LPARAM( lParam );
+        lasty = GET_Y_LPARAM( lParam );
+        mousedown = TRUE;
+        SetCapture(hwnd);
+        break;
+
+    case WM_MOUSEMOVE:
+        if (mousedown)
+        {
+            float x = GET_X_LPARAM( lParam );
+            float y = GET_Y_LPARAM( lParam );
+            float dx = (x - lastx) * 0.0065;
+            float dy = (y - lasty) * 0.0065;
+
+            CameraPosition -= CameraRight * dx;
+            CameraPosition += CameraUp * dy;
+
+            lastx = x;
+            lasty = y;
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        break;
+
+    case WM_RBUTTONUP:
+        ReleaseCapture();
+        mousedown = FALSE;
+        break;
+
     default:
         return DefWindowProc (hwnd, message, wParam, lParam);
     }

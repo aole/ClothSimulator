@@ -9,6 +9,7 @@ $$$$ 16. save/load 2d shapes
 $$$$ 8. 2D grid
 $$$$ 33. using glsl shaders
 $$$$ 5. 3d projection/view/camera
+$$$$ 34. Pan 3D window
 
 28. add a ground plane.
 2. create corresponding 3d shapes as the shape in 2d section
@@ -30,4 +31,4 @@ $$$$ 5. 3d projection/view/camera
 26. zoom 2d view
 27. delete whole shape
 32. CODE EFFICIENCY!!!
-34. 
+35. 
