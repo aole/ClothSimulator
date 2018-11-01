@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <cstdio>
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 #include <SDL2/SDL.h>
 #include <gl/glew.h>
@@ -9,38 +12,136 @@
 SDL_Window* sdlWnd = NULL;
 SDL_Window *dummyWnd = NULL;
 
-UINT uiVAOid, uiVBOid;
+//UINT uiVAOid, uiVBOid;
 
 bool initialized = FALSE;
 
+GLuint programID;
+
+static const GLfloat g_vertex_buffer_data[] = {
+   -.5, 0, 0.0,
+   0.5, 0, 0.0,
+   0.0,  0.5, 0.0,
+};
+
+GLuint VertexArrayID;
+GLuint vertexbuffer; // vertex buffer identifier
+
+GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path){
+
+	// Create the shaders
+	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+	// Read the Vertex Shader code from the file
+	std::string VertexShaderCode;
+	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+	if(VertexShaderStream.is_open()){
+		std::stringstream sstr;
+		sstr << VertexShaderStream.rdbuf();
+		VertexShaderCode = sstr.str();
+		VertexShaderStream.close();
+	}else{
+		std::cout<<"Cannot to open '"<<vertex_file_path <<"'.\n" << std::endl;
+		getchar();
+		return 0;
+	}
+
+	// Read the Fragment Shader code from the file
+	std::string FragmentShaderCode;
+	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+	if(FragmentShaderStream.is_open()){
+		std::stringstream sstr;
+		sstr << FragmentShaderStream.rdbuf();
+		FragmentShaderCode = sstr.str();
+		FragmentShaderStream.close();
+	}
+
+	GLint Result = GL_FALSE;
+	int InfoLogLength;
+
+	// Compile Vertex Shader
+	std::cout<<"Compiling shader : "<<vertex_file_path<<std::endl;
+	char const * VertexSourcePointer = VertexShaderCode.c_str();
+	glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
+	glCompileShader(VertexShaderID);
+
+	// Check Vertex Shader
+	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
+		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+		std::cout<<&VertexShaderErrorMessage[0]<<std::endl;
+	}
+
+	// Compile Fragment Shader
+	std::cout<<"Compiling shader : "<<fragment_file_path<<std::endl;
+	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
+	glCompileShader(FragmentShaderID);
+
+	// Check Fragment Shader
+	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::vector<char> FragmentShaderErrorMessage(InfoLogLength+1);
+		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+		std::cout<< &FragmentShaderErrorMessage[0]<<std::endl;
+	}
+
+	// Link the program
+	std::cout<<"Linking program\n";
+	GLuint ProgramID = glCreateProgram();
+	glAttachShader(ProgramID, VertexShaderID);
+	glAttachShader(ProgramID, FragmentShaderID);
+	glLinkProgram(ProgramID);
+
+	// Check the program
+	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::vector<char> ProgramErrorMessage(InfoLogLength+1);
+		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+		std::cout<<&ProgramErrorMessage[0]<<std::endl;
+	}
+
+	glDetachShader(ProgramID, VertexShaderID);
+	glDetachShader(ProgramID, FragmentShaderID);
+
+	glDeleteShader(VertexShaderID);
+	glDeleteShader(FragmentShaderID);
+
+	return ProgramID;
+}
+
+void init()
+{
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
+	// generate 1 buffer
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	// pass to OpenGL
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+}
+
 void display()
 {
-    float fVert[9];
-    fVert[0] = -.5;
-    fVert[1] = 0;
-    fVert[2] = 0;
-    fVert[3] = 1.5;
-    fVert[4] = 0;
-    fVert[5] = 0;
-    fVert[6] = 0;
-    fVert[7] = .1;
-    fVert[8] = 0;
-
-    glGenVertexArrays(1, &uiVAOid);
-    glBindVertexArray(uiVAOid);
-
-    glGenBuffers(1, &uiVBOid);
-    glBindBuffer(GL_ARRAY_BUFFER, uiVBOid);
-
-    glBufferData(GL_ARRAY_BUFFER, 9*sizeof(GLfloat), fVert, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
-    glClearColor(.8,.8,.8, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glBindVertexArray(uiVAOid);
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
+    glClearColor(.8,.8,.8, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(programID);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDisableVertexAttribArray(0);
 
     SDL_GL_SwapWindow(sdlWnd);
 }
@@ -158,6 +259,9 @@ HWND GLWindow::create(HWND hWndParent, HINSTANCE hInstance)
         std::cout<<"glewInit error"<<std::endl;
 
     initialized = TRUE;
+
+    init();
+    programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
 
     ShowWindow (hwnd, SW_SHOWDEFAULT);
 

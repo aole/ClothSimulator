@@ -7,6 +7,7 @@ $$$$ 12. fill shape
 $$$$ 11. move the whole 2d shape
 $$$$ 16. save/load 2d shapes
 $$$$ 8. 2D grid
+$$$$ 33. using glsl shaders
 
 28. add a ground plane.
 5. 3d view
@@ -29,4 +30,4 @@ $$$$ 8. 2D grid
 26. zoom 2d view
 27. delete whole shape
 32. CODE EFFICIENCY!!!
-33. 
+34. 

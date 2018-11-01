@@ -320,6 +320,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         }
         mousedown = FALSE;
         highlighted_vertex = NULL;
+        InvalidateRect(hwnd, NULL, TRUE);
         break;
     case WM_MOUSEMOVE:
         x = GET_X_LPARAM( lParam );
@@ -411,9 +412,11 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         // all shapes
         for (Shape *shape: shapes)
         {
-            // render shape grid
-            SelectObject(memhdc, hpen_shape_grid);
-            shape->RenderGrid(memhdc);
+            if(!mousedown) {
+                // render shape grid
+                SelectObject(memhdc, hpen_shape_grid);
+                shape->RenderGrid(memhdc);
+            }
 
             // render shape outline
             SelectObject(memhdc, GetStockObject(BLACK_PEN));
@@ -449,8 +452,14 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         }
 
+        // highlighted vertex
+        if(highlighted_vertex && (operation_mode==1)){
+            SelectObject(memhdc, hpen_highlght);
+
+            Ellipse(memhdc, (int)highlighted_vertex->m_x-3, (int)highlighted_vertex->m_y-3, (int)highlighted_vertex->m_x+3, (int)highlighted_vertex->m_y+3);
+        }
         // highlighted segment
-        if(highlighted_segment && (operation_mode==1 || operation_mode==2))
+        else if(highlighted_segment && (operation_mode==1 || operation_mode==2))
         {
             SelectObject(memhdc, hpen_highlght);
 
