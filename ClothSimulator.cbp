@@ -63,7 +63,7 @@
 			<Add directory="C:/Projects/FreeImage/Dist/x32" />
 		</Linker>
 		<ExtraCommands>
-			<Add after="XCOPY $(#sdl2)\bin\*.dll $(TARGET_OUTPUT) /D /Y" />
+			<Add after="XCOPY $(sdl2)\bin\*.dll $(TARGET_OUTPUT_DIR) /D /Y" />
 		</ExtraCommands>
 		<Unit filename="include/btoolbar.h" />
 		<Unit filename="include/bwindow.h" />

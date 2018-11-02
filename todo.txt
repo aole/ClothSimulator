@@ -11,6 +11,7 @@ $$$$ 33. using glsl shaders
 $$$$ 5. 3d projection/view/camera
 $$$$ 34. Pan 3D window with RMB
 $$$$ 28. add a ground plane.
+$$$$ 37. pan 2d grid with RMB
 
 2. create corresponding 3d shapes as the shape in 2d section
 4. CLOTHIFY!!!
@@ -33,4 +34,4 @@ $$$$ 28. add a ground plane.
 32. CODE EFFICIENCY!!!
 35. ground plane to grid?
 36. orbit 3D window
-37.
+38. pan shapes in 2D window with RMB

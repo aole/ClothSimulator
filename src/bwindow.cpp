@@ -129,8 +129,11 @@ void BWindow::load(wchar_t* filename)
                 wcsncpy(image_file, value.c_str(), 256);
                 loadImage(image_file);
             }
-        } else {
-            if(shape){
+        }
+        else
+        {
+            if(shape)
+            {
                 shape->process(key, value);
             }
         }
@@ -193,6 +196,82 @@ void BWindow::reset()
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
+void BWindow::rButtonDown(int x, int y)
+{
+    isRBDown = TRUE;
+    last_mouse_x = x;
+    last_mouse_y = y;
+}
+
+void BWindow::rButtonUp(int x, int y)
+{
+    isRBDown = FALSE;
+    last_mouse_x = x;
+    last_mouse_y = y;
+}
+
+void BWindow::mouseMove(int x, int y)
+{
+    if(isRBDown){
+        int dx = x - last_mouse_x;
+        int dy = y - last_mouse_y;
+
+        panx += dx;
+        pany += dy;
+
+        repaint();
+    }
+
+    last_mouse_x = x;
+    last_mouse_y = y;
+}
+
+void BWindow::drawGrid(HDC hdc)
+{
+    SelectObject(hdc, hpen_side_grid_lines);
+
+    int cx = panx+w/2;
+    int cy = pany+h/2;
+
+    // horizontal
+    for(int y=(cy>0?cy:0) - gril_gap; y>0; y-=gril_gap)
+    {
+        MoveToEx(hdc, 0, y, NULL);
+        LineTo(hdc, w, y);
+    }
+    for(int y=(cy<h?cy:h) + gril_gap; y<h; y+=gril_gap)
+    {
+        MoveToEx(hdc, 0, y, NULL);
+        LineTo(hdc, w, y);
+    }
+// vertical
+    for(int x=(cx>0?cx:0) - gril_gap; x>0; x-=gril_gap)
+    {
+        MoveToEx(hdc, x, 0, NULL);
+        LineTo(hdc, x, h);
+    }
+    for(int x=(cx<w?cx:w) + gril_gap; x<w; x+=gril_gap)
+    {
+        MoveToEx(hdc, x, 0, NULL);
+        LineTo(hdc, x, h);
+    }
+
+    SelectObject(hdc, hpen_main_grid_lines);
+
+// horizontal
+    if(cy>0 && cy<w)
+    {
+        MoveToEx(hdc, 0, cy, NULL);
+        LineTo(hdc, w, cy);
+    }
+// vertical
+    if(cx>0 && cx<h)
+    {
+        MoveToEx(hdc, cx, 0, NULL);
+        LineTo(hdc, cx, h);
+    }
+}
+
 LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int x, y;
@@ -204,6 +283,17 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR) ((CREATESTRUCT*)lParam)->lpCreateParams);
         return DefWindowProc (hwnd, message, wParam, lParam);
+
+    case WM_MOVE:
+    {
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+        wndptr->setWidth(rect.right - (int)(short) LOWORD(lParam));
+    }
+    break;
+    case WM_SIZE:
+        wndptr->setHeight(HIWORD(lParam));
+        break;
 
     case WM_KEYDOWN:
         switch(wParam)
@@ -220,6 +310,15 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             }
             break;
         }
+        break;
+
+    case WM_RBUTTONDOWN:
+        SetCapture(hwnd);
+        wndptr->rButtonDown(GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ));
+        break;
+    case WM_RBUTTONUP:
+        ReleaseCapture();
+        wndptr->rButtonUp(GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ));
         break;
     case WM_LBUTTONDOWN:
         SetFocus(hwnd);
@@ -291,10 +390,11 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         break;
     case WM_LBUTTONUP:
         ReleaseCapture();
+        x = GET_X_LPARAM( lParam );
+        y = GET_Y_LPARAM( lParam );
+
         if (mousedown && operation_mode==0 && !highlighted_shape)
         {
-            x = GET_X_LPARAM( lParam );
-            y = GET_Y_LPARAM( lParam );
             v2.set(x,y);
             Shape *shape = new Shape(v1,v2);
             shapes.push_back(shape);
@@ -325,6 +425,8 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     case WM_MOUSEMOVE:
         x = GET_X_LPARAM( lParam );
         y = GET_Y_LPARAM( lParam );
+
+        wndptr->mouseMove(x, y);
 
         // create rectangle
         if (mousedown && operation_mode==0)
@@ -405,6 +507,8 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
         FillRect(memhdc,&Client_Rect, hbrush_background);
 
+        // draw background 2D grid
+        wndptr->drawGrid(memhdc);
 
         SelectObject(memhdc, hbrush_fill);
         SelectObject(memhdc, GetStockObject(BLACK_PEN));
@@ -412,7 +516,8 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         // all shapes
         for (Shape *shape: shapes)
         {
-            if(!mousedown) {
+            if(!mousedown)
+            {
                 // render shape grid
                 SelectObject(memhdc, hpen_shape_grid);
                 shape->RenderGrid(memhdc);
@@ -453,7 +558,8 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         }
 
         // highlighted vertex
-        if(highlighted_vertex && (operation_mode==1)){
+        if(highlighted_vertex && (operation_mode==1))
+        {
             SelectObject(memhdc, hpen_highlght);
 
             Ellipse(memhdc, (int)highlighted_vertex->m_x-3, (int)highlighted_vertex->m_y-3, (int)highlighted_vertex->m_x+3, (int)highlighted_vertex->m_y+3);
@@ -538,8 +644,8 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
     /* The Window structure */
     wincl.hInstance = hInstance;
     wincl.lpszClassName = szClassName;
-    wincl.lpfnWndProc = CanvasProcedure;      /* This function is called by windows */
-    wincl.style = CS_DBLCLKS|CS_OWNDC;                 /* Catch double-clicks */
+    wincl.lpfnWndProc = CanvasProcedure;
+    wincl.style = CS_OWNDC|CS_HREDRAW|CS_VREDRAW;
     wincl.cbSize = sizeof (WNDCLASSEX);
 
     /* Use default icon and mouse-pointer */
@@ -559,11 +665,8 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
                                  WS_EX_CLIENTEDGE,
                                  szClassName,
                                  szClassName,
-                                 WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-                                 x,
-                                 y,
-                                 w,                 /* The programs width */
-                                 h,                 /* and height in pixels */
+                                 WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
+                                 0, 0, w, h,
                                  hWndParent,        /* The window is a child-window */
                                  NULL,
                                  GetModuleHandle(NULL),       /* Program Instance handler */

@@ -48,6 +48,10 @@ int image_opacity = 255;
 int shape_opacity = 255;
 int shape_fill=1;
 
+BToolBar toolbar;
+BWindow canvas;
+GLWindow glwindow;
+
 void readPreferencesFile()
 {
     ifstream pref_file("pref.txt");
@@ -140,10 +144,6 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     return messages.wParam;
 }
 
-BToolBar toolbar;
-BWindow canvas;
-GLWindow glwindow;
-
 void CreateUI(HWND hWndParent)
 {
     // menubar
@@ -175,8 +175,8 @@ void CreateUI(HWND hWndParent)
     RECT tbrect;
     GetWindowRect(toolbar.getHandle(), &tbrect);
     // canvas
-    canvas.setSize(wrect.left+(wrect.right-wrect.left)/2+1,
-                   wrect.top+tbrect.bottom-tbrect.top,
+    canvas.setSize(//wrect.left+(wrect.right-wrect.left)/2+1,
+                   //wrect.top+tbrect.bottom-tbrect.top,
                    wrect.right-wrect.left,
                    wrect.bottom-wrect.top-(tbrect.bottom-tbrect.top));
     canvas.create(hWndParent, hInstance);

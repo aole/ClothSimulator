@@ -21,7 +21,10 @@ Move Segments:
 Click and Drag LMB over a line segment to move it.
 
 Pan 3D Window:
-Click and Drag RMB
+Click and Drag RMB.
+
+Pan 2D Window:
+Click and Drag RMB.
 
 Open an image file to display it over the 2D window.
 
