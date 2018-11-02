@@ -15125,9 +15125,11 @@
 	<windows.h>
 	<vector>
 
-1541185109 c:\projects\clothsimulator\include\bwindow.h
+1541195318 c:\projects\clothsimulator\include\bwindow.h
 	<windows.h>
 	<iostream>
+	<vector>
+	"segment.h"
 
 1540825658 c:\projects\clothsimulator\include\glwindow.h
 	<windows.h>
@@ -15137,9 +15139,8 @@
 	<commctrl.h>
 	<iostream>
 
-1541185377 source:c:\projects\clothsimulator\src\bwindow.cpp
+1541194446 source:c:\projects\clothsimulator\src\bwindow.cpp
 	"bwindow.h"
-	<vector>
 	<list>
 	<windowsx.h>
 	<iostream>
@@ -15152,7 +15153,6 @@
 	<boost/geometry/geometries/register/linestring.hpp>
 	<boost/foreach.hpp>
 	<FreeImage.h>
-	"segment.h"
 
 1541079459 c:\projects\clothsimulator\include\segment.h
 	<windows.h>

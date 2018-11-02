@@ -29,6 +29,9 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Environment>
+				<Variable name="SDL2" value="C:\SDL2-2.0.8\i686-w64-mingw32" />
+			</Environment>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />

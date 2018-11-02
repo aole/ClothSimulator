@@ -35,3 +35,4 @@ $$$$ 37. pan 2d grid with RMB
 35. ground plane to grid?
 36. orbit 3D window
 38. pan shapes in 2D window with RMB
+39. pan bg image with the grid
