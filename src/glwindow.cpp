@@ -10,10 +10,12 @@
 #include <SDL2/SDL.h>
 #include <gl/glew.h>
 
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+// #define GLM_FORCE_CUDA
+
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 SDL_Window* sdlWnd = NULL;
 SDL_Window *dummyWnd = NULL;
@@ -23,23 +25,13 @@ int glwindow_height = 400;
 
 bool initialized = FALSE;
 
-static const GLfloat g_vertex_buffer_data[] =
-{
-    -.5, 0, 0.0,
-    0.5, 0, 0.0,
-    0.0,  0.5, 0.0,
-};
-
-GLuint VertexArrayID;
-GLuint vertexbuffer; // vertex buffer identifier
-
 // horizontal angle : toward -Z
-float horizontalAngle = 0;
+float horizontalAngle = 3.14;
 // vertical angle : 0, look at the horizon
 float verticalAngle = 0.0f;
 
 glm::mat4 Projection;
-glm::vec3 CameraPosition = glm::vec3(0, 0, -5);
+glm::vec3 CameraPosition = glm::vec3(0, 0, 5);
 glm::vec3 CameraLookAt = glm::vec3(0,0,0);
 glm::vec3 CameraDirection = glm::vec3(0,0,0);
 glm::vec3 CameraRight = glm::vec3(1,0,0);
@@ -61,45 +53,14 @@ glm::mat4 mvp;
 GLuint programID;
 GLuint MatrixID;
 
-void display()
-{
-    CameraDirection = glm::vec3( std::cos(verticalAngle) * std::sin(horizontalAngle),
-                        std::sin(verticalAngle),
-                        std::cos(verticalAngle) * std::cos(horizontalAngle));
+GLuint VertexArrayID;
+GLuint vertexbuffer; // vertex buffer identifier
+GLuint colorbuffer; // color buffer identifier
 
-    CameraRight = glm::vec3(
-        std::sin(horizontalAngle - 3.14f/2.0f),
-        0,
-        std::cos(horizontalAngle - 3.14f/2.0f)
-    );
-    CameraUp = glm::cross( CameraRight, CameraDirection );
+std::vector< glm::vec3 > opengl_vertices;
+std::vector< glm::vec3 > opengl_colors;
 
-    View = glm::lookAt(
-               CameraPosition, // Camera position, in World Space
-               CameraPosition + CameraDirection, // and looks at the origin
-               CameraUp  // Head is up (set to 0,-1,0 to look upside-down)
-           );
-    mvp = Projection * View * Model;
-
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glClearColor(.8,.8,.8, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(programID);
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glDisableVertexAttribArray(0);
-
-    SDL_GL_SwapWindow(sdlWnd);
-}
-
-GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path)
+GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path)
 {
 
     // Create the shaders
@@ -200,7 +161,7 @@ void init()
     programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
 
     // Get a handle for our "MVP" uniform
-    // Only during the initialisation
+    // Only during the initialization
     MatrixID = glGetUniformLocation(programID, "MVP");
 
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
@@ -211,6 +172,31 @@ void init()
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 
+    // define counter-clock wise
+    // display ground plane
+    opengl_vertices.push_back(glm::vec3(-10, -1, -10));
+    opengl_vertices.push_back(glm::vec3(-10, -1, 10));
+    opengl_vertices.push_back(glm::vec3(10, -1, -10));
+    opengl_vertices.push_back(glm::vec3(10, -1, -10));
+    opengl_vertices.push_back(glm::vec3(-10, -1, 10));
+    opengl_vertices.push_back(glm::vec3(10, -1, 10));
+
+    opengl_colors.push_back(glm::vec3(.2, .2, .2));
+    opengl_colors.push_back(glm::vec3(.2, .2, .2));
+    opengl_colors.push_back(glm::vec3(.2, .2, .2));
+    opengl_colors.push_back(glm::vec3(.2, .2, .2));
+    opengl_colors.push_back(glm::vec3(.2, .2, .2));
+    opengl_colors.push_back(glm::vec3(.2, .2, .2));
+
+    // cloth
+    opengl_vertices.push_back(glm::vec3(-.5, 0, 0.0));
+    opengl_vertices.push_back(glm::vec3(0.5, 0, 0.0));
+    opengl_vertices.push_back(glm::vec3(0.0,  0.5, 0.0));
+
+    opengl_colors.push_back(glm::vec3(.6, .6, .6));
+    opengl_colors.push_back(glm::vec3(.6, .6, .6));
+    opengl_colors.push_back(glm::vec3(.6, .6, .6));
+
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
@@ -218,8 +204,68 @@ void init()
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     // pass to OpenGL
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0], GL_STATIC_DRAW);
 
+    glGenBuffers(1, &colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, opengl_colors.size() * sizeof(glm::vec3), &opengl_colors[0], GL_STATIC_DRAW);
+}
+
+void display()
+{
+    // setup camera view
+    CameraDirection = glm::vec3( std::cos(verticalAngle) * std::sin(horizontalAngle),
+                        std::sin(verticalAngle),
+                        std::cos(verticalAngle) * std::cos(horizontalAngle));
+
+    CameraRight = glm::vec3(
+        std::sin(horizontalAngle - 3.14f/2.0f),
+        0,
+        std::cos(horizontalAngle - 3.14f/2.0f)
+    );
+    CameraUp = glm::cross( CameraRight, CameraDirection );
+
+    View = glm::lookAt(
+               CameraPosition, // Camera position, in World Space
+               CameraPosition + CameraDirection, // and looks at the origin
+               CameraUp  // Head is up (set to 0,-1,0 to look upside-down)
+           );
+    mvp = Projection * View * Model;
+
+    glUseProgram(programID);
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+
+    glClearColor(.8,.8,.8, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // display clothes
+    glEnable(GL_CULL_FACE);
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // 2nd attribute buffer : colors
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glVertexAttribPointer(
+        1,                                // attribute. must match the layout in the shader.
+        3,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+    glDrawArrays(GL_TRIANGLES, 0, opengl_vertices.size());
+
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(0);
+
+    // present
+    SDL_GL_SwapWindow(sdlWnd);
 }
 
 LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

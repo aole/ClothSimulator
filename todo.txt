@@ -9,15 +9,15 @@ $$$$ 16. save/load 2d shapes
 $$$$ 8. 2D grid
 $$$$ 33. using glsl shaders
 $$$$ 5. 3d projection/view/camera
-$$$$ 34. Pan 3D window
+$$$$ 34. Pan 3D window with RMB
+$$$$ 28. add a ground plane.
 
-28. add a ground plane.
 2. create corresponding 3d shapes as the shape in 2d section
 4. CLOTHIFY!!!
 29. run simulation
 30. stitch edges
 31. export obj
-21. pan 2d view with MMB
+21. pan 2d view with RMB
 10. undo/redo
 6. add lights
 7. CODE CLEANUP!!!
@@ -31,4 +31,6 @@ $$$$ 34. Pan 3D window
 26. zoom 2d view
 27. delete whole shape
 32. CODE EFFICIENCY!!!
-35. 
+35. ground plane to grid?
+36. orbit 3D window
+37.

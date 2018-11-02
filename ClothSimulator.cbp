@@ -40,6 +40,7 @@
 			<Add directory="C:/SDL2-2.0.8/i686-w64-mingw32/include" />
 			<Add directory="C:/glew-2.1.0/include" />
 			<Add directory="C:/Projects/FreeImage/Dist/x32" />
+			<Add directory="C:/projects/glm" />
 		</Compiler>
 		<Linker>
 			<Add library="glew32s" />
