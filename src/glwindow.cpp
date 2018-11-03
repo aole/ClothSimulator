@@ -211,18 +211,18 @@ void init()
     glBufferData(GL_ARRAY_BUFFER, opengl_colors.size() * sizeof(glm::vec3), &opengl_colors[0], GL_STATIC_DRAW);
 }
 
-void display()
+void render()
 {
     // setup camera view
     CameraDirection = glm::vec3( std::cos(verticalAngle) * std::sin(horizontalAngle),
-                        std::sin(verticalAngle),
-                        std::cos(verticalAngle) * std::cos(horizontalAngle));
+                                 std::sin(verticalAngle),
+                                 std::cos(verticalAngle) * std::cos(horizontalAngle));
 
     CameraRight = glm::vec3(
-        std::sin(horizontalAngle - 3.14f/2.0f),
-        0,
-        std::cos(horizontalAngle - 3.14f/2.0f)
-    );
+                      std::sin(horizontalAngle - 3.14f/2.0f),
+                      0,
+                      std::cos(horizontalAngle - 3.14f/2.0f)
+                  );
     CameraUp = glm::cross( CameraRight, CameraDirection );
 
     View = glm::lookAt(
@@ -291,7 +291,7 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
     return 0;
     case WM_PAINT:
         if(initialized)
-            display();
+            render();
         break;
     case WM_SIZE:
         RECT r;
@@ -304,6 +304,14 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 
         break;
 
+    case WM_MOUSEWHEEL:
+    {
+        float zdelta = GET_WHEEL_DELTA_WPARAM(wParam);
+        CameraPosition += CameraDirection * (zdelta*0.01f);
+
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+    break;
     case WM_RBUTTONDOWN:
         lastx = GET_X_LPARAM( lParam );
         lasty = GET_Y_LPARAM( lParam );
@@ -316,8 +324,8 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
         {
             float x = GET_X_LPARAM( lParam );
             float y = GET_Y_LPARAM( lParam );
-            float dx = (x - lastx) * 0.0065;
-            float dy = (y - lasty) * 0.0065;
+            float dx = (x - lastx) * 0.0065f;
+            float dy = (y - lasty) * 0.0065f;
 
             CameraPosition -= CameraRight * dx;
             CameraPosition += CameraUp * dy;

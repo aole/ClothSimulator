@@ -20,8 +20,9 @@ Click and Hold LMB over the vertex and click Delete key to dissolve the vertex.
 Move Segments:
 Click and Drag LMB over a line segment to move it.
 
-Pan 3D Window:
+Pan / Zoom 3D Window:
 Click and Drag RMB.
+Rotate mouse wheel to zoom.
 
 Pan 2D Window:
 Click and Drag RMB.

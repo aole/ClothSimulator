@@ -258,7 +258,7 @@ void BWindow::lButtonDown(int x, int y)
             {
                 // if not near any vertex, split the segment
                 // grab the new vertex
-                highlighted_vertex = highlighted_segment->splitAt(x-(centerx+panx), y-(centery+pany));
+                highlighted_vertex = highlighted_segment->splitAt(mouse_point);
                 highlighted_segment = NULL;
 
                 InvalidateRect(hwnd, NULL, TRUE);

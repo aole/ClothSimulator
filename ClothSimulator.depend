@@ -15139,7 +15139,7 @@
 	<commctrl.h>
 	<iostream>
 
-1541219805 source:c:\projects\clothsimulator\src\bwindow.cpp
+1541222053 source:c:\projects\clothsimulator\src\bwindow.cpp
 	"bwindow.h"
 	<list>
 	<windowsx.h>
@@ -15154,12 +15154,13 @@
 	<boost/foreach.hpp>
 	<FreeImage.h>
 
-1541042904 c:\projects\clothsimulator\include\segment.h
+1541222485 c:\projects\clothsimulator\include\segment.h
 	<windows.h>
 	<vector>
 	<algorithm>
 	<fstream>
 	<string>
+	<glm/vec3.hpp>
 
 1541134637 source:c:\projects\clothsimulator\src\glwindow.cpp
 	"glwindow.h"
@@ -15176,7 +15177,7 @@
 	<glm/mat4x4.hpp>
 	<glm/gtc/matrix_transform.hpp>
 
-1541047427 source:c:\projects\clothsimulator\src\segment.cpp
+1541222631 source:c:\projects\clothsimulator\src\segment.cpp
 	"segment.h"
 	<boost/geometry.hpp>
 	<boost/geometry/geometries/geometries.hpp>

@@ -7,6 +7,8 @@
 #include <fstream>
 #include <string>
 
+#include <glm/vec3.hpp>
+
 using namespace std;
 
 class Shape;
@@ -66,7 +68,7 @@ public:
         this->at(1)->m_x += x;
         this->at(1)->m_y += y;
     }
-    Vertex *splitAt(double Cx, double Cy);
+    Vertex *splitAt(Vertex C);
 };
 
 class Shape
@@ -81,29 +83,10 @@ public:
 
     Shape() {}
 
-    Shape(Vertex &v1, Vertex &v2)
-    {
-        double minx = min(v1.m_x, v2.m_x);
-        double maxx = max(v1.m_x, v2.m_x);
-        double miny = min(v1.m_y, v2.m_y);
-        double maxy = max(v1.m_y, v2.m_y);
-
-        Vertex *a = new Vertex(minx, miny, this);
-        Vertex *b = new Vertex(maxx, miny, this);
-        Vertex *c = new Vertex(maxx, maxy, this);
-        Vertex *d = new Vertex(minx, maxy, this);
-        m_vertices.push_back(a);
-        m_vertices.push_back(b);
-        m_vertices.push_back(c);
-        m_vertices.push_back(d);
-
-        m_segments.push_back(new Segment(a, b, this));
-        m_segments.push_back(new Segment(b, c, this));
-        m_segments.push_back(new Segment(c, d, this));
-        m_segments.push_back(new Segment(d, a, this));
-    }
+    Shape(Vertex &v1, Vertex &v2);
 
     void RenderGrid(HDC hdc);
+    vector<glm::vec3> &getOpenGLVertices();
 
     void process(std::wstring key, std::wstring value);
 
