@@ -314,6 +314,12 @@ void render()
     SDL_GL_SwapWindow(sdlWnd);
 }
 
+void GLWindow::clothUpdated()
+{
+    populate();
+    render();
+}
+
 LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int lastx, lasty;
@@ -338,7 +344,6 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
     case WM_PAINT:
         if(initialized)
         {
-            populate();
             render();
         }
         break;

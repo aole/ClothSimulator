@@ -190,6 +190,8 @@ void CreateUI(HWND hWndParent)
                      wrect.bottom-wrect.top-(tbrect.bottom-tbrect.top));
     glwindow.create(hWndParent, hInstance, &canvas);
 
+    canvas.addClothChangeListener(&glwindow);
+
 }
 
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

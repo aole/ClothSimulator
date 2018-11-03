@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "segment.h"
+#include "clothchangelistener.h"
 
 class BWindow
 {
@@ -16,6 +17,8 @@ public:
     void reset();
     void save(wchar_t *filename);
     void load(wchar_t *filename);
+
+    void addClothChangeListener(ClothChangeListener *listener) { clothChangeListeners.push_back(listener); }
 
     void setShapeFill(int shape_fill) { this->shape_fill = shape_fill; }
     void setShapeOpacity(int shape_opacity) { this->shape_opacity = shape_opacity; }
@@ -47,10 +50,16 @@ public:
 
     void keyDown(UINT keyCode);
 
-    void clothChangedAck() { clothChanged = FALSE; }
-
     std::vector<Shape*> shapes;
 private:
+    vector<ClothChangeListener*> clothChangeListeners;
+
+    void clothChanged()
+    {
+        for(ClothChangeListener *l: clothChangeListeners)
+            l->clothUpdated();
+    }
+
     int shape_fill = 1;
     int shape_opacity = 255;
     int image_opacity = 255;
@@ -76,8 +85,6 @@ private:
     bool isLMDown = FALSE;
 
     bool isPainting = FALSE;
-
-    bool clothChanged = FALSE;
 };
 
 #endif // BWINDOW_H

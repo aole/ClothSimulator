@@ -4,8 +4,9 @@
 #include <windows.h>
 
 #include "bwindow.h"
+#include "clothchangelistener.h"
 
-class GLWindow
+class GLWindow : public ClothChangeListener
 {
 public:
     HWND create(HWND hWndParent, HINSTANCE hInstance, BWindow *c);
@@ -13,6 +14,9 @@ public:
     void setSize(int x, int y, int w, int h){ this->x=x; this->y=y; this->w=w; this->h=h; };
 
     HWND getHandle() { return hwnd; }
+
+    void clothUpdated();
+
 protected:
 
 private:

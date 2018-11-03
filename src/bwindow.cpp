@@ -53,7 +53,7 @@ void BWindow::cleanUp()
         background_image = NULL;
     }
 
-    clothChanged = TRUE;
+    clothChanged();
 }
 
 void BWindow::save(wchar_t* filename)
@@ -125,7 +125,7 @@ void BWindow::load(wchar_t* filename)
         }
     }
 
-    clothChanged = TRUE;
+    clothChanged();
 }
 
 void BWindow::setMode(int mode)
@@ -181,8 +181,8 @@ void BWindow::reset()
         delete s;
     shapes.clear();
 
+    clothChanged();
     InvalidateRect(hwnd, NULL, TRUE);
-    clothChanged = TRUE;
 }
 
 void BWindow::rButtonDown(int x, int y)
@@ -279,10 +279,12 @@ void BWindow::lButtonUp(int x, int y)
         Shape *shape = new Shape(v1,v2);
         shapes.push_back(shape);
         InvalidateRect(hwnd, NULL, TRUE);
-        clothChanged = TRUE;
+
     }
     isLMDown = FALSE;
     highlighted_vertex = NULL;
+
+    clothChanged();
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
@@ -420,8 +422,9 @@ void BWindow::keyDown(UINT keyCode)
             highlighted_vertex = NULL;
             highlighted_segment = NULL;
 
+            clothChanged();
+
             InvalidateRect(hwnd, NULL, TRUE);
-            clothChanged = TRUE;
         }else if(operation_mode==0 && highlighted_shape)
         {
             shapes.erase(std::remove(shapes.begin(), shapes.end(), highlighted_shape), shapes.end());
@@ -432,6 +435,8 @@ void BWindow::keyDown(UINT keyCode)
             highlighted_vertex = NULL;
 
             isLMDown = FALSE; // avoid new shape creation
+
+            clothChanged();
 
             repaint();
         }

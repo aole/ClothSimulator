@@ -222,8 +222,8 @@ void Shape::getOpenGLVertices(vector<glm::vec3> &vertices, vector<unsigned int> 
                 int polyvertcount = 0;
                 for(auto it = boost::begin(boost::geometry::exterior_ring(poly)); it != boost::end(boost::geometry::exterior_ring(poly)); ++it)
                 {
-                    float px = boost::geometry::get<0>(*it)/100.0;
-                    float py = boost::geometry::get<1>(*it)/-100.0;
+                    float px = boost::geometry::get<0>(*it)*0.05;
+                    float py = boost::geometry::get<1>(*it)*-0.05;
                     vertices.push_back(glm::vec3(px, py, 0));
                     polyvertcount++;
                 }

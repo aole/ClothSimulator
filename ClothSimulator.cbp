@@ -70,12 +70,14 @@
 		</ExtraCommands>
 		<Unit filename="include/btoolbar.h" />
 		<Unit filename="include/bwindow.h" />
+		<Unit filename="include/clothchangelistener.h" />
 		<Unit filename="include/controller.h" />
 		<Unit filename="include/glwindow.h" />
 		<Unit filename="include/segment.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/btoolbar.cpp" />
 		<Unit filename="src/bwindow.cpp" />
+		<Unit filename="src/clothchangelistener.cpp" />
 		<Unit filename="src/glwindow.cpp" />
 		<Unit filename="src/segment.cpp" />
 		<Extensions>

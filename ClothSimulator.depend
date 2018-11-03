@@ -15108,7 +15108,7 @@
 
 1533160258 c:\boost_1_68_0\boost\program_options\version.hpp
 
-1541224557 source:c:\projects\clothsimulator\main.cpp
+1541270335 source:c:\projects\clothsimulator\main.cpp
 	<tchar.h>
 	<windows.h>
 	<commctrl.h>
@@ -15125,15 +15125,17 @@
 	<windows.h>
 	<vector>
 
-1541224541 c:\projects\clothsimulator\include\bwindow.h
+1541270512 c:\projects\clothsimulator\include\bwindow.h
 	<windows.h>
 	<iostream>
 	<vector>
 	"segment.h"
+	"clothchangelistener.h"
 
-1541224892 c:\projects\clothsimulator\include\glwindow.h
+1541270535 c:\projects\clothsimulator\include\glwindow.h
 	<windows.h>
 	"bwindow.h"
+	"clothchangelistener.h"
 
 1540674344 source:c:\projects\clothsimulator\src\btoolbar.cpp
 	"btoolbar.h"
@@ -15163,7 +15165,7 @@
 	<string>
 	<glm/vec3.hpp>
 
-1541267078 source:c:\projects\clothsimulator\src\glwindow.cpp
+1541270289 source:c:\projects\clothsimulator\src\glwindow.cpp
 	"glwindow.h"
 	<iostream>
 	<cstdio>
@@ -15178,7 +15180,7 @@
 	<glm/mat4x4.hpp>
 	<glm/gtc/matrix_transform.hpp>
 
-1541230235 source:c:\projects\clothsimulator\src\segment.cpp
+1541269831 source:c:\projects\clothsimulator\src\segment.cpp
 	"segment.h"
 	<sstream>
 	<iostream>
@@ -15816,4 +15818,9 @@
 
 1541172597 source:c:\projects\clothsimulator\src\viewport2d.cpp
 	"viewport2d.h"
+
+1541269977 source:c:\projects\clothsimulator\src\clothchangelistener.cpp
+	"clothchangelistener.h"
+
+1541270675 c:\projects\clothsimulator\include\clothchangelistener.h
 
