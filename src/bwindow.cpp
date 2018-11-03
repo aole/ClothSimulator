@@ -413,7 +413,7 @@ void BWindow::keyDown(UINT keyCode)
     switch(keyCode)
     {
     case VK_DELETE:
-        if (highlighted_vertex)
+        if (operation_mode==1 && highlighted_vertex)
         {
             Shape *s = highlighted_vertex->shape;
             s->removeVertex(highlighted_vertex);
@@ -422,6 +422,18 @@ void BWindow::keyDown(UINT keyCode)
 
             InvalidateRect(hwnd, NULL, TRUE);
             clothChanged = TRUE;
+        }else if(operation_mode==0 && highlighted_shape)
+        {
+            shapes.erase(std::remove(shapes.begin(), shapes.end(), highlighted_shape), shapes.end());
+
+            delete highlighted_shape;
+            highlighted_segment = NULL;
+            highlighted_shape = NULL;
+            highlighted_vertex = NULL;
+
+            isLMDown = FALSE; // avoid new shape creation
+
+            repaint();
         }
         break;
     }
@@ -547,7 +559,7 @@ void BWindow::paint()
         LineTo(memhdc, x2+centerx+panx,y2+centery+pany);
     }
 
-    // temporary (while creating) rectangle
+    // temporary (while dragging) rectangle
     if (isLMDown && operation_mode==0 && !highlighted_shape)
     {
         if(shape_fill)
@@ -626,9 +638,9 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
     case WM_DESTROY:
         wndptr->cleanUp();
 
-    //case WM_DRAWITEM:
+    case WM_DRAWITEM:
     case WM_ERASEBKGND:
-        return (LRESULT)1;// to avoid flicker
+        break;// to avoid flicker
 
     default:
         return DefWindowProc (hwnd, message, wParam, lParam);
@@ -642,26 +654,22 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
 {
     TCHAR szClassName[ ] = L"Canvas";
 
-    WNDCLASSEX wincl;        /* Data structure for the windowclass */
+    WNDCLASSEX wincl;
 
-    /* The Window structure */
     wincl.hInstance = hInstance;
     wincl.lpszClassName = szClassName;
     wincl.lpfnWndProc = CanvasProcedure;
     wincl.style = CS_OWNDC|CS_HREDRAW|CS_VREDRAW;
     wincl.cbSize = sizeof (WNDCLASSEX);
 
-    /* Use default icon and mouse-pointer */
     wincl.hIcon = LoadIcon (NULL, IDI_APPLICATION);
     wincl.hIconSm = LoadIcon (NULL, IDI_APPLICATION);
     wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL;                 /* No menu */
-    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;                      /* structure or the window instance */
-    /* Use Windows's default colour as the background of the window */
+    wincl.lpszMenuName = NULL;
+    wincl.cbClsExtra = 0;
+    wincl.cbWndExtra = 0;
     wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
 
-    /* Register the window class, and if it fails quit the program */
     RegisterClassEx (&wincl);
 
     HWND hwnd = this->hwnd = CreateWindowEx (
@@ -670,9 +678,9 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
                                  szClassName,
                                  WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
                                  0, 0, window_width, window_height,
-                                 hWndParent,        /* The window is a child-window */
+                                 hWndParent,
                                  NULL,
-                                 GetModuleHandle(NULL),       /* Program Instance handler */
+                                 GetModuleHandle(NULL),
                                  this                 // object reference
                              );
     ShowWindow (hwnd, SW_SHOWDEFAULT);

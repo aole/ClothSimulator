@@ -16,6 +16,7 @@ $$$$ 39. pan bg image with the grid
 $$$$ 38. pan shapes in 2D window with RMB
 $$$$ 39. zoom 3D window.
 $$$$ 2. create corresponding 3d shapes as the shape in 2d section
+$$$$ 27. delete whole shape
 
 35. display 3d ground plane as 3d lines
 6. add lights
@@ -34,5 +35,4 @@ $$$$ 2. create corresponding 3d shapes as the shape in 2d section
 24. non-modal dialog to change preferences.
 25. shape opacity
 26. zoom 2d view
-27. delete whole shape
 32. CODE EFFICIENCY!!!

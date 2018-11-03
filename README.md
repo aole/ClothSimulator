@@ -8,9 +8,10 @@ The cloth is affected by gravity, collision geometry and other forces.
 
 Features
 --------
-Create Rectangle / Move:
+Create / Move / Delete Rectangle:
 Click and Drag LMB on an empty area to create a rectangle in the 2D window.
 Click and Drag LMB on a shape to move it.
+Click and Hold LMB over the shape and click Delete key to delete it.
 
 Create / Move / Delete Vertices:
 Click and Drag LMB over an existing vertex to move it.
