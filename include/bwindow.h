@@ -48,12 +48,12 @@ public:
     void keyDown(UINT keyCode);
 
     void clothChangedAck() { clothChanged = FALSE; }
+
+    std::vector<Shape*> shapes;
 private:
     int shape_fill = 1;
     int shape_opacity = 255;
     int image_opacity = 255;
-
-    std::vector<Shape*> shapes;
 
     Shape *highlighted_shape = NULL;
     Segment *highlighted_segment = NULL;

@@ -85,8 +85,8 @@ public:
 
     Shape(Vertex &v1, Vertex &v2);
 
-    void RenderGrid(HDC hdc);
-    vector<glm::vec3> &getOpenGLVertices();
+    void RenderGrid(HDC hdc, int dx, int dy);
+    void getOpenGLVertices(vector<glm::vec3> &vertices, vector<unsigned int> &indices, int start_index);
 
     void process(std::wstring key, std::wstring value);
 
@@ -151,7 +151,7 @@ public:
             }
         }
 
-        m_segments.push_back(new Segment(a->at(ai), b->at(bi), this));
+        addSegment(new Segment(a->at(ai), b->at(bi), this), a);
         m_segments.erase(std::remove(m_segments.begin(), m_segments.end(), a), m_segments.end());
         m_segments.erase(std::remove(m_segments.begin(), m_segments.end(), b), m_segments.end());
         delete a;

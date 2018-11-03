@@ -1,12 +1,12 @@
 #include "segment.h"
 
+#include <sstream>
+#include <iostream>
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/foreach.hpp>
-
-#include <sstream>
 
 typedef boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> point_t;
 typedef boost::geometry::model::polygon<point_t, FALSE, FALSE> polygon_type;
@@ -105,7 +105,7 @@ void Shape::process(std::wstring key, std::wstring value)
     }
 }
 
-void Shape::RenderGrid(HDC hdc)
+void Shape::RenderGrid(HDC hdc, int dx, int dy)
 {
     // create grid
     Vertex *x0, *y0, *xe, *ye;
@@ -156,20 +156,142 @@ void Shape::RenderGrid(HDC hdc)
             for(polygon_type poly: intersected_polys)
             {
                 auto itb = boost::begin(boost::geometry::exterior_ring(poly));
-                MoveToEx(hdc, (int)boost::geometry::get<0>(*itb), (int)boost::geometry::get<1>(*itb), NULL);
+                MoveToEx(hdc, (int)boost::geometry::get<0>(*itb)+dx, (int)boost::geometry::get<1>(*itb)+dy, NULL);
                 for(auto it = boost::begin(boost::geometry::exterior_ring(poly))+1; it != boost::end(boost::geometry::exterior_ring(poly)); ++it)
                 {
                     double px = boost::geometry::get<0>(*it);
                     double py = boost::geometry::get<1>(*it);
-                    LineTo(hdc, (int)(px), (int)(py));
+                    LineTo(hdc, (int)(px+dx), (int)(py+dy));
                 }
             }
         }
     }
 }
 
-vector<glm::vec3> &Shape::getOpenGLVertices()
+void Shape::getOpenGLVertices(vector<glm::vec3> &vertices, vector<unsigned int> &indices, int start_index)
 {
-    return vertices;
+    // create grid
+    Vertex *x0, *y0, *xe, *ye;
+    x0 = y0 = xe = ye = NULL;
+    // find left most point = x0
+    // find top most point = y0
+    // find right most point = xe
+    // find bottom most point = ye
+    for(Vertex *v: m_vertices)
+    {
+        if(!x0)
+        {
+            x0 = y0 = xe = ye = v;
+            continue;
+        }
+        if(v->m_x < x0->m_x)
+            x0 = v;
+        if(v->m_x > xe->m_x)
+            xe = v;
+        if(v->m_y < y0->m_y)
+            y0 = v;
+        if(v->m_y > ye->m_y)
+            ye = v;
+    }
+    polygon_type main_shape;
+    for(Segment *s: m_segments)
+    {
+        boost::geometry::append(main_shape.outer(), point_t(s->at(0)->m_x, s->at(0)->m_y));
+    }
+
+    // distance between points = d
+    double d = 20;
+
+    int vert_indices = start_index;
+    // find intersecting polygons between each cell and the main shape
+    for(double y=y0->m_y; y<ye->m_y; y += d)
+    {
+        for(double x=x0->m_x; x<xe->m_x; x += d)
+        {
+            polygon_type cell;
+            boost::geometry::append(cell.outer(), point_t(x, y));
+            boost::geometry::append(cell.outer(), point_t(x+d, y));
+            boost::geometry::append(cell.outer(), point_t(x+d, y+d));
+            boost::geometry::append(cell.outer(), point_t(x, y+d));
+
+            std::vector<polygon_type> intersected_polys;
+            boost::geometry::intersection(main_shape, cell, intersected_polys);
+
+            for(polygon_type poly: intersected_polys)
+            {
+                int polyvertcount = 0;
+                for(auto it = boost::begin(boost::geometry::exterior_ring(poly)); it != boost::end(boost::geometry::exterior_ring(poly)); ++it)
+                {
+                    float px = boost::geometry::get<0>(*it)/100.0;
+                    float py = boost::geometry::get<1>(*it)/-100.0;
+                    vertices.push_back(glm::vec3(px, py, 0));
+                    polyvertcount++;
+                }
+                if(polyvertcount==3)
+                {
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices+1);
+                }
+                else if(polyvertcount==4)
+                {
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices+1);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+3);
+                }
+                else if(polyvertcount==5)
+                {
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices+1);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+3);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+4);
+                    indices.push_back(vert_indices+3);
+                }
+                else if(polyvertcount==6)
+                {
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices+1);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+3);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+4);
+                    indices.push_back(vert_indices+3);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+5);
+                    indices.push_back(vert_indices+4);
+                }
+                else if(polyvertcount==7)
+                {
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices+1);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+3);
+                    indices.push_back(vert_indices+2);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+4);
+                    indices.push_back(vert_indices+3);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+5);
+                    indices.push_back(vert_indices+4);
+                    indices.push_back(vert_indices);
+                    indices.push_back(vert_indices+6);
+                    indices.push_back(vert_indices+5);
+                }else
+                    std::cout<<polyvertcount<<std::endl;
+
+                vert_indices+=polyvertcount;
+            }
+        }
+    }
 }
 

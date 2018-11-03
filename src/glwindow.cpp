@@ -55,10 +55,11 @@ GLuint MatrixID;
 
 GLuint VertexArrayID;
 GLuint vertexbuffer; // vertex buffer identifier
-GLuint colorbuffer; // color buffer identifier
 
 std::vector< glm::vec3 > opengl_vertices;
-std::vector< glm::vec3 > opengl_colors;
+std::vector< unsigned int > opengl_indices;
+
+BWindow *bcanvas;
 
 GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path)
 {
@@ -156,6 +157,34 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
     return ProgramID;
 }
 
+void populate()
+{
+    opengl_vertices.clear();
+    // display ground plane
+    opengl_vertices.push_back(glm::vec3(-10, -1, -10));
+    opengl_vertices.push_back(glm::vec3(-10, -1, 10));
+    opengl_vertices.push_back(glm::vec3(10, -1, -10));
+    opengl_vertices.push_back(glm::vec3(10, -1, 10));
+
+    opengl_indices.clear();
+    opengl_indices.push_back(0);
+    opengl_indices.push_back(1);
+    opengl_indices.push_back(2);
+    opengl_indices.push_back(2);
+    opengl_indices.push_back(1);
+    opengl_indices.push_back(3);
+
+    for(Shape *s: bcanvas->shapes)
+    {
+        int start_indices = opengl_vertices.size();
+        s->getOpenGLVertices(opengl_vertices, opengl_indices, start_indices);
+    }
+
+    // pass to OpenGL
+    glBufferData(GL_ARRAY_BUFFER, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, opengl_indices.size() * sizeof(unsigned int), &opengl_indices[0], GL_STATIC_DRAW);
+}
+
 void init()
 {
     programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
@@ -165,37 +194,12 @@ void init()
     MatrixID = glGetUniformLocation(programID, "MVP");
 
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    Projection = glm::perspective(glm::radians(45.0f), (float) glwindow_width / (float) glwindow_height, 0.1f, 100.0f);
+    Projection = glm::perspective(glm::radians(45.0f), (float) glwindow_width / (float) glwindow_height, 0.1f, 1000.0f);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
-
-    // define counter-clock wise
-    // display ground plane
-    opengl_vertices.push_back(glm::vec3(-10, -1, -10));
-    opengl_vertices.push_back(glm::vec3(-10, -1, 10));
-    opengl_vertices.push_back(glm::vec3(10, -1, -10));
-    opengl_vertices.push_back(glm::vec3(10, -1, -10));
-    opengl_vertices.push_back(glm::vec3(-10, -1, 10));
-    opengl_vertices.push_back(glm::vec3(10, -1, 10));
-
-    opengl_colors.push_back(glm::vec3(.2, .2, .2));
-    opengl_colors.push_back(glm::vec3(.2, .2, .2));
-    opengl_colors.push_back(glm::vec3(.2, .2, .2));
-    opengl_colors.push_back(glm::vec3(.2, .2, .2));
-    opengl_colors.push_back(glm::vec3(.2, .2, .2));
-    opengl_colors.push_back(glm::vec3(.2, .2, .2));
-
-    // cloth
-    opengl_vertices.push_back(glm::vec3(-.5, 0, 0.0));
-    opengl_vertices.push_back(glm::vec3(0.5, 0, 0.0));
-    opengl_vertices.push_back(glm::vec3(0.0,  0.5, 0.0));
-
-    opengl_colors.push_back(glm::vec3(.6, .6, .6));
-    opengl_colors.push_back(glm::vec3(.6, .6, .6));
-    opengl_colors.push_back(glm::vec3(.6, .6, .6));
 
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
@@ -203,12 +207,13 @@ void init()
     // generate 1 buffer
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    // pass to OpenGL
-    glBufferData(GL_ARRAY_BUFFER, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0], GL_STATIC_DRAW);
 
-    glGenBuffers(1, &colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, opengl_colors.size() * sizeof(glm::vec3), &opengl_colors[0], GL_STATIC_DRAW);
+    // Generate a buffer for the indices
+    GLuint elementbuffer;
+    glGenBuffers(1, &elementbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+    populate();
 }
 
 void render()
@@ -239,29 +244,24 @@ void render()
     glClearColor(.8,.8,.8, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // display clothes
     glEnable(GL_CULL_FACE);
+    //glDisable(GL_CULL_FACE);
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // 2nd attribute buffer : colors
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-    glVertexAttribPointer(
-        1,                                // attribute. must match the layout in the shader.
-        3,                                // size
-        GL_FLOAT,                         // type
-        GL_FALSE,                         // normalized?
-        0,                                // stride
-        (void*)0                          // array buffer offset
+    //glDrawArrays(GL_TRIANGLES, 0, opengl_vertices.size());
+
+// Draw the triangles !
+    glDrawElements(
+        GL_TRIANGLES,      // mode
+        opengl_indices.size(),    // count
+        GL_UNSIGNED_INT,   // type
+        (void*)0           // element array buffer offset
     );
 
-    glDrawArrays(GL_TRIANGLES, 0, opengl_vertices.size());
-
-    glDisableVertexAttribArray(1);
+    //glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);
 
     // present
@@ -291,7 +291,10 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
     return 0;
     case WM_PAINT:
         if(initialized)
+        {
+            populate();
             render();
+        }
         break;
     case WM_SIZE:
         RECT r;
@@ -349,8 +352,10 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 }
 
 
-HWND GLWindow::create(HWND hWndParent, HINSTANCE hInstance)
+HWND GLWindow::create(HWND hWndParent, HINSTANCE hInstance, BWindow *c)
 {
+    bcanvas = c;
+
     TCHAR szClassName[ ] = L"OpenGLWindow";
 
     WNDCLASSEX wincl;        /* Data structure for the windowclass */

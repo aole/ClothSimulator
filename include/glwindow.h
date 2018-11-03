@@ -3,10 +3,12 @@
 
 #include <windows.h>
 
+#include "bwindow.h"
+
 class GLWindow
 {
 public:
-    HWND create(HWND hWndParent, HINSTANCE hInstance);
+    HWND create(HWND hWndParent, HINSTANCE hInstance, BWindow *c);
 
     void setSize(int x, int y, int w, int h){ this->x=x; this->y=y; this->w=w; this->h=h; };
 

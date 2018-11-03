@@ -188,7 +188,7 @@ void CreateUI(HWND hWndParent)
                      wrect.top+tbrect.bottom-tbrect.top,
                      (wrect.right-wrect.left)/2-1,
                      wrect.bottom-wrect.top-(tbrect.bottom-tbrect.top));
-    glwindow.create(hWndParent, hInstance);
+    glwindow.create(hWndParent, hInstance, &canvas);
 
 }
 

@@ -458,7 +458,7 @@ void BWindow::displayClothes(HDC hdc)
         {
             // render shape grid
             SelectObject(hdc, hpen_shape_grid);
-            //shape->RenderGrid(hdc);
+            //shape->RenderGrid(hdc, centerx+panx, centery+pany);
         }
 
         // render shape outline
