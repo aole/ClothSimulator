@@ -13,13 +13,13 @@ $$$$ 34. Pan 3D window with RMB
 $$$$ 28. add a ground plane.
 $$$$ 37. pan 2d grid with RMB
 $$$$ 39. pan bg image with the grid
+$$$$ 38. pan shapes in 2D window with RMB
 
 2. create corresponding 3d shapes as the shape in 2d section
 4. CLOTHIFY!!!
 29. run simulation
 30. stitch edges
 31. export obj
-21. pan 2d view with RMB
 10. undo/redo
 6. add lights
 7. CODE CLEANUP!!!
@@ -35,4 +35,3 @@ $$$$ 39. pan bg image with the grid
 32. CODE EFFICIENCY!!!
 35. ground plane to grid?
 36. orbit 3D window
-38. pan shapes in 2D window with RMB

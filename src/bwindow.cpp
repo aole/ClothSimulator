@@ -199,17 +199,106 @@ void BWindow::rButtonUp(int x, int y)
     last_mouse_y = y;
 }
 
+void BWindow::lButtonDown(int x, int y)
+{
+    last_mouse_x = x;
+    last_mouse_y = y;
+    isLMDown = TRUE;
+
+    if (operation_mode==0) // start rectangle
+    {
+        Vertex mouse_point(x-(centerx+panx), y-(centery+pany));
+        // check if inside a shape, then start move
+        highlighted_shape = NULL;
+        BOOST_REVERSE_FOREACH(Shape *shape, shapes)
+        {
+            if(shape->within(&mouse_point))
+            {
+                highlighted_shape = shape;
+                break;
+            }
+        }
+        if (!highlighted_shape)
+        {
+            // start creating rectangle shape
+            v1.set(x, y);
+            v2.set(x, y);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+    }
+    else if (operation_mode==1) // add vertex
+    {
+        if(highlighted_segment)
+        {
+            // check if near any already existing vertex.
+            // if so grab it.
+            Vertex mouse_point(x-(centerx+panx), y-(centery+pany));
+            double min_dist = 10000000;
+            Vertex *nearest;
+
+            // TODO: Optimize ... get the first within range
+            for (Shape *shape: shapes)
+            {
+                for (Vertex *v: shape->m_vertices)
+                {
+                    double comp_dist = boost::geometry::comparable_distance(mouse_point, *v);
+                    if (comp_dist<min_dist)
+                    {
+                        min_dist = comp_dist;
+                        nearest = v;
+                    }
+                }
+            }
+
+            if(min_dist<=MIN_DISTANCE_SQUARE)
+            {
+                highlighted_vertex = nearest;
+            }
+            else
+            {
+                // if not near any vertex, split the segment
+                // grab the new vertex
+                highlighted_vertex = highlighted_segment->splitAt(x-(centerx+panx), y-(centery+pany));
+                highlighted_segment = NULL;
+
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
+        }
+    }
+    SetCapture(hwnd);
+}
+
+void BWindow::lButtonUp(int x, int y)
+{
+    if (isLMDown && operation_mode==0 && !highlighted_shape)
+    {
+        v1.m_x -= (centerx+panx);
+        v1.m_y -= (centery+pany);
+        v2.set(x-(centerx+panx),y-(centery+pany));
+
+        Shape *shape = new Shape(v1,v2);
+        shapes.push_back(shape);
+        InvalidateRect(hwnd, NULL, TRUE);
+        clothChanged = TRUE;
+    }
+    isLMDown = FALSE;
+    highlighted_vertex = NULL;
+    InvalidateRect(hwnd, NULL, TRUE);
+}
+
 void BWindow::mouseMove(int x, int y)
 {
+    int dx = x - last_mouse_x;
+    int dy = y - last_mouse_y;
+
     if(isRMDown)
     {
-        int dx = x - last_mouse_x;
-        int dy = y - last_mouse_y;
 
         panx += dx;
         pany += dy;
 
-        repaint();
+        InvalidateRect(hwnd, NULL, TRUE);
+        //repaint();
     }
 
     else if(isLMDown)
@@ -218,22 +307,22 @@ void BWindow::mouseMove(int x, int y)
         if (isLMDown && operation_mode==0)
         {
             if(highlighted_shape)
-                highlighted_shape->translate(x-last_mouse_x, y-last_mouse_y);
+                highlighted_shape->translate(dx, dy);
             else
-                v2.set(x,y);
+                v2.set(x, y);
 
             InvalidateRect(hwnd, NULL, TRUE);
         }
         // move segments
         else if (highlighted_segment && isLMDown && operation_mode==2)
         {
-            highlighted_segment->addPoint(x-last_mouse_x,y-last_mouse_y);
+            highlighted_segment->addPoint(dx, dy);
             InvalidateRect(hwnd, NULL, TRUE);
         }
         // move vertices
         else if (highlighted_vertex && isLMDown && operation_mode==1)
         {
-            highlighted_vertex->addPoint(x-last_mouse_x,y-last_mouse_y);
+            highlighted_vertex->addPoint(dx, dy);
             InvalidateRect(hwnd, NULL, TRUE);
         }
     }
@@ -241,7 +330,7 @@ void BWindow::mouseMove(int x, int y)
     // highlight segments
     else  if ((operation_mode==1 || operation_mode==2))
     {
-        Vertex mouse_point(x, y);
+        Vertex mouse_point(x-(centerx+panx), y-(centery+pany));
 
         double min_dist = 10000000;
         Segment *nearest;
@@ -284,38 +373,38 @@ void BWindow::drawGrid(HDC hdc)
     for(int y=(cy>0?cy:0) - gril_gap; y>0; y-=gril_gap)
     {
         MoveToEx(hdc, 0, y, NULL);
-        LineTo(hdc, w, y);
+        LineTo(hdc, window_width, y);
     }
-    for(int y=(cy<h?cy:h) + gril_gap; y<h; y+=gril_gap)
+    for(int y=(cy<window_height?cy:window_height) + gril_gap; y<window_height; y+=gril_gap)
     {
         MoveToEx(hdc, 0, y, NULL);
-        LineTo(hdc, w, y);
+        LineTo(hdc, window_width, y);
     }
 // vertical
     for(int x=(cx>0?cx:0) - gril_gap; x>0; x-=gril_gap)
     {
         MoveToEx(hdc, x, 0, NULL);
-        LineTo(hdc, x, h);
+        LineTo(hdc, x, window_height);
     }
-    for(int x=(cx<w?cx:w) + gril_gap; x<w; x+=gril_gap)
+    for(int x=(cx<window_width?cx:window_width) + gril_gap; x<window_width; x+=gril_gap)
     {
         MoveToEx(hdc, x, 0, NULL);
-        LineTo(hdc, x, h);
+        LineTo(hdc, x, window_height);
     }
 
     SelectObject(hdc, hpen_main_grid_lines);
 
-// horizontal
-    if(cy>0 && cy<w)
+// horizontal main
+    if(cy>0 && cy<window_width)
     {
         MoveToEx(hdc, 0, cy, NULL);
-        LineTo(hdc, w, cy);
+        LineTo(hdc, window_width, cy);
     }
-// vertical
-    if(cx>0 && cx<h)
+// vertical main
+    if(cx>0 && cx<window_height)
     {
         MoveToEx(hdc, cx, 0, NULL);
-        LineTo(hdc, cx, h);
+        LineTo(hdc, cx, window_height);
     }
 }
 
@@ -338,88 +427,74 @@ void BWindow::keyDown(UINT keyCode)
     }
 }
 
-void BWindow::lButtonDown(int x, int y)
+void BWindow::displayImage(HDC hdc)
 {
-    last_mouse_x = x;
-    last_mouse_y = y;
-    isLMDown = TRUE;
-
-    if (operation_mode==0) // start rectangle
+    if (background_image)
     {
-        Vertex mouse_point(x, y);
-        // check if inside a shape, then start move
-        highlighted_shape = NULL;
-        BOOST_REVERSE_FOREACH(Shape *shape, shapes)
-        {
-            if(shape->within(&mouse_point))
-            {
-                highlighted_shape = shape;
-                break;
-            }
-        }
-        if (!highlighted_shape)
-        {
-            // start creating rectangle shape
-            v1.set(x,y);
-            v2.set(x,y);
-            InvalidateRect(hwnd, NULL, TRUE);
-        }
+        HDC bithdc = CreateCompatibleDC(hdc);
+        HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, bg_width, bg_height);
+        SelectObject(bithdc, bitbitmap);
+        SetStretchBltMode(bithdc, COLORONCOLOR);
+        StretchDIBits(bithdc, 0, 0,
+                      bg_width, bg_height,
+                      0, 0, bg_width, bg_height,
+                      FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
+
+        AlphaBlend(hdc, panx+centerx-bg_width/2, pany+centery-bg_height/2, bg_width,bg_height,bithdc,0,0,bg_width,bg_height,blendFn);
+        DeleteObject(bitbitmap);
+        DeleteDC(bithdc);
     }
-    else if (operation_mode==1) // add vertex
+}
+
+void BWindow::displayClothes(HDC hdc)
+{
+    SelectObject(hdc, hbrush_fill);
+    SelectObject(hdc, GetStockObject(BLACK_PEN));
+
+    // all shapes
+    for (Shape *shape: shapes)
     {
-        if(highlighted_segment)
+        if(!isLMDown)
         {
-            // check if near any already existing vertex.
-            // if so grab it.
-            Vertex mouse_point(x, y);
-            double min_dist = 10000000;
-            Vertex *nearest;
+            // render shape grid
+            SelectObject(hdc, hpen_shape_grid);
+            //shape->RenderGrid(hdc);
+        }
 
-            // TODO: Optimize ... get the first within range
-            for (Shape *shape: shapes)
-            {
-                for (Vertex *v: shape->m_vertices)
-                {
-                    double comp_dist = boost::geometry::comparable_distance(mouse_point, *v);
-                    if (comp_dist<min_dist)
-                    {
-                        min_dist = comp_dist;
-                        nearest = v;
-                    }
-                }
-            }
+        // render shape outline
+        SelectObject(hdc, GetStockObject(BLACK_PEN));
 
-            if(min_dist<=MIN_DISTANCE_SQUARE)
+        int num_points = shape->m_segments.size()+1;
+        POINT points[num_points];
+        int i=0;
+        for (Segment *seg: shape->m_segments)
+        {
+            if(shape_fill)
             {
-                highlighted_vertex = nearest;
+                if(!i)
+                    points[i++] = {(int)seg->getx(0)+centerx+panx, (int)seg->gety(0)+centery+pany};
+                points[i++] = {(int)seg->getx(1)+centerx+panx, (int)seg->gety(1)+centery+pany};
             }
             else
             {
-                // if not near any vertex, split the segment
-                // grab the new vertex
-                highlighted_vertex = highlighted_segment->splitAt(x, y);
-                highlighted_segment = NULL;
+                MoveToEx(hdc, (int)seg->getx(0)+centerx+panx, (int)seg->gety(0)+centery+pany, NULL);
+                LineTo(hdc, (int)seg->getx(1)+centerx+panx, (int)seg->gety(1)+centery+pany);
+            }
+        };
 
-                InvalidateRect(hwnd, NULL, TRUE);
+        if(shape_fill)
+            Polygon(hdc, points, num_points);
+
+        if (operation_mode==2 || operation_mode==1)
+        {
+            for (Vertex *v: shape->m_vertices)
+            {
+                Ellipse(hdc, (int)v->m_x-3+centerx+panx, (int)v->m_y-3+centery+pany,
+                        (int)v->m_x+3+centerx+panx, (int)v->m_y+3+centery+pany);
             }
         }
-    }
-    SetCapture(hwnd);
-}
 
-void BWindow::lButtonUp(int x, int y)
-{
-    if (isLMDown && operation_mode==0 && !highlighted_shape)
-    {
-        v2.set(x,y);
-        Shape *shape = new Shape(v1,v2);
-        shapes.push_back(shape);
-        InvalidateRect(hwnd, NULL, TRUE);
-        clothChanged = TRUE;
     }
-    isLMDown = FALSE;
-    highlighted_vertex = NULL;
-    InvalidateRect(hwnd, NULL, TRUE);
 }
 
 void BWindow::paint()
@@ -433,8 +508,8 @@ void BWindow::paint()
 
     RECT Client_Rect;
     GetClientRect(hwnd,&Client_Rect);
-    int win_width = Client_Rect.right - Client_Rect.left;
-    int win_height = Client_Rect.bottom + Client_Rect.left;
+    int win_width = window_width; //Client_Rect.right - Client_Rect.left;
+    int win_height = window_height; //Client_Rect.bottom + Client_Rect.left;
     HDC memhdc;
     HBITMAP membitmap;
     PAINTSTRUCT ps;
@@ -446,63 +521,17 @@ void BWindow::paint()
 
     FillRect(memhdc,&Client_Rect, hbrush_background);
 
-    // draw background 2D grid
     drawGrid(memhdc);
 
-    SelectObject(memhdc, hbrush_fill);
-    SelectObject(memhdc, GetStockObject(BLACK_PEN));
-
-    // all shapes
-    for (Shape *shape: shapes)
-    {
-        if(!isLMDown)
-        {
-            // render shape grid
-            SelectObject(memhdc, hpen_shape_grid);
-            shape->RenderGrid(memhdc);
-        }
-
-        // render shape outline
-        SelectObject(memhdc, GetStockObject(BLACK_PEN));
-
-        int num_points = shape->m_segments.size()+1;
-        POINT points[num_points];
-        int i=0;
-        for (Segment *seg: shape->m_segments)
-        {
-            if(shape_fill)
-            {
-                if(!i)
-                    points[i++] = {(int)seg->getx(0), (int)seg->gety(0)};
-                points[i++] = {(int)seg->getx(1), (int)seg->gety(1)};
-            }
-            else
-            {
-                MoveToEx(memhdc, (int)seg->getx(0), (int)seg->gety(0), NULL);
-                LineTo(memhdc, (int)seg->getx(1), (int)seg->gety(1));
-            }
-        };
-
-        if(shape_fill)
-            Polygon(memhdc, points, num_points);
-
-        if (operation_mode==2 || operation_mode==1)
-        {
-            for (Vertex *v: shape->m_vertices)
-            {
-                Ellipse(memhdc, (int)v->m_x-3, (int)v->m_y-3, (int)v->m_x+3, (int)v->m_y+3);
-            }
-        }
-
-    }
+    displayClothes(memhdc);
 
     // highlighted vertex
     if(highlighted_vertex && (operation_mode==1))
     {
         SelectObject(memhdc, hpen_highlght);
 
-        Ellipse(memhdc, (int)highlighted_vertex->m_x-3, (int)highlighted_vertex->m_y-3,
-                (int)highlighted_vertex->m_x+3, (int)highlighted_vertex->m_y+3);
+        Ellipse(memhdc, (int)highlighted_vertex->m_x-3+centerx+panx, (int)highlighted_vertex->m_y-3+centery+pany,
+                (int)highlighted_vertex->m_x+3+centerx+panx, (int)highlighted_vertex->m_y+3+centery+pany);
     }
     // highlighted segment
     else if(highlighted_segment && (operation_mode==1 || operation_mode==2))
@@ -514,8 +543,8 @@ void BWindow::paint()
         double x2 = highlighted_segment->getx(1);
         double y2 = highlighted_segment->gety(1);
 
-        MoveToEx(memhdc, x1,y1, NULL);
-        LineTo(memhdc, x2,y2);
+        MoveToEx(memhdc, x1+centerx+panx,y1+centery+pany, NULL);
+        LineTo(memhdc, x2+centerx+panx,y2+centery+pany);
     }
 
     // temporary (while creating) rectangle
@@ -533,22 +562,7 @@ void BWindow::paint()
         }
     }
 
-    // render background image
-    if (background_image)
-    {
-        HDC bithdc = CreateCompatibleDC(hdc);
-        HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, bg_width, bg_height);
-        SelectObject(bithdc, bitbitmap);
-        SetStretchBltMode(bithdc, COLORONCOLOR);
-        StretchDIBits(bithdc, 0, 0,
-                      bg_width, bg_height,
-                      0, 0, bg_width, bg_height,
-                      FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
-
-        AlphaBlend(memhdc, panx+centerx-bg_width/2, pany+centery-bg_height/2, bg_width,bg_height,bithdc,0,0,bg_width,bg_height,blendFn);
-        DeleteObject(bitbitmap);
-        DeleteDC(bithdc);
-    }
+    displayImage(memhdc);
 
     BitBlt(hdc, 0, 0, win_width, win_height, memhdc, 0, 0, SRCCOPY);
     DeleteObject(membitmap);
@@ -561,7 +575,6 @@ void BWindow::paint()
 
 LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int x, y;
     BWindow *wndptr = (BWindow*) GetWindowLongPtr(hwnd, GWL_USERDATA);
 
     switch (message)                  /* handle the messages */
@@ -596,6 +609,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         break;
     case WM_LBUTTONDOWN:
         SetFocus(hwnd);
+        SetCapture(hwnd);
         wndptr->lButtonDown(GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ));
         break;
     case WM_LBUTTONUP:
@@ -603,11 +617,7 @@ LRESULT CALLBACK CanvasProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         wndptr->lButtonUp(GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ));
         break;
     case WM_MOUSEMOVE:
-        x = GET_X_LPARAM( lParam );
-        y = GET_Y_LPARAM( lParam );
-
-        wndptr->mouseMove(x, y);
-
+        wndptr->mouseMove(GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ));
         break;
     case WM_PAINT:
         wndptr->paint();
@@ -659,7 +669,7 @@ HWND BWindow::create(HWND hWndParent, HINSTANCE hInstance)
                                  szClassName,
                                  szClassName,
                                  WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
-                                 0, 0, w, h,
+                                 0, 0, window_width, window_height,
                                  hWndParent,        /* The window is a child-window */
                                  NULL,
                                  GetModuleHandle(NULL),       /* Program Instance handler */

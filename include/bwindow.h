@@ -19,22 +19,25 @@ public:
 
     void setShapeFill(int shape_fill) { this->shape_fill = shape_fill; }
     void setShapeOpacity(int shape_opacity) { this->shape_opacity = shape_opacity; }
+    void displayClothes(HDC hdc);
+
     void setImageOpacity(int image_opacity) { this->image_opacity = image_opacity; }
     void loadImage(wchar_t *filename);
     void clearImage();
+    void displayImage(HDC hdc);
 
     HWND getHandle() { return hwnd; }
-    void setSize(int w, int h){ this->w=w; this->h=h; centerx=w/2; centery=h/2; };
+    void setSize(int w, int h){ this->window_width=w; this->window_height=h; centerx=w/2; centery=h/2; };
     void drawGrid(HDC hdc);
     void repaint() { InvalidateRect(hwnd, NULL, TRUE); };
     void paint();
 
     void setMode(int mode);
-    int getWidth() { return w; }
-    int getHeight() { return h; }
+    int getWidth() { return window_width; }
+    int getHeight() { return window_height; }
 
-    void setWidth(int w) { this->w=w; centerx=w/2; }
-    void setHeight(int h) { this->h=h; centery=h/2; }
+    void setWidth(int w) { this->window_width=w; centerx=w/2; }
+    void setHeight(int g) { this->window_height=g; centery=g/2; }
 
     void rButtonDown(int x, int y);
     void rButtonUp(int x, int y);
@@ -58,9 +61,9 @@ private:
 
     int last_mouse_x, last_mouse_y;
 
-    int w=100,h=100;
+    int window_width=100,window_height=100;
     int panx=0, pany=0;
-    int centerx=0, centery=0;
+    int centerx=50, centery=50;
 
     HWND hwnd;
     wchar_t image_file[256];

@@ -15125,7 +15125,7 @@
 	<windows.h>
 	<vector>
 
-1541214897 c:\projects\clothsimulator\include\bwindow.h
+1541219395 c:\projects\clothsimulator\include\bwindow.h
 	<windows.h>
 	<iostream>
 	<vector>
@@ -15139,7 +15139,7 @@
 	<commctrl.h>
 	<iostream>
 
-1541213073 source:c:\projects\clothsimulator\src\bwindow.cpp
+1541219805 source:c:\projects\clothsimulator\src\bwindow.cpp
 	"bwindow.h"
 	<list>
 	<windowsx.h>
