@@ -12,6 +12,7 @@ $$$$ 5. 3d projection/view/camera
 $$$$ 34. Pan 3D window with RMB
 $$$$ 28. add a ground plane.
 $$$$ 37. pan 2d grid with RMB
+$$$$ 39. pan bg image with the grid
 
 2. create corresponding 3d shapes as the shape in 2d section
 4. CLOTHIFY!!!
@@ -35,4 +36,3 @@ $$$$ 37. pan 2d grid with RMB
 35. ground plane to grid?
 36. orbit 3D window
 38. pan shapes in 2D window with RMB
-39. pan bg image with the grid

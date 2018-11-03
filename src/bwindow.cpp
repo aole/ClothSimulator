@@ -277,8 +277,8 @@ void BWindow::drawGrid(HDC hdc)
 {
     SelectObject(hdc, hpen_side_grid_lines);
 
-    int cx = panx+w/2;
-    int cy = pany+h/2;
+    int cx = panx+centerx;
+    int cy = pany+centery;
 
     // horizontal
     for(int y=(cy>0?cy:0) - gril_gap; y>0; y-=gril_gap)
@@ -537,15 +537,15 @@ void BWindow::paint()
     if (background_image)
     {
         HDC bithdc = CreateCompatibleDC(hdc);
-        HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, bg_height, bg_height);
+        HBITMAP bitbitmap = CreateCompatibleBitmap(hdc, bg_width, bg_height);
         SelectObject(bithdc, bitbitmap);
         SetStretchBltMode(bithdc, COLORONCOLOR);
         StretchDIBits(bithdc, 0, 0,
-                      bg_height, bg_height,
-                      0, 0, bg_height, bg_height,
+                      bg_width, bg_height,
+                      0, 0, bg_width, bg_height,
                       FreeImage_GetBits(background_image), FreeImage_GetInfo(background_image), DIB_RGB_COLORS, SRCCOPY);
 
-        AlphaBlend(memhdc, 0,0,bg_height,bg_height,bithdc,0,0,bg_height,bg_height,blendFn);
+        AlphaBlend(memhdc, panx+centerx-bg_width/2, pany+centery-bg_height/2, bg_width,bg_height,bithdc,0,0,bg_width,bg_height,blendFn);
         DeleteObject(bitbitmap);
         DeleteDC(bithdc);
     }

@@ -24,7 +24,7 @@ public:
     void clearImage();
 
     HWND getHandle() { return hwnd; }
-    void setSize(int w, int h){ this->w=w; this->h=h; };
+    void setSize(int w, int h){ this->w=w; this->h=h; centerx=w/2; centery=h/2; };
     void drawGrid(HDC hdc);
     void repaint() { InvalidateRect(hwnd, NULL, TRUE); };
     void paint();
@@ -33,8 +33,8 @@ public:
     int getWidth() { return w; }
     int getHeight() { return h; }
 
-    void setWidth(int w) { this->w=w; }
-    void setHeight(int h) { this->h=h; }
+    void setWidth(int w) { this->w=w; centerx=w/2; }
+    void setHeight(int h) { this->h=h; centery=h/2; }
 
     void rButtonDown(int x, int y);
     void rButtonUp(int x, int y);
@@ -60,6 +60,8 @@ private:
 
     int w=100,h=100;
     int panx=0, pany=0;
+    int centerx=0, centery=0;
+
     HWND hwnd;
     wchar_t image_file[256];
 
