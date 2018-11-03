@@ -31,7 +31,7 @@ float horizontalAngle = 3.14;
 float verticalAngle = 0.0f;
 
 glm::mat4 Projection;
-glm::vec3 CameraPosition = glm::vec3(0, 0, 5);
+glm::vec3 CameraPosition = glm::vec3(0, 10, 35);
 glm::vec3 CameraLookAt = glm::vec3(0,0,0);
 glm::vec3 CameraDirection = glm::vec3(0,0,0);
 glm::vec3 CameraRight = glm::vec3(1,0,0);
@@ -52,12 +52,15 @@ glm::mat4 mvp;
 
 GLuint programID;
 GLuint MatrixID;
+GLuint ShaderColorID;
 
 GLuint VertexArrayID;
 GLuint vertexbuffer; // vertex buffer identifier
 
 std::vector< glm::vec3 > opengl_vertices;
 std::vector< unsigned int > opengl_indices;
+
+unsigned int num_grid_indices;
 
 BWindow *bcanvas;
 
@@ -159,20 +162,50 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 
 void populate()
 {
+    // create ground vertices
     opengl_vertices.clear();
-    // display ground plane
-    opengl_vertices.push_back(glm::vec3(-10, -1, -10));
-    opengl_vertices.push_back(glm::vec3(-10, -1, 10));
-    opengl_vertices.push_back(glm::vec3(10, -1, -10));
-    opengl_vertices.push_back(glm::vec3(10, -1, 10));
 
+    float minx = -10.0f;
+    float minz = -10.0f;
+    float maxx =  10.0f;
+    float maxz =  10.0f;
+    int xdiv = 5;
+    int zdiv = 5;
+    float dx = (maxx-minx)/(xdiv+1);
+    float dz = (maxz-minz)/(zdiv+1);
+
+    for(float x=minx; x<=maxx; x+=dx)
+    {
+        for(float z=minz; z<=maxz; z+=dz)
+        {
+            opengl_vertices.push_back(glm::vec3(x, 0, z));
+        }
+    }
+
+    // create ground indices
     opengl_indices.clear();
-    opengl_indices.push_back(0);
-    opengl_indices.push_back(1);
-    opengl_indices.push_back(2);
-    opengl_indices.push_back(2);
-    opengl_indices.push_back(1);
-    opengl_indices.push_back(3);
+
+    int totlines = (xdiv+1) + 1;
+    int x=0;
+
+    for(int i=0;i<totlines;i++){
+        opengl_indices.push_back(x);
+        opengl_indices.push_back(x+zdiv+1);
+
+        x+=zdiv+1+1;
+    }
+
+    totlines = (zdiv+1) + 1;
+    int z=0;
+
+    for(int i=0;i<totlines;i++){
+        opengl_indices.push_back(z);
+        opengl_indices.push_back(z+(zdiv+2)*(xdiv+1));
+
+        z+=1;
+    }
+
+    num_grid_indices = opengl_indices.size();
 
     for(Shape *s: bcanvas->shapes)
     {
@@ -189,9 +222,10 @@ void init()
 {
     programID = LoadShaders( "VertexShader.glsl", "FragmentShader.glsl" );
 
-    // Get a handle for our "MVP" uniform
-    // Only during the initialization
+    // these map direct to vertex shader variables
     MatrixID = glGetUniformLocation(programID, "MVP");
+    ShaderColorID = glGetUniformLocation(programID, "shaderColor");
+
 
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
     Projection = glm::perspective(glm::radians(45.0f), (float) glwindow_width / (float) glwindow_height, 0.1f, 1000.0f);
@@ -244,8 +278,8 @@ void render()
     glClearColor(.8,.8,.8, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_CULL_FACE);
-    //glDisable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -253,12 +287,24 @@ void render()
 
     //glDrawArrays(GL_TRIANGLES, 0, opengl_vertices.size());
 
-// Draw the triangles !
+// Draw the grid
+    glUniform3f(ShaderColorID, .1f, .1f, .1f);
+
     glDrawElements(
-        GL_TRIANGLES,      // mode
-        opengl_indices.size(),    // count
+        GL_LINES,      // mode
+        num_grid_indices,    // count
         GL_UNSIGNED_INT,   // type
         (void*)0           // element array buffer offset
+    );
+
+    // draw the shapes
+    glUniform3f(ShaderColorID, 0.3f, 0.3f, 0.3f);
+
+    glDrawElements(
+        GL_TRIANGLES,      // mode
+        opengl_indices.size()-6,    // count
+        GL_UNSIGNED_INT,   // type
+        (void*)(num_grid_indices*sizeof(unsigned int))           // element array buffer offset
     );
 
     //glDisableVertexAttribArray(1);
