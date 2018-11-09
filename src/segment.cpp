@@ -8,7 +8,10 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/foreach.hpp>
 
-typedef boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> point_t;
+#include "boost/polygon/voronoi.hpp"
+
+typedef boost::polygon::point_data<double>ppoint;
+typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian> point_t;
 typedef boost::geometry::model::polygon<point_t, FALSE, FALSE> polygon_type;
 
 
@@ -16,10 +19,10 @@ vector<glm::vec3> vertices;
 
 Shape::Shape(Vertex& v1, Vertex& v2)
 {
-    double minx = min(v1.m_x, v2.m_x);
-    double maxx = max(v1.m_x, v2.m_x);
-    double miny = min(v1.m_y, v2.m_y);
-    double maxy = max(v1.m_y, v2.m_y);
+    float minx = min(v1.m_x, v2.m_x);
+    float maxx = max(v1.m_x, v2.m_x);
+    float miny = min(v1.m_y, v2.m_y);
+    float maxy = max(v1.m_y, v2.m_y);
 
     Vertex *a = new Vertex(minx, miny, this);
     Vertex *b = new Vertex(maxx, miny, this);
@@ -102,6 +105,42 @@ void Shape::process(std::wstring key, std::wstring value)
         stm >> a >> b;
 
         m_segments.push_back(new Segment(m_vertices[a], m_vertices[b], this));
+    }
+}
+
+void Shape::Voronoize(HDC hdc, int dx, int dy)
+{
+    std::vector<ppoint> vvertices;
+    for(Vertex *v: m_vertices)
+    {
+        vvertices.push_back(ppoint(v->m_x, v->m_y));
+    }
+
+    boost::polygon::voronoi_diagram<double> vd;
+    boost::polygon::construct_voronoi(vvertices.begin(), vvertices.end(), &vd);
+
+    for (const auto& vertex: vd.vertices())
+    {
+        std::vector<ppoint> triangle;
+        auto edge = vertex.incident_edge();
+        do
+        {
+            auto cell = edge->cell();
+            assert(cell->contains_point());
+
+            triangle.push_back(vvertices[cell->source_index()]);
+            if (triangle.size() == 3)
+            {
+                // process output triangles
+                MoveToEx(hdc, triangle[2].x() + dx, triangle[2].y()+dy, NULL);
+                for(int ind=0;ind<3;ind++)
+                    LineTo(hdc, triangle[ind].x() + dx, triangle[ind].y() + dy);
+                triangle.erase(triangle.begin() + 1);
+            }
+
+            edge = edge->rot_next();
+        }
+        while (edge != vertex.incident_edge());
     }
 }
 
@@ -286,7 +325,8 @@ void Shape::getOpenGLVertices(vector<glm::vec3> &vertices, vector<unsigned int> 
                     indices.push_back(vert_indices);
                     indices.push_back(vert_indices+6);
                     indices.push_back(vert_indices+5);
-                }else
+                }
+                else
                     std::cout<<polyvertcount<<std::endl;
 
                 vert_indices+=polyvertcount;

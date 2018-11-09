@@ -15108,7 +15108,7 @@
 
 1533160258 c:\boost_1_68_0\boost\program_options\version.hpp
 
-1541270335 source:c:\projects\clothsimulator\main.cpp
+1541272414 source:c:\projects\clothsimulator\main.cpp
 	<tchar.h>
 	<windows.h>
 	<commctrl.h>
@@ -15132,7 +15132,7 @@
 	"segment.h"
 	"clothchangelistener.h"
 
-1541270535 c:\projects\clothsimulator\include\glwindow.h
+1541272196 c:\projects\clothsimulator\include\glwindow.h
 	<windows.h>
 	"bwindow.h"
 	"clothchangelistener.h"
@@ -15142,7 +15142,7 @@
 	<commctrl.h>
 	<iostream>
 
-1541261742 source:c:\projects\clothsimulator\src\bwindow.cpp
+1541295274 source:c:\projects\clothsimulator\src\bwindow.cpp
 	"bwindow.h"
 	<list>
 	<windowsx.h>
@@ -15157,7 +15157,7 @@
 	<boost/foreach.hpp>
 	<FreeImage.h>
 
-1541228633 c:\projects\clothsimulator\include\segment.h
+1541293017 c:\projects\clothsimulator\include\segment.h
 	<windows.h>
 	<vector>
 	<algorithm>
@@ -15165,7 +15165,7 @@
 	<string>
 	<glm/vec3.hpp>
 
-1541270289 source:c:\projects\clothsimulator\src\glwindow.cpp
+1541301587 source:c:\projects\clothsimulator\src\glwindow.cpp
 	"glwindow.h"
 	<iostream>
 	<cstdio>
@@ -15180,7 +15180,7 @@
 	<glm/mat4x4.hpp>
 	<glm/gtc/matrix_transform.hpp>
 
-1541269831 source:c:\projects\clothsimulator\src\segment.cpp
+1541302338 source:c:\projects\clothsimulator\src\segment.cpp
 	"segment.h"
 	<sstream>
 	<iostream>
@@ -15188,6 +15188,7 @@
 	<boost/geometry/geometries/geometries.hpp>
 	<boost/geometry/geometries/polygon.hpp>
 	<boost/foreach.hpp>
+	"boost/polygon/voronoi.hpp"
 
 1521999740 c:\projects\freeimage\dist\x32\freeimage.h
 	<wchar.h>
@@ -15823,4 +15824,122 @@
 	"clothchangelistener.h"
 
 1541270675 c:\projects\clothsimulator\include\clothchangelistener.h
+
+1533160258 c:\boost_1_68_0\boost\polygon\voronoi.hpp
+	"isotropy.hpp"
+	"point_concept.hpp"
+	"segment_concept.hpp"
+	"voronoi_builder.hpp"
+	"voronoi_diagram.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\isotropy.hpp
+	<cmath>
+	<cstddef>
+	<cstdlib>
+	<vector>
+	<deque>
+	<map>
+	<set>
+	<list>
+	<algorithm>
+	<limits>
+	<iterator>
+	<string>
+	<boost/config.hpp>
+	<boost/mpl/size_t.hpp>
+	<boost/mpl/protect.hpp>
+	<boost/utility/enable_if.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/mpl/and.hpp>
+	<boost/mpl/or.hpp>
+
+1533160258 c:\boost_1_68_0\boost\polygon\point_concept.hpp
+	"isotropy.hpp"
+	"point_traits.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\point_traits.hpp
+	"isotropy.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\segment_concept.hpp
+	"isotropy.hpp"
+	"segment_traits.hpp"
+	"rectangle_concept.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\segment_traits.hpp
+	"isotropy.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\rectangle_concept.hpp
+	"isotropy.hpp"
+	"point_data.hpp"
+	"point_traits.hpp"
+	"point_concept.hpp"
+	"interval_data.hpp"
+	"interval_traits.hpp"
+	"interval_concept.hpp"
+	"rectangle_data.hpp"
+	"rectangle_traits.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\point_data.hpp
+	"isotropy.hpp"
+	"point_concept.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\interval_data.hpp
+	"isotropy.hpp"
+	"interval_concept.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\interval_concept.hpp
+	"isotropy.hpp"
+	"interval_traits.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\interval_traits.hpp
+	"isotropy.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\rectangle_data.hpp
+	"isotropy.hpp"
+	"interval_data.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\rectangle_traits.hpp
+	"isotropy.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\voronoi_builder.hpp
+	<algorithm>
+	<map>
+	<queue>
+	<utility>
+	<vector>
+	"detail/voronoi_ctypes.hpp"
+	"detail/voronoi_predicates.hpp"
+	"detail/voronoi_structures.hpp"
+	"voronoi_geometry_type.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\detail\voronoi_ctypes.hpp
+	<boost/cstdint.hpp>
+	<cmath>
+	<cstring>
+	<utility>
+	<vector>
+
+1533160258 c:\boost_1_68_0\boost\polygon\detail\voronoi_predicates.hpp
+	<utility>
+	"voronoi_robust_fpt.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\detail\voronoi_robust_fpt.hpp
+	<algorithm>
+	<cmath>
+
+1533160258 c:\boost_1_68_0\boost\polygon\detail\voronoi_structures.hpp
+	<list>
+	<queue>
+	<vector>
+	"boost/polygon/voronoi_geometry_type.hpp"
+
+1533160258 c:\boost_1_68_0\boost\polygon\voronoi_geometry_type.hpp
+	<cstddef>
+
+1533160258 c:\boost_1_68_0\boost\polygon\voronoi_diagram.hpp
+	<vector>
+	<utility>
+	"detail/voronoi_ctypes.hpp"
+	"detail/voronoi_structures.hpp"
+	"voronoi_geometry_type.hpp"
 

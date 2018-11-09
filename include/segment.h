@@ -85,6 +85,7 @@ public:
 
     Shape(Vertex &v1, Vertex &v2);
 
+    void Voronoize(HDC hdc, int dx, int dy);
     void RenderGrid(HDC hdc, int dx, int dy);
     void getOpenGLVertices(vector<glm::vec3> &vertices, vector<unsigned int> &indices, int start_index);
 

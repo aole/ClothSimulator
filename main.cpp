@@ -21,6 +21,7 @@
 #define ID_CREATE_RECT  10001
 #define ID_ADD_VERTEX   10002
 #define ID_MOVE_SEGMENT 10003
+#define ID_SIMULATE     10004
 
 #define ID_FILE             20000
 #define ID_FILE_EXIT        20001
@@ -51,6 +52,8 @@ int shape_fill=1;
 BToolBar toolbar;
 BWindow canvas;
 GLWindow glwindow;
+
+bool run_simulation = FALSE;
 
 void readPreferencesFile()
 {
@@ -166,7 +169,7 @@ void CreateUI(HWND hWndParent)
     // toolbar
     toolbar.addCheckGroup(STD_FILENEW, ID_CREATE_RECT, TRUE);
     toolbar.addCheckGroup(STD_DELETE, ID_ADD_VERTEX, FALSE);
-    toolbar.addCheckGroup(STD_COPY, ID_MOVE_SEGMENT, FALSE);
+    toolbar.addCheckGroup(STD_COPY, ID_SIMULATE, FALSE);
     toolbar.create(hWndParent);
 
     RECT wrect;
@@ -231,6 +234,10 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             break;
         case ID_MOVE_SEGMENT:
             canvas.setMode(2);
+            break;
+        case ID_SIMULATE:
+            run_simulation = !run_simulation;
+            glwindow.runSimulation(run_simulation);
             break;
         case ID_FILE_SAVE:
         {

@@ -20,9 +20,9 @@ $$$$ 27. delete whole shape
 $$$$ 35. display 3d ground plane as 3d lines
 $$$$ 40. cloth mesh updated in 3D window as changes are done in the 2D window
 
+4. CLOTHIFY!!!
 6. add lights
 36. orbit 3D window
-4. CLOTHIFY!!!
 29. run simulation
 30. stitch edges
 31. export obj

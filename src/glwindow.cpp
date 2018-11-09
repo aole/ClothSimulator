@@ -58,9 +58,11 @@ GLuint VertexArrayID;
 GLuint vertexbuffer; // vertex buffer identifier
 
 std::vector< glm::vec3 > opengl_vertices;
-std::vector< unsigned int > opengl_indices;
+std::vector< glm::vec3* > opengl_vertices_per;
+std::vector< UINT > opengl_indices;
 
-unsigned int num_grid_indices;
+UINT num_grid_indices;
+UINT clothes_start_index;
 
 BWindow *bcanvas;
 
@@ -181,6 +183,7 @@ void populate()
             opengl_vertices.push_back(glm::vec3(x, 0, z));
         }
     }
+    clothes_start_index = opengl_vertices.size();
 
     // create ground indices
     opengl_indices.clear();
@@ -188,7 +191,8 @@ void populate()
     int totlines = (xdiv+1) + 1;
     int x=0;
 
-    for(int i=0;i<totlines;i++){
+    for(int i=0; i<totlines; i++)
+    {
         opengl_indices.push_back(x);
         opengl_indices.push_back(x+zdiv+1);
 
@@ -198,7 +202,8 @@ void populate()
     totlines = (zdiv+1) + 1;
     int z=0;
 
-    for(int i=0;i<totlines;i++){
+    for(int i=0; i<totlines; i++)
+    {
         opengl_indices.push_back(z);
         opengl_indices.push_back(z+(zdiv+2)*(xdiv+1));
 
@@ -213,9 +218,17 @@ void populate()
         s->getOpenGLVertices(opengl_vertices, opengl_indices, start_indices);
     }
 
+    // persist vertex data for manipulation later
+    for(glm::vec3 *v: opengl_vertices_per)
+        delete v;
+    opengl_vertices_per.clear();
+
+    for(glm::vec3 v: opengl_vertices)
+        opengl_vertices_per.push_back(new glm::vec3(v));
+
     // pass to OpenGL
-    glBufferData(GL_ARRAY_BUFFER, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0], GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, opengl_indices.size() * sizeof(unsigned int), &opengl_indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0], GL_STREAM_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, opengl_indices.size() * sizeof(UINT), &opengl_indices[0], GL_STATIC_DRAW);
 }
 
 void init()
@@ -304,7 +317,7 @@ void render()
         GL_TRIANGLES,      // mode
         opengl_indices.size()-6,    // count
         GL_UNSIGNED_INT,   // type
-        (void*)(num_grid_indices*sizeof(unsigned int))           // element array buffer offset
+        (void*)(num_grid_indices*sizeof(UINT))           // element array buffer offset
     );
 
     //glDisableVertexAttribArray(1);
@@ -320,6 +333,104 @@ void GLWindow::clothUpdated()
     render();
 }
 
+float mass = 1;
+float damping = 0.9;
+glm::vec3 acceleration;
+
+void addForce(glm::vec3 f)
+{
+    acceleration += f/mass;
+}
+
+void GLWindow::runSimulation(bool run)
+{
+
+    // copy all vertices
+    opengl_vertices.clear();
+    std::vector<glm::vec3> old_positions;
+    for(glm::vec3 *v: opengl_vertices_per)
+    {
+        opengl_vertices.push_back(*v);
+        old_positions.push_back(*v);
+    }
+
+    // find link distances (dist. between vertices that the cloth wants to keep)
+    std::vector<float> distances;
+    std::cout<<opengl_indices.size()<<std::endl;
+    for (UINT i=0; i<opengl_indices.size(); i+=2)
+    {
+        float dist = glm::distance(opengl_vertices[opengl_indices[i+1]], opengl_vertices[opengl_indices[i]]);
+        distances.push_back(dist);
+    }
+    // add gravity
+    addForce(glm::vec3(0,-0.1, 0));
+
+    // run simulation
+    for(int frames=0; frames<100; frames++)
+    {
+        std::cout<<"Frame:"<<frames<<std::endl;
+
+        // satisfy constraints
+        for (int iter=0; iter<10; iter++)
+        {
+            for (UINT i=clothes_start_index+3; i<opengl_indices.size(); i+=2)
+            {
+                glm::vec3 *p1 = &opengl_vertices[opengl_indices[i]];
+                glm::vec3 *p2 = &opengl_vertices[opengl_indices[i+1]];
+
+                //if(iter==0 && i==clothes_start_index+51)
+                //    std::cout<<p1->x<<","<<p1->y<<","<<p1->z<<"..."<<p2->x<<","<<p2->y<<","<<p2->z<<"="<<distances[i/2]<<std::endl;
+
+                glm::vec3 p1p2 = *p2 - *p1;
+                //if(iter==0 && i==clothes_start_index+51)
+                //    std::cout<<p1p2.x<<","<<p1p2.y<<","<<p1p2.z<<std::endl;
+
+                float len = glm::length(p1p2);
+                //if(iter==0 && i==clothes_start_index+51)
+                //    std::cout<<len<<std::endl;
+                glm::vec3 cor = p1p2 * ((1.0f - distances[i/2]/len) * 0.5f);
+                //if(iter==0 && i==clothes_start_index+51)
+                //    std::cout<<cor.x<<","<<cor.y<<","<<cor.z<<std::endl;
+
+                p1->x += cor.x;
+                p1->y += cor.y;
+                p1->z += cor.z;
+
+                p2->x -= cor.x;
+                p2->y -= cor.y;
+                p2->z -= cor.z;
+            }
+        }
+        // update vertices
+        // update only clothes
+        for(UINT i=clothes_start_index+3; i<opengl_vertices.size(); i++)
+        {
+            glm::vec3 *v = &opengl_vertices[i];
+            glm::vec3 *ov = &old_positions[i];
+            glm::vec3 tp = *v;
+
+            v->x += (v->x - ov->x)*(1-damping) + acceleration.x;
+            v->y += (v->y - ov->y)*(1-damping) + acceleration.y;
+            v->z += (v->z - ov->z)*(1-damping) + acceleration.z;
+
+            if (v->y<0)
+                v->y = 0;
+
+            ov->x = tp.x;
+            ov->y = tp.y;
+            ov->z = tp.z;
+        }
+
+        // update opengl
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0]);
+        //glBindBuffer(GL_ARRAY_BUFFER, 1);
+
+        // render
+        render();
+    }
+}
+
 LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int lastx, lasty;
@@ -329,6 +440,11 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
     {
     case WM_DESTROY:
     {
+        // deleted persisted vertices
+        for(glm::vec3 *v: opengl_vertices_per)
+            delete v;
+        opengl_vertices.clear();
+
         //Destroy window
         SDL_DestroyWindow( dummyWnd );
         dummyWnd = NULL;

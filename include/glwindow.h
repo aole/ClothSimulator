@@ -17,7 +17,7 @@ public:
 
     void clothUpdated();
 
-protected:
+    void runSimulation(bool run);
 
 private:
     int x=0,y=0,w=100,h=100;
