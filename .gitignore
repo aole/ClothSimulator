@@ -32,3 +32,5 @@
 *.app
 ClothSimulator.depend
 ClothSimulator.layout
+*.bin
+*.ipch
