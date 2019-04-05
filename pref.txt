@@ -1,5 +1,0 @@
-width=1280
-height=720
-image_opacity=100
-shape_opacity=255
-shape_fill=1
