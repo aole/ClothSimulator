@@ -28,8 +28,6 @@
 *.exe
 *.out
 *.app
-ClothSimulator.depend
-ClothSimulator.layout
 *.log
 *.ipch
 *.db
@@ -41,3 +39,6 @@ ClothSimulator.layout
 *.user
 *.filters
 .vs/ClothSimulator/v16/.suo
+
+# Ignore Debug folder
+Debug

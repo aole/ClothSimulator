@@ -33,26 +33,3 @@ Open an image file to display it over the 2D window.
 Save and Load 2D Shapes (with background) to a text file.
 
 Preferences file: set background image opacity. set shape fill/no fill.
-
-How to Compile
---------------
-Download SDL2: https://www.libsdl.org/download-2.0.php
-Point to include and lib in your project.
-Copy SDL2.dll in the project folder
-
-Download GLEW (binaries): http://glew.sourceforge.net/
-Point to include and lib in your project.
-
-Download FreeImage(binaries): http://freeimage.sourceforge.net/download.html
-Point to include and lib in your project.
-
-Download GLM header files: https://github.com/g-truc/glm/tags
-Point to include in your project
-
-Troubleshooting
----------------
-UNICODE
-
-GLEW_STATIC
-
-WINVER>=0x0501 (for use of AlphaBlend)
