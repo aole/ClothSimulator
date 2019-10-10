@@ -21,7 +21,7 @@ HWND BToolBar::create(HWND parent)
 
     //std::cout<<buttons.size()<<std::endl;
 
-    TBBUTTON tbb[buttons.size()];
+    TBBUTTON tbb[50];
     TBADDBITMAP tbab;
 
     tbab.hInst = HINST_COMMCTRL;
@@ -37,7 +37,9 @@ HWND BToolBar::create(HWND parent)
     }
 
     SendMessage(hwnd, TB_ADDBITMAP, 0, (LPARAM)&tbab);
-    SendMessage(hwnd, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
+    //SendMessage(hwnd, TB_ADDBUTTONS, sizeof(tbb)/sizeof(TBBUTTON), (LPARAM)&tbb);
+	SendMessage(hwnd, TB_ADDBUTTONS, buttons.size(), (LPARAM)&tbb);
+	
     return hwnd;
 }
 

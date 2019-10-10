@@ -7,7 +7,7 @@
 #include <sstream>
 #include <windowsx.h>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <gl/glew.h>
 
 // #define GLM_FORCE_CUDA
@@ -26,7 +26,7 @@ int glwindow_height = 400;
 bool initialized = FALSE;
 
 // horizontal angle : toward -Z
-float horizontalAngle = 3.14;
+float horizontalAngle = 3.14f;
 // vertical angle : 0, look at the horizon
 float verticalAngle = 0.0f;
 
@@ -275,7 +275,7 @@ void render()
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
 
-    glClearColor(.8,.8,.8, 1);
+    glClearColor(.8f,.8f,.8f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //glEnable(GL_CULL_FACE);
@@ -376,8 +376,8 @@ LRESULT CALLBACK GLProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
     case WM_MOUSEMOVE:
         if (mousedown)
         {
-            float x = GET_X_LPARAM( lParam );
-            float y = GET_Y_LPARAM( lParam );
+            int x = GET_X_LPARAM( lParam );
+            int y = GET_Y_LPARAM( lParam );
             float dx = (x - lastx) * 0.0065f;
             float dy = (y - lasty) * 0.0065f;
 
@@ -461,7 +461,7 @@ HWND GLWindow::create(HWND hWndParent, HINSTANCE hInstance, BWindow *c)
         std::cout<<"Create dummy Window: "<<SDL_GetError()<<std::endl;
 
     char sBuf[32];
-    std::sprintf(sBuf, "%p", dummyWnd);
+    sprintf_s(sBuf, "%p", dummyWnd);
 
     SDL_SetHint(SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT, sBuf);
 

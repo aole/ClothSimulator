@@ -32,3 +32,13 @@
 *.app
 ClothSimulator.depend
 ClothSimulator.layout
+*.log
+*.ipch
+*.db
+*.opendb
+.vs/ClothSimulator/v15/.suo
+*.tlog
+*.pdb
+*.ilk
+*.user
+*.filters

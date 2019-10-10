@@ -482,7 +482,7 @@ void BWindow::displayClothes(HDC hdc)
         SelectObject(hdc, GetStockObject(BLACK_PEN));
 
         int num_points = shape->m_segments.size()+1;
-        POINT points[num_points];
+        POINT points[50];
         int i=0;
         for (Segment *seg: shape->m_segments)
         {
