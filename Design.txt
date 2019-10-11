@@ -1,0 +1,133 @@
+Cloth Designer App - V1
+
+- User Stories
+  - Create a T-Shirt
+    - Import a model.
+    - Using Rectangle Tool, drag a rectangle in the 2D Panel.
+    - Using add points tool. Divide top line to create 2 equal segments for the neck.
+      - Divide left side line for the arm.
+    - Using Transform Tool lower the end points of the top line.
+    - Using Mirror Tool (instance/copy) click on right edge to unfold the cloth.
+    - Using Curve Tool drag the middle section of the top line down to create neck curve.
+    - Using Duplicate Tool, select the cloth and duplicate (copy / instance).
+    - In 3D Panel, position the cloth.
+    - 3D: flip the cloth horizontally.
+    - Using Stitch Segment Tool, stitch edges.
+    - Click Simulate
+    - Export Clothes
+- User Interface
+  - Main Window
+    - File
+      - New
+      - Open
+      - Save
+      - Save As
+      - Import
+      - Export
+      - Exit
+    - 2D Toolbar
+      - Import Tool
+      - Rectangle Tool
+        - Drag to create rectangle
+      - Divide Line Tool
+        - L-Click once to add points, twice to confirm, R-Click to confirm equal division. Wheel to inc./dec. number of points.
+      - Transform Tool
+        - select and drag multiple points.
+      - Mirror (instance/copy) Tool
+        - click on line segment to mirror
+      - Curve Tool
+      - Duplicate (instance / copy) Tool
+        - click on the cloth to duplicate
+      - Stitch Segment.
+        - Select A segments (Shift to select more than one)
+        - Select B segments (Shift to select more than one)
+    - 3D Toolbar
+      - View buttons (Front, top, left, right, bottom, right-top, frame)
+      - Simulate
+        - toggle simulation
+      - Flip horizontally
+    - Panels
+      - 2D Panel
+        - Renders 2D Structures
+        - Properties Panel (Press N to toggle visibility)
+      - 3D Panel
+        - Renders 3D Structures
+        - Simulation indicator?
+- Processes
+  - NEW
+  - OPEN
+  - SAVE
+  - INIT
+    - Add a default Avatar?
+    - Add 2D and 3D grids
+    - Add 3D Ground Collider
+  - Import OBJ as Collider objects in the 3D Panel
+    - Scale to proportions
+  - Create Rectangular Cloth
+    - Create CLOTH with 4 points
+    - Create 3D structure from the 2D structure
+  - Update Cloth
+    - Add/modify points of 2D structure.
+      - if has instance, update mirror points too.
+    - Update 3D structure.
+  - Click to select (using transform tool)
+    - SHIFT for multiple selection
+  - Drag selection to transform.
+    - if has instance, update mirror points too.
+  - Mirror using edge
+    - only 1 instance is allowed per cloth.
+    - mirror points and edges from one side of the other
+      - mark instance if requested on both sides.
+      - store mirror line if instance
+  - Curve line segment
+    - convert line to curve line
+    - update control points based on the line curve.
+    - take care of mirror instance
+    - update 3D structure
+  - Duplicate cloth
+    - create a copy of the cloth.
+    - instance all cloths if requested.
+  - 2D/3D: Shift MMB to pan
+  - 2D/3D: Ctrl MMB / wheel to zoom
+  - 3D: MMB to orbit
+  - LMB
+    - In Simulation
+      - pull vertices
+    - Not in Simultion
+      - drag / update cloth transform
+  - Simulate
+    - SIMULATE
+- Data Structure
+  - CLOTH
+    - 2D Structure
+      - Duplicate Instances
+        - array of CLOTH
+      - has Mirror Instance?
+      - Mirror
+        - POINT 1
+        - POINT 2
+      - Points (POINT)
+        - 2D Position
+        - Mirror Point ref
+      - Edges (EDGE)
+        - is Curve?
+        - POINT ref 1
+        - POINT ref 2
+        - CTRL POINT 1
+        - CTRL POINT 2
+      - Stitches (STITCH)
+        - A Edges
+        - B Edges
+    - 3D Structure
+      - Vertices
+      - Indices
+  - COLLIDER
+    - 3D Structure
+      - Vertices
+      - Indices
+- Milestone
+  - V1.1
+    - Create Frame with two Panels (3D OpenGL and 2D canvas)
+    - Drag rectangle in 2D Panel
+      - Create Corresponding rectangle in 3D Panel
+    - UPDATE DESIGN
