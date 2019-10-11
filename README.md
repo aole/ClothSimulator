@@ -4,7 +4,7 @@ Program to design to clothes and drape the resulting mesh in 3D.
 Design the clothes in 2D window, then simulate the clothes in 3D window to get realistic folds.
 The cloth is affected by gravity, collision geometry and other forces.
 
-![Screenshot](screenshots/screenshot10.jpg?raw=true)
+![Screenshot](screenshots/screenshot01.jpg?raw=true)
 
 Features
 --------
@@ -33,3 +33,7 @@ Open an image file to display it over the 2D window.
 Save and Load 2D Shapes (with background) to a text file.
 
 Preferences file: set background image opacity. set shape fill/no fill.
+
+Compile Dependency
+------------------
+wxWidgets
