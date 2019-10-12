@@ -19,5 +19,8 @@ private:
 
 	int m_winHeight;
 
+	bool m_glewInit;
+	GLint m_programID;
+
 	wxDECLARE_EVENT_TABLE();
 };

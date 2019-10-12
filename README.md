@@ -36,4 +36,6 @@ Preferences file: set background image opacity. set shape fill/no fill.
 
 Compile Dependency
 ------------------
-wxWidgets
+- wxWidgets
+- glew
+- glm
