@@ -1,3 +1,6 @@
+
+#include <wx/wx.h>
+
 #include "csApplication.h"
 
 wxIMPLEMENT_APP(csApplication);

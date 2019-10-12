@@ -17,12 +17,18 @@
     <ClInclude Include="ClothSimulator\csMainFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ClothSimulator\csGLPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClothSimulator\csApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClothSimulator\csMainFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClothSimulator\csGLPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
