@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wx/glcanvas.h>
+#include <cs3DContext.h>
 
 class csGLPanel : public wxGLCanvas
 {
@@ -16,11 +17,9 @@ public:
 
 private:
 	wxGLContext *m_GLContext;
+	cs3DContext* m_3DContext;
 
 	int m_winHeight;
-
-	bool m_glewInit;
-	GLint m_programID;
 
 	wxDECLARE_EVENT_TABLE();
 };

@@ -20,8 +20,8 @@
     <ClInclude Include="ClothSimulator\csGLPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cs3DContext.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="ClothSimulator\cs3DContext.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -34,7 +34,7 @@
     <ClCompile Include="ClothSimulator\csGLPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cs3DContext.cpp">
+    <ClCompile Include="ClothSimulator\cs3DContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
