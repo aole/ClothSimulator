@@ -6,6 +6,7 @@
 class csGL3DObject {
 public:
 	void render();
+	void get_color(float color[]);
 
 protected:
 	void creategl(std::vector< glm::vec3 >& vertices, std::vector< unsigned int >& indices);

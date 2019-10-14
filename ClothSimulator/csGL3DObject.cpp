@@ -36,3 +36,8 @@ void csGL3DObject::render()
 		(void*)0           // element array buffer offset
 	);
 }
+
+void csGL3DObject::get_color(float color[])
+{
+	color[0] = color[1] = color[2] = .5f;
+}

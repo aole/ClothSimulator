@@ -4,6 +4,7 @@
 
 #include "csMainFrame.h"
 #include "csGLPanel.h"
+#include "cs2DPanel.h"
 
 csMainFrame::csMainFrame() : wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
 {
@@ -31,9 +32,7 @@ void csMainFrame::CreatePanels()
 	wxSplitterWindow* splitter = new wxSplitterWindow(this);
 
 	// ========== CLOTH EDIT PANEL ==========
-	wxWindow* window2D = new wxWindow(splitter, wxID_ANY);
-	window2D->SetBackgroundColour(wxColour(150, 150, 150));
-	window2D->SetWindowStyle(wxBORDER_SUNKEN);
+	cs2DPanel* window2D = new cs2DPanel(splitter);
 
 	// ========== 3D OPENGL PANEL ==========
 	wxGLAttributes vAttrs;

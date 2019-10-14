@@ -26,14 +26,10 @@ glm::vec3 CameraPosition = glm::vec3(0, 10, 35);
 glm::vec3 CameraLookAt = glm::vec3(0, 0, 0);
 glm::vec3 CameraDirection = glm::vec3(0, 0, 0);
 glm::vec3 CameraRight = glm::vec3(1, 0, 0);
-glm::vec3 CameraUp = glm::vec3(0, 0, 1);
+glm::vec3 CameraUp = glm::vec3(0, 1, 0);
 
 // Camera matrix
-glm::mat4 View = glm::lookAt(
-	CameraPosition, // Camera position, in World Space
-	glm::vec3(0, 0, 0), // and looks at the origin
-	glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-);
+glm::mat4 View;
 
 // Model matrix : an identity matrix (model will be at the origin)
 glm::mat4 Model = glm::mat4(1.0f);
@@ -143,9 +139,11 @@ void cs3DContext::render()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glUniform3f(ShaderColorID, .1f, .1f, .1f);
-
+	float color[3];
 	for (csGL3DObject *ro : m_rendered_objects) {
+		ro->get_color(color);
+		glUniform3f(ShaderColorID, color[0], color[1], color[2]);
+
 		ro->render();
 	}
 
