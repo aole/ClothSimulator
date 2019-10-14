@@ -22,11 +22,13 @@
     <ClInclude Include="ClothSimulator\csApplication.h" />
     <ClInclude Include="ClothSimulator\csMainFrame.h" />
     <ClInclude Include="ClothSimulator\csGLPanel.h" />
+    <ClInclude Include="cs3DContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClothSimulator\csApplication.cpp" />
     <ClCompile Include="ClothSimulator\csGLPanel.cpp" />
     <ClCompile Include="ClothSimulator\csMainFrame.cpp" />
+    <ClCompile Include="cs3DContext.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

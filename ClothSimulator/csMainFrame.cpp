@@ -5,7 +5,7 @@
 #include "csMainFrame.h"
 #include "csGLPanel.h"
 
-csMainFrame::csMainFrame() : wxFrame(nullptr, wxID_ANY, "Cloth Simulator")
+csMainFrame::csMainFrame() : wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
 {
 	CreateMenuBar();
 	CreatePanels();
@@ -35,7 +35,10 @@ void csMainFrame::CreatePanels()
 	window2D->SetBackgroundColour(wxColour(150, 150, 150));
 
 	// ========== 3D OPENGL PANEL ==========
-	csGLPanel* window3D = new csGLPanel(splitter);
+	wxGLAttributes vAttrs;
+	vAttrs.PlatformDefaults().Defaults().EndList();
+
+	csGLPanel* window3D = new csGLPanel(splitter, vAttrs);
 
 	// ========== SPLITTER ==========
 	splitter->SetSize(GetClientSize());

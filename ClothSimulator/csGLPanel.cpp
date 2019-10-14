@@ -12,8 +12,8 @@
 #include "csGLPanel.h"
 
 wxBEGIN_EVENT_TABLE(csGLPanel, wxGLCanvas)
-EVT_SIZE(csGLPanel::OnSize)
-EVT_PAINT(csGLPanel::OnPaint)
+	EVT_SIZE(csGLPanel::OnSize)
+	EVT_PAINT(csGLPanel::OnPaint)
 wxEND_EVENT_TABLE()
 
 // horizontal angle : toward -Z
@@ -54,8 +54,10 @@ unsigned int num_grid_indices;
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
 void populate();
 
-csGLPanel::csGLPanel(wxWindow *parent) : wxGLCanvas(parent), m_winHeight(0), m_glewInit(false)
+csGLPanel::csGLPanel(wxWindow *parent, const wxGLAttributes& canvasAttrs) : wxGLCanvas(parent, canvasAttrs), m_winHeight(0), m_glewInit(false), m_programID(0)
 {
+	SetWindowStyle(wxBORDER_SUNKEN);
+
 	//SetColour("gray");
 	wxGLContextAttrs ctxAttrs;
 
@@ -89,7 +91,6 @@ csGLPanel::~csGLPanel()
 
 bool csGLPanel::GLInit()
 {
-	wxLogDebug("\tInitializing!");
 	if (!m_GLContext)
 		return false;
 
@@ -130,22 +131,23 @@ void csGLPanel::OnSize(wxSizeEvent& event)
 {
 	event.Skip();
 
-	if (!IsShownOnScreen())
-		return;
-
-	if (!GLInit())
-		return;
-
 	const wxSize size = event.GetSize() * GetContentScaleFactor();
 	m_winHeight = size.y;
+
+	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+	Projection = glm::perspective(glm::radians(45.0f), (float)size.x / (float)m_winHeight, 0.1f, 1000.0f);
+
+	glViewport(0, 0, size.x, size.y);
+	S
+	if (!GLInit())
+		return;
+	
+	//if (!IsShownOnScreen())
+	//	return;
 
 	// these map direct to vertex shader variables
 	MatrixID = glGetUniformLocation(m_programID, "MVP");
 	ShaderColorID = glGetUniformLocation(m_programID, "shaderColor");
-
-
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	Projection = glm::perspective(glm::radians(45.0f), (float)size.x / (float)m_winHeight, 0.1f, 1000.0f);
 
 	populate();
 

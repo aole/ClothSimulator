@@ -5,7 +5,7 @@
 class csGLPanel : public wxGLCanvas
 {
 public:
-	csGLPanel(wxWindow *parent);
+	csGLPanel(wxWindow *parent, const wxGLAttributes& canvasAttrs);
 	~csGLPanel();
 
 	bool GLInit();
