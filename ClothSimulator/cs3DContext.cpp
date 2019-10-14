@@ -13,10 +13,8 @@
 #include <sstream>
 
 #include <wx/wx.h>
-
-GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
-void populate();
-
+#include <csGL3DGrid.h>
+#include <csGLRectangle.h>
 
 // horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
@@ -45,26 +43,28 @@ glm::mat4 mvp;
 
 GLuint MatrixID;
 GLuint ShaderColorID;
-GLuint VertexArrayID;
-GLuint vertexbuffer; // vertex buffer identifier
 
-std::vector< glm::vec3 > opengl_vertices;
-std::vector< unsigned int > opengl_indices;
+GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
 
-unsigned int num_grid_indices;
+cs3DContext::cs3DContext(): m_initialized(false), m_programID(0) {}
 
-cs3DContext::cs3DContext(): m_initialized(false), m_programID(0)
+cs3DContext::~cs3DContext()
 {
+	for (csGL3DObject* o : m_rendered_objects)
+		delete o;
+	m_rendered_objects.clear();
 }
 
-void cs3DContext::init()
+int cs3DContext::init()
 {
 	if (m_initialized)
-		return;
+		return 2;
 
 	GLenum err = glewInit(); // after the window is created
-	if (err)
+	if (err) {
 		wxLogFatalError("glewInit Error! %d", err);
+		return 0;
+	}
 	ShaderColorID = glGetUniformLocation(m_programID, "shaderColor");
 
 	m_programID = LoadShaders("VertexShader.glsl", "FragmentShader.glsl");
@@ -74,25 +74,13 @@ void cs3DContext::init()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-
-	// generate 1 buffer
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-
-	// Generate a buffer for the indices
-	GLuint elementbuffer;
-	glGenBuffers(1, &elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
 	// these map direct to vertex shader variables
 	MatrixID = glGetUniformLocation(m_programID, "MVP");
 	ShaderColorID = glGetUniformLocation(m_programID, "shaderColor");
 
-	populate();
-
 	m_initialized = true;
+
+	return 1;
 }
 
 void cs3DContext::resize(int width, int height)
@@ -101,6 +89,26 @@ void cs3DContext::resize(int width, int height)
 	Projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 1000.0f);
 
 	glViewport(0, 0, width, height);
+}
+
+void cs3DContext::setGrid(float width, float depth, float major)
+{
+	csGL3DGrid *grid = new csGL3DGrid();
+	grid->create(width, depth, major);
+	m_rendered_objects.push_back(grid);
+}
+
+int cs3DContext::addRectangle(float x1, float y1, float z1, float x2, float y2, float z2)
+{
+	csGLRectangle *rect = new csGLRectangle();
+	rect->create(x1, y1, z1, x2, y2, z2);
+	m_rendered_objects.push_back(rect);
+
+	return 0;
+}
+
+void cs3DContext::removeRectangle(int id)
+{
 }
 
 void cs3DContext::render()
@@ -135,18 +143,14 @@ void cs3DContext::render()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	// Draw the grid
 	glUniform3f(ShaderColorID, .1f, .1f, .1f);
 
-	glDrawElements(
-		GL_LINES,      // mode
-		num_grid_indices,    // count
-		GL_UNSIGNED_INT,   // type
-		(void*)0           // element array buffer offset
-	);
+	for (csGL3DObject *ro : m_rendered_objects) {
+		ro->render();
+	}
 
 	glDisableVertexAttribArray(0);
-
+	glUseProgram(0);
 }
 
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path)
@@ -247,56 +251,4 @@ GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path)
 	glDeleteShader(FragmentShaderID);
 
 	return ProgramID;
-}
-
-void populate()
-{
-	// create ground vertices
-	opengl_vertices.clear();
-
-	float minx = -10.0f;
-	float minz = -10.0f;
-	float maxx = 10.0f;
-	float maxz = 10.0f;
-	int xdiv = 5;
-	int zdiv = 5;
-	float dx = (maxx - minx) / (xdiv + 1);
-	float dz = (maxz - minz) / (zdiv + 1);
-
-	for (float x = minx; x <= maxx; x += dx)
-	{
-		for (float z = minz; z <= maxz; z += dz)
-		{
-			opengl_vertices.push_back(glm::vec3(x, 0, z));
-		}
-	}
-
-	// create ground indices
-	opengl_indices.clear();
-
-	int totlines = (xdiv + 1) + 1;
-	int x = 0;
-
-	for (int i = 0;i < totlines;i++) {
-		opengl_indices.push_back(x);
-		opengl_indices.push_back(x + zdiv + 1);
-
-		x += zdiv + 1 + 1;
-	}
-
-	totlines = (zdiv + 1) + 1;
-	int z = 0;
-
-	for (int i = 0;i < totlines;i++) {
-		opengl_indices.push_back(z);
-		opengl_indices.push_back(z + (zdiv + 2) * (xdiv + 1));
-
-		z += 1;
-	}
-
-	num_grid_indices = opengl_indices.size();
-
-	// pass to OpenGL
-	glBufferData(GL_ARRAY_BUFFER, opengl_vertices.size() * sizeof(glm::vec3), &opengl_vertices[0], GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, opengl_indices.size() * sizeof(unsigned int), &opengl_indices[0], GL_STATIC_DRAW);
 }

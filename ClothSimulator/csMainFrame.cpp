@@ -33,6 +33,7 @@ void csMainFrame::CreatePanels()
 	// ========== CLOTH EDIT PANEL ==========
 	wxWindow* window2D = new wxWindow(splitter, wxID_ANY);
 	window2D->SetBackgroundColour(wxColour(150, 150, 150));
+	window2D->SetWindowStyle(wxBORDER_SUNKEN);
 
 	// ========== 3D OPENGL PANEL ==========
 	wxGLAttributes vAttrs;

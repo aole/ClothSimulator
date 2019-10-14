@@ -57,7 +57,11 @@ bool csGLPanel::GLInit()
 
 	SetCurrent(*m_GLContext);
 
-	m_3DContext->init();
+	int ret = m_3DContext->init();
+	if (ret == 1) { // first time init
+		m_3DContext->setGrid(50, 50, 5);
+		m_3DContext->addRectangle(-5, -5, 0, 5, 5, 0);
+	}
 
 	return true;
 }
