@@ -22,7 +22,7 @@ float horizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 
 glm::mat4 Projection;
-glm::vec3 CameraPosition = glm::vec3(0, 10, 35);
+glm::vec3 CameraPosition = glm::vec3(0, 50, 400);
 glm::vec3 CameraLookAt = glm::vec3(0, 0, 0);
 glm::vec3 CameraDirection = glm::vec3(0, 0, 0);
 glm::vec3 CameraRight = glm::vec3(1, 0, 0);
@@ -46,9 +46,24 @@ cs3DContext::cs3DContext(): m_initialized(false), m_programID(0) {}
 
 cs3DContext::~cs3DContext()
 {
+	clearObjects();
+}
+
+void cs3DContext::clearObjects()
+{
 	for (csGL3DObject* o : m_rendered_objects)
 		delete o;
 	m_rendered_objects.clear();
+}
+
+void cs3DContext::clearObjectsExceptGrid()
+{
+	csGL3DObject* grid = m_rendered_objects[0];
+	for (csGL3DObject* o : m_rendered_objects)
+		if (grid != o)
+			delete o;
+	m_rendered_objects.clear();
+	m_rendered_objects.push_back(grid);
 }
 
 int cs3DContext::init()

@@ -39,12 +39,12 @@ void csMainFrame::CreatePanels()
 	wxGLAttributes vAttrs;
 	vAttrs.PlatformDefaults().Defaults().EndList();
 
-	csGLPanel* window3D = new csGLPanel(splitter, vAttrs);
+	m_3DView = new csGLPanel(m_model, splitter, vAttrs);
 
 	// ========== SPLITTER ==========
 	splitter->SetSize(GetClientSize());
 	splitter->SetSashGravity(0.5);
-	splitter->SplitVertically(window3D, m_2DView);
+	splitter->SplitVertically(m_3DView, m_2DView);
 }
 
 void csMainFrame::addViewListener(ViewListener* l)

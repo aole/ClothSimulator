@@ -24,6 +24,9 @@ public:
 	// render
 	void render();
 
+	void clearObjects();
+	void clearObjectsExceptGrid();
+
 private:
 	bool m_initialized;
 	

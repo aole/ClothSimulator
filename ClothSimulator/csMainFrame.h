@@ -4,6 +4,7 @@
 #include <ViewListener.h>
 #include <Model.h>
 #include <cs2DPanel.h>
+#include <csGLPanel.h>
 
 class csMainFrame : public wxFrame, public View
 {
@@ -23,4 +24,5 @@ private:
 	Model* m_model;
 
 	cs2DPanel* m_2DView;
+	csGLPanel* m_3DView;
 };

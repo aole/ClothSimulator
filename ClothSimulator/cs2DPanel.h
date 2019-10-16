@@ -21,9 +21,15 @@ public:
 	void updated() { Refresh(false); };
 
 private:
+	void drawGrid(wxDC &dc);
+
 	Model* m_model;
 
+	bool initialized = false;
+	long panx, pany;
+
 	bool m_mouse_left_down;
+
 	long m_lastx, m_lasty;
 	wxPoint m_anchorpoint;
 	wxOverlay m_overlay;
