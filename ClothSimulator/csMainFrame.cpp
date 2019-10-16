@@ -1,12 +1,13 @@
 
 #include <wx/wx.h>
 #include <wx/splitter.h>
+#include <Model.h>
 
 #include "csMainFrame.h"
 #include "csGLPanel.h"
 #include "cs2DPanel.h"
 
-csMainFrame::csMainFrame() : wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
+csMainFrame::csMainFrame(Model* model) : m_model(model), wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
 {
 	CreateMenuBar();
 	CreatePanels();
@@ -32,7 +33,7 @@ void csMainFrame::CreatePanels()
 	wxSplitterWindow* splitter = new wxSplitterWindow(this);
 
 	// ========== CLOTH EDIT PANEL ==========
-	cs2DPanel* window2D = new cs2DPanel(splitter);
+	m_2DView = new cs2DPanel(m_model, splitter);
 
 	// ========== 3D OPENGL PANEL ==========
 	wxGLAttributes vAttrs;
@@ -43,7 +44,12 @@ void csMainFrame::CreatePanels()
 	// ========== SPLITTER ==========
 	splitter->SetSize(GetClientSize());
 	splitter->SetSashGravity(0.5);
-	splitter->SplitVertically(window3D, window2D);
+	splitter->SplitVertically(window3D, m_2DView);
+}
+
+void csMainFrame::addViewListener(ViewListener* l)
+{
+	m_2DView->addViewListener(l);
 }
 
 void csMainFrame::OnExit(wxCommandEvent& event)

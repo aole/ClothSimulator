@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClothSimulator\Controller.h" />
     <ClInclude Include="ClothSimulator\cs2DPanel.h" />
     <ClInclude Include="ClothSimulator\cs3DContext.h" />
     <ClInclude Include="ClothSimulator\csApplication.h" />
@@ -27,6 +28,10 @@
     <ClInclude Include="ClothSimulator\csMainFrame.h" />
     <ClInclude Include="ClothSimulator\csGLPanel.h" />
     <ClInclude Include="ClothSimulator\csGL3DObject.h" />
+    <ClInclude Include="ClothSimulator\Model.h" />
+    <ClInclude Include="ClothSimulator\ModelListener.h" />
+    <ClInclude Include="ClothSimulator\View.h" />
+    <ClInclude Include="ClothSimulator\ViewListener.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClothSimulator\cs2DPanel.cpp" />
@@ -37,6 +42,7 @@
     <ClCompile Include="ClothSimulator\csGLPanel.cpp" />
     <ClCompile Include="ClothSimulator\csGLRectangle.cpp" />
     <ClCompile Include="ClothSimulator\csMainFrame.cpp" />
+    <ClCompile Include="ClothSimulator\Model.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

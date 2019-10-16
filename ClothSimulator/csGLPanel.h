@@ -2,8 +2,9 @@
 
 #include <wx/glcanvas.h>
 #include <cs3DContext.h>
+#include <View.h>
 
-class csGLPanel : public wxGLCanvas
+class csGLPanel : public wxGLCanvas, public View
 {
 public:
 	csGLPanel(wxWindow *parent, const wxGLAttributes& canvasAttrs);
