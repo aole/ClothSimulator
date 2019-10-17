@@ -7,12 +7,20 @@
 class Controller : public ViewListener
 {
 public:
-	Controller(Model* model) : m_model(model) {}
+	Controller(Model* model) : m_model(model), m_mouse_left_down(false) {}
 
-	void addView(View* view) { view->addViewListener(this); }
+	void add2DView(View2D* view) { view->addViewListener(this); m_2Dviews.push_back(view); }
 
-	void rectangleAdded(float x1, float y1, float x2, float y2) { m_model->addRectangle(x1, y1, x2, y2); }
+	void mouseUp2D(float screenx, float screeny, float logicalx, float logicaly);
+	void mouseDown2D(float screenx, float screeny, float logicalx, float logicaly);
+	void mouseMove2D(float screenx, float screeny, float logicalx, float logicaly);
 
 private:
 	Model* m_model;
+	std::vector<View2D*> m_2Dviews;
+
+	bool m_mouse_left_down;
+
+	float m_lastx, m_lasty;
+	float m_anchorx, m_anchory;
 };

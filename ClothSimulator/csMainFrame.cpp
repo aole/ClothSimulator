@@ -6,8 +6,9 @@
 #include "csMainFrame.h"
 #include "csGLPanel.h"
 #include "cs2DPanel.h"
+#include <Controller.h>
 
-csMainFrame::csMainFrame(Model* model) : m_model(model), wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
+csMainFrame::csMainFrame(Model* model, Controller* controller) : m_model(model), m_controller(controller), wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
 {
 	CreateMenuBar();
 	CreatePanels();
@@ -34,6 +35,7 @@ void csMainFrame::CreatePanels()
 
 	// ========== CLOTH EDIT PANEL ==========
 	m_2DView = new cs2DPanel(m_model, splitter);
+	m_controller->add2DView(m_2DView);
 
 	// ========== 3D OPENGL PANEL ==========
 	wxGLAttributes vAttrs;

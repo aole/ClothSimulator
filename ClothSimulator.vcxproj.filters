@@ -88,5 +88,8 @@
     <ClCompile Include="ClothSimulator\Cloth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClothSimulator\Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -10,3 +10,9 @@ public:
 protected:
 	std::vector<ViewListener*> m_listeners;
 };
+
+class View2D : public View
+{
+public:
+	virtual void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy) = 0;
+};

@@ -9,7 +9,7 @@
 #include "wx/wx.h"
 #include "wx/overlay.h"
 
-class cs2DPanel : public wxWindow, public ModelListener, public View
+class cs2DPanel : public wxWindow, public ModelListener, public View2D
 {
 public:
 	cs2DPanel(Model* model, wxWindow* parent);
@@ -24,18 +24,16 @@ public:
 
 	void updated() { Refresh(false); };
 
+	void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy);
+
 private:
 	void drawGrid(wxDC &dc);
 
 	Model* m_model;
 
-	bool initialized = false;
-	long panx, pany;
+	bool m_initialized = false;
+	long m_panx, m_pany;
 
-	bool m_mouse_left_down;
-
-	long m_lastx, m_lasty;
-	wxPoint m_anchorpoint;
 	wxOverlay m_overlay;
 
 	wxDECLARE_EVENT_TABLE();

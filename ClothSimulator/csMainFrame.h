@@ -3,13 +3,15 @@
 #include <View.h>
 #include <ViewListener.h>
 #include <Model.h>
+#include <Controller.h>
+
 #include <cs2DPanel.h>
 #include <csGLPanel.h>
 
 class csMainFrame : public wxFrame, public View
 {
 public:
-	csMainFrame(Model* model);
+	csMainFrame(Model* model, Controller* controller);
 
 public:
 	void CreateMenuBar();
@@ -22,6 +24,7 @@ public:
 
 private:
 	Model* m_model;
+	Controller* m_controller;
 
 	cs2DPanel* m_2DView;
 	csGLPanel* m_3DView;
