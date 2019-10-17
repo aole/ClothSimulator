@@ -131,3 +131,34 @@ Cloth Designer App - V1
     - Drag rectangle in 2D Panel
       - Create Corresponding rectangle in 3D Panel
     - UPDATE DESIGN
+  - V1.2
+    - Create 3D clothes
+    - Simulate structural spring and gravity
+    - Press SpaceBar to toggle simulation
+- Code Structure
+  - Model
+    - store clothes (Shape in 2D)
+    - update listeners (View)
+  - Controller
+    - listens to View
+    - handles view commands
+    - updates Model
+  - View (Interface)
+    - stores collection of listeners
+  - csApplication
+    - create model, controller and mainframe
+  - csMainFrame (View)
+    - create menu bar
+    - create panels, 3D on the left and 2D on the right
+  - csGLPanel (View)
+    - create context
+    - create context::grid
+    - recreate context::shapes if updated (from 2D to 3D)
+    - listens to Model
+  - cs3DContext
+    - handle opengl rendering
+    - store opengl structures
+  - cs2DPanel (View)
+    - handle 2d rendering
+    - get objects from Model
+    - listens to Model

@@ -1,7 +1,8 @@
 
+#include "csGLPanel.h"
+
 #include <wx/wx.h>
 
-#include "csGLPanel.h"
 #include <Model.h>
 
 wxBEGIN_EVENT_TABLE(csGLPanel, wxGLCanvas)
@@ -123,8 +124,9 @@ void csGLPanel::updated()
 				else if (v.y > maxy)
 					maxy = v.y;
 			}
-			//wxLogDebug("add: %f, %f - %f, %f", minx, miny, maxx, maxy);
-			m_3DContext->addRectangle(minx, miny, 0, maxx, maxy, 0);
+			//wxLogDebug("add: %f, %f : %f, %f", minx, miny, maxx, maxy);
+			//m_3DContext->addRectangle(minx, miny, 0, maxx, maxy, 0);
+			m_3DContext->createCloth(minx, miny, maxx, maxy, 0);
 		}
 	}
 

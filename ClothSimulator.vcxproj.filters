@@ -50,6 +50,12 @@
     <ClInclude Include="ClothSimulator\View.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ClothSimulator\Cloth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClothSimulator\glincludes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClothSimulator\csApplication.cpp">
@@ -77,6 +83,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClothSimulator\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClothSimulator\Cloth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

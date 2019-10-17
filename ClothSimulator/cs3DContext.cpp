@@ -1,11 +1,4 @@
 
-#include <GL/glew.h>
-
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "cs3DContext.h"
 
 #include <vector>
@@ -15,6 +8,7 @@
 #include <wx/wx.h>
 #include <csGL3DGrid.h>
 #include <csGLRectangle.h>
+#include <Cloth.h>
 
 // horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
@@ -109,17 +103,18 @@ void cs3DContext::setGrid(float width, float depth, float major)
 	m_rendered_objects.push_back(grid);
 }
 
-int cs3DContext::addRectangle(float x1, float y1, float z1, float x2, float y2, float z2)
+void cs3DContext::addRectangle(float x1, float y1, float z1, float x2, float y2, float z2)
 {
 	csGLRectangle *rect = new csGLRectangle();
 	rect->create(x1, y1, z1, x2, y2, z2);
 	m_rendered_objects.push_back(rect);
-
-	return 0;
 }
 
-void cs3DContext::removeRectangle(int id)
+void cs3DContext::createCloth(float x1, float y1, float x2, float y2, float z)
 {
+	Cloth* cloth = new Cloth();
+	cloth->create(x1, y1, x2, y2, z, 20);
+	m_rendered_objects.push_back(cloth);
 }
 
 void cs3DContext::render()

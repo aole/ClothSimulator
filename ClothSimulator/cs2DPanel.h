@@ -1,9 +1,13 @@
 #pragma once
 
-#include "wx/overlay.h"
+#include "glincludes.h"
+
 #include <Model.h>
 #include <ViewListener.h>
 #include <View.h>
+
+#include "wx/wx.h"
+#include "wx/overlay.h"
 
 class cs2DPanel : public wxWindow, public ModelListener, public View
 {

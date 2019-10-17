@@ -1,5 +1,6 @@
-#include <GL\glew.h>
+
 #include "csGL3DObject.h"
+
 #include <wx\log.h>
 
 void csGL3DObject::creategl(std::vector<glm::vec3>& vertices, std::vector<unsigned int>& indices)
@@ -31,6 +32,7 @@ void csGL3DObject::render()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 
+	//wxLogDebug("rendering %d, %d", m_draw_mode, m_draw_count);
 	glDrawElements(
 		m_draw_mode,      // mode
 		m_draw_count,    // count

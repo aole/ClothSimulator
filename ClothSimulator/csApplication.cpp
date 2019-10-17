@@ -1,7 +1,7 @@
 
-#include <wx/wx.h>
-
 #include "csApplication.h"
+
+#include <wx/wx.h>
 
 wxIMPLEMENT_APP(csApplication);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/vec3.hpp>
+#include "glincludes.h"
 #include <vector>
 
 class csGL3DObject {

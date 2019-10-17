@@ -1,6 +1,5 @@
 #include "Model.h"
 #include <algorithm>
-#include <glm\ext\vector_float2.hpp>
 #include "wx/wx.h"
 
 void Shape::addVertex(float x, float y)

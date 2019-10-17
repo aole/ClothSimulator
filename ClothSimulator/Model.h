@@ -1,7 +1,9 @@
 #pragma once
+
+#include "glincludes.h"
+
 #include <vector>
 #include <ModelListener.h>
-#include <glm\ext\vector_float2.hpp>
 
 class Shape
 {

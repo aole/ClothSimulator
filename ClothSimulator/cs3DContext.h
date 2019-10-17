@@ -16,8 +16,9 @@ public:
 	void setGrid(float width, float depth, float major);
 	// 2D
 	// 3D
-	int addRectangle(float x1, float y1, float z1, float x2, float y2, float z2);
-	void removeRectangle(int id);
+	void addRectangle(float x1, float y1, float z1, float x2, float y2, float z2);
+
+	void createCloth(float x1, float y1, float x2, float y2, float z);
 
 	// model
 

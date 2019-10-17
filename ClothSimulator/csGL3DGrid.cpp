@@ -1,13 +1,9 @@
-#include <GL/glew.h>
-
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "wx/wx.h"
 
 #include "csGL3DGrid.h"
+
+#include "csGL3DObject.h"
+
+#include "wx/wx.h"
 
 void csGL3DGrid::create(float width, float depth, float major)
 {

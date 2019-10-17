@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClothSimulator\Cloth.h" />
     <ClInclude Include="ClothSimulator\Controller.h" />
     <ClInclude Include="ClothSimulator\cs2DPanel.h" />
     <ClInclude Include="ClothSimulator\cs3DContext.h" />
@@ -28,12 +29,14 @@
     <ClInclude Include="ClothSimulator\csMainFrame.h" />
     <ClInclude Include="ClothSimulator\csGLPanel.h" />
     <ClInclude Include="ClothSimulator\csGL3DObject.h" />
+    <ClInclude Include="ClothSimulator\glincludes.h" />
     <ClInclude Include="ClothSimulator\Model.h" />
     <ClInclude Include="ClothSimulator\ModelListener.h" />
     <ClInclude Include="ClothSimulator\View.h" />
     <ClInclude Include="ClothSimulator\ViewListener.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClothSimulator\Cloth.cpp" />
     <ClCompile Include="ClothSimulator\cs2DPanel.cpp" />
     <ClCompile Include="ClothSimulator\cs3DContext.cpp" />
     <ClCompile Include="ClothSimulator\csApplication.cpp" />
@@ -123,6 +126,7 @@
       <AdditionalIncludeDirectories>C:\SDKs\glew-2.1.0\include;C:\SDKs\wxWidgets-3.1.2\include;C:\SDKs\wxWidgets-3.1.2\include\msvc;C:\SDKs\glm-0.9.9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -141,6 +145,7 @@
       <AdditionalIncludeDirectories>C:\SDKs\glew-2.1.0\include;C:\SDKs\wxWidgets-3.1.2\include;C:\SDKs\wxWidgets-3.1.2\include\msvc;C:\SDKs\glm-0.9.9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>

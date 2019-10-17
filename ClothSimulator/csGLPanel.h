@@ -1,5 +1,7 @@
 #pragma once
 
+#include "glincludes.h"
+
 #include <wx/glcanvas.h>
 #include <cs3DContext.h>
 #include <View.h>

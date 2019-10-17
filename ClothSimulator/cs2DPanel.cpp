@@ -1,9 +1,7 @@
 
-#include "wx/wx.h"
+#include "cs2DPanel.h"
 
 #include "wx/dcbuffer.h"
-
-#include "cs2DPanel.h"
 
 wxBEGIN_EVENT_TABLE(cs2DPanel, wxWindow)
 	EVT_SIZE(cs2DPanel::OnSize)
@@ -60,10 +58,10 @@ void cs2DPanel::drawGrid(wxDC& dc)
 {
 	wxRect r = GetClientRect();
 	dc.SetBrush(*wxTRANSPARENT_BRUSH);
-	dc.SetPen(wxPen(wxColour(255, 50, 50, 150), 2));
+	dc.SetPen(wxPen(wxColour(255, 150, 150, 50), 1));
 	// x axis
 	dc.DrawLine(0, pany, r.width, pany);
-	dc.SetPen(wxPen(wxColour(50, 255, 50, 150), 2));
+	dc.SetPen(wxPen(wxColour(150, 255, 150, 50), 1));
 	dc.DrawLine(panx, 0, panx, r.height);
 }
 
