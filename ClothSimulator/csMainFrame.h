@@ -15,6 +15,7 @@ public:
 
 public:
 	void CreateMenuBar();
+	void CreateToolStatusBar();
 	void CreatePanels();
 
 	void addViewListener(ViewListener* l);
@@ -23,6 +24,8 @@ public:
 	void OnExit(wxCommandEvent& event);
 
 private:
+	void toggleSimulation(bool simulate);
+
 	Model* m_model;
 	Controller* m_controller;
 

@@ -27,3 +27,8 @@ void Controller::mouseMove2D(float screenx, float screeny, float logicalx, float
 			v->drawTemporaryRectangle(m_anchorx, m_anchory, m_lastx, m_lasty);
 		}
 }
+
+void Controller::OnToggleSimulation(bool simulate)
+{
+	wxLogDebug("s:%i", simulate);
+}

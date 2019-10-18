@@ -4,6 +4,8 @@
 #include <Model.h>
 #include <View.h>
 
+#include "wx/wx.h"
+
 class Controller : public ViewListener
 {
 public:
@@ -15,6 +17,9 @@ public:
 	void mouseDown2D(float screenx, float screeny, float logicalx, float logicaly);
 	void mouseMove2D(float screenx, float screeny, float logicalx, float logicaly);
 
+	void OnMenuFileExit(wxFrame *frame) { frame->Close(true); };
+
+	void OnToggleSimulation(bool simulate);
 private:
 	Model* m_model;
 	std::vector<View2D*> m_2Dviews;

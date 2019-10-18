@@ -8,9 +8,12 @@
 #include "cs2DPanel.h"
 #include <Controller.h>
 
+#include <wx/tglbtn.h>
+
 csMainFrame::csMainFrame(Model* model, Controller* controller) : m_model(model), m_controller(controller), wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
 {
 	CreateMenuBar();
+	CreateToolStatusBar();
 	CreatePanels();
 }
 
@@ -26,7 +29,17 @@ void csMainFrame::CreateMenuBar()
 	SetMenuBar(menuBar);
 
 	//Bind(wxEVT_MENU, &csMainFrame::OnExit, this, wxID_EXIT);
-	Bind(wxEVT_MENU, [=](wxCommandEvent&) { Close(true); }, wxID_EXIT);
+	Bind(wxEVT_MENU, [=](wxCommandEvent&) { m_controller->OnMenuFileExit(this); }, wxID_EXIT);
+}
+
+void csMainFrame::CreateToolStatusBar()
+{
+	wxToolBar* toolbar = CreateToolBar();
+
+	wxToggleButton* btnSimulate = new wxToggleButton(toolbar, 19999, "Simulate");
+	Bind(wxEVT_TOGGLEBUTTON, [=](wxCommandEvent&) { m_controller->OnToggleSimulation(btnSimulate->GetValue()); }, 19999);
+
+	toolbar->Realize();
 }
 
 void csMainFrame::CreatePanels()
@@ -52,9 +65,4 @@ void csMainFrame::CreatePanels()
 void csMainFrame::addViewListener(ViewListener* l)
 {
 	m_2DView->addViewListener(l);
-}
-
-void csMainFrame::OnExit(wxCommandEvent& event)
-{
-	Close(true);
 }
