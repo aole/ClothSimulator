@@ -1,6 +1,7 @@
 #pragma once
 
 #include <csGL3DObject.h>
+#include "ClothMesh.h"
 
 class cs3DContext {
 public:
@@ -18,7 +19,7 @@ public:
 	// 3D
 	void addRectangle(float x1, float y1, float z1, float x2, float y2, float z2);
 
-	void createCloth(float x1, float y1, float x2, float y2, float z);
+	ClothMesh* createCloth(float x1, float y1, float x2, float y2, float z);
 
 	// model
 

@@ -21,7 +21,4 @@ void csGLRectangle::create(float x1, float y1, float z1, float x2, float y2, flo
 	indices.push_back(2);
 
 	creategl(vertices, indices);
-
-	vertices.clear();
-	indices.clear();
 }

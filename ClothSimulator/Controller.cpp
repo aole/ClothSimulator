@@ -30,5 +30,5 @@ void Controller::mouseMove2D(float screenx, float screeny, float logicalx, float
 
 void Controller::OnToggleSimulation(bool simulate)
 {
-	wxLogDebug("s:%i", simulate);
+	m_model->simulate(simulate);
 }

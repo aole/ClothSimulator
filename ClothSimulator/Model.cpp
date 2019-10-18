@@ -2,31 +2,87 @@
 #include <algorithm>
 #include "wx/wx.h"
 
-void Shape::addVertex(float x, float y)
+const glm::vec3 GRAVITY(0, -0.1, 0);
+
+void ClothShape::simulate()
 {
-	m_vertices.push_back(glm::vec2(x, y));
+	if (m_mesh) {
+		// GRAVITY
+		m_mesh->addForce(GRAVITY);
+
+		m_mesh->update();
+	}
 }
 
 Model::~Model()
 {
 	m_listeners.clear();
 
-	for (Shape* s : m_shapes)
+	for (ClothShape* s : m_shapes)
 		delete s;
 	m_shapes.clear();
 }
 
 void Model::addRectangle(float x1, float y1, float x2, float y2)
 {
-	Shape* shape = new Shape();
+	ClothShape* shape = new ClothShape();
 	// clockwize
-	shape->addVertex(std::min(x1, x2), std::min(y1, y2));
-	shape->addVertex(std::max(x1, x2), std::min(y1, y2));
-	shape->addVertex(std::max(x1, x2), std::max(y1, y2));
-	shape->addVertex(std::min(x1, x2), std::max(y1, y2));
+	float minx = std::min(x1, x2);
+	float miny = std::min(y1, y2);
+	float maxx = std::max(x1, x2);
+	float maxy = std::max(y1, y2);
+
+	shape->addVertex(minx, miny);
+	shape->addVertex(maxx, miny);
+	shape->addVertex(maxx, maxy);
+	shape->addVertex(minx, maxy);
 
 	m_shapes.push_back(shape);
 
+	if (m_3DContext)
+		shape->m_mesh = m_3DContext->createCloth(minx, miny, maxx, maxy, 0);
+
+	notifyListeners();
+}
+
+void Model::notifyListeners()
+{
 	for (ModelListener* l : m_listeners)
 		l->updated();
+}
+
+void Model::simulate(bool simulate)
+{
+	m_simulate = simulate;
+	wxLogDebug("m_simulate %i", m_simulate);
+	
+	if (true) {
+		for (int i = 0; i < 50; i++) {
+			//wxLogDebug("Simulating model!");
+			for (ClothShape* s : getShapes())
+				s->simulate();
+
+			notifyListeners();
+		}
+	}
+	else {
+		if (m_simulate) {
+			assert(m_thread == nullptr);
+
+			SimulationThread* m_thread = new SimulationThread(this);
+			m_thread->Create();
+			m_thread->Run();
+			wxLogDebug("running thread");
+		}
+		else {
+			if (m_thread) {
+				m_thread->TestDestroy();
+				// wait for previous thread to complete
+				// we cannot kill the thread as it would leave vertices in inconsistant state.
+				while (m_thread->IsRunning()) {}
+
+				m_thread = nullptr;
+			}
+		}
+	}
 }

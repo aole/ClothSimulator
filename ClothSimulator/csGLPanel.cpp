@@ -64,8 +64,10 @@ bool csGLPanel::GLInit()
 	SetCurrent(*m_GLContext);
 
 	int ret = m_3DContext->init();
-	if (ret == 1) // first time init
+	if (ret == 1) {// first time init
+		m_model->set3DContext(m_3DContext);
 		m_3DContext->setGrid(500, 500, 50);
+	}
 
 	return true;
 }
@@ -104,31 +106,11 @@ void csGLPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	m_3DContext->render();
 
 	SwapBuffers();
+	//wxLogDebug("buffers swapped");
 }
 
 void csGLPanel::updated()
 {
-	m_3DContext->clearObjectsExceptGrid();
-
-	for (Shape* s : m_model->getShapes()) {
-		float minx=1e10, maxx = -1e10, miny = 1e10, maxy = -1e10;
-		if (s->getCount() == 4) {
-			for (int i = 0; i < s->getCount();i++) {
-				glm::vec2 v = s->getVertex(i);
-				if (v.x < minx)
-					minx = v.x;
-				else if (v.x > maxx)
-					maxx = v.x;
-				if (v.y < miny)
-					miny = v.y;
-				else if (v.y > maxy)
-					maxy = v.y;
-			}
-			//wxLogDebug("add: %f, %f : %f, %f", minx, miny, maxx, maxy);
-			//m_3DContext->addRectangle(minx, miny, 0, maxx, maxy, 0);
-			m_3DContext->createCloth(minx, miny, maxx, maxy, 0);
-		}
-	}
-
 	Refresh();
+	Update();
 }

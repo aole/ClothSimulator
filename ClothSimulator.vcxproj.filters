@@ -50,10 +50,10 @@
     <ClInclude Include="ClothSimulator\View.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ClothSimulator\Cloth.h">
+    <ClInclude Include="ClothSimulator\glincludes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ClothSimulator\glincludes.h">
+    <ClInclude Include="ClothSimulator\ClothMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -85,10 +85,10 @@
     <ClCompile Include="ClothSimulator\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ClothSimulator\Cloth.cpp">
+    <ClCompile Include="ClothSimulator\Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ClothSimulator\Controller.cpp">
+    <ClCompile Include="ClothSimulator\ClothMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

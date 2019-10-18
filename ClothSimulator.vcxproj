@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ClothSimulator\Cloth.h" />
+    <ClInclude Include="ClothSimulator\ClothMesh.h" />
     <ClInclude Include="ClothSimulator\Controller.h" />
     <ClInclude Include="ClothSimulator\cs2DPanel.h" />
     <ClInclude Include="ClothSimulator\cs3DContext.h" />
@@ -36,7 +36,7 @@
     <ClInclude Include="ClothSimulator\ViewListener.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClothSimulator\Cloth.cpp" />
+    <ClCompile Include="ClothSimulator\ClothMesh.cpp" />
     <ClCompile Include="ClothSimulator\Controller.cpp" />
     <ClCompile Include="ClothSimulator\cs2DPanel.cpp" />
     <ClCompile Include="ClothSimulator\cs3DContext.cpp" />

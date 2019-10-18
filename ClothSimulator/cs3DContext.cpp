@@ -8,7 +8,7 @@
 #include <wx/wx.h>
 #include <csGL3DGrid.h>
 #include <csGLRectangle.h>
-#include <Cloth.h>
+#include <ClothMesh.h>
 
 // horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
@@ -110,11 +110,13 @@ void cs3DContext::addRectangle(float x1, float y1, float z1, float x2, float y2,
 	m_rendered_objects.push_back(rect);
 }
 
-void cs3DContext::createCloth(float x1, float y1, float x2, float y2, float z)
+ClothMesh* cs3DContext::createCloth(float x1, float y1, float x2, float y2, float z)
 {
-	Cloth* cloth = new Cloth();
+	ClothMesh* cloth = new ClothMesh();
 	cloth->create(x1, y1, x2, y2, z, 20);
 	m_rendered_objects.push_back(cloth);
+
+	return cloth;
 }
 
 void cs3DContext::render()

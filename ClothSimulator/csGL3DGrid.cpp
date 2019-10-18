@@ -53,7 +53,4 @@ void csGL3DGrid::create(float width, float depth, float major)
 	}
 
 	creategl(vertices, indices);
-
-	vertices.clear();
-	indices.clear();
 }

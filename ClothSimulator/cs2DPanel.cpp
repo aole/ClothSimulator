@@ -43,7 +43,7 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	drawGrid(dc);
 
 	dc.SetPen(*wxMEDIUM_GREY_PEN);
-	for (Shape* s : m_model->getShapes()) {
+	for (ClothShape* s : m_model->getShapes()) {
 		if (s->getCount() > 2) {
 			glm::vec2 v1 = s->getVertex(s->getCount() - 1);
 			for (glm::vec2 v2 : s->getVertices()) {

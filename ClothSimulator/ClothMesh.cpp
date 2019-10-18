@@ -1,4 +1,4 @@
-#include "Cloth.h"
+#include "ClothMesh.h"
 
 #include "wx/wx.h"
 
@@ -43,38 +43,34 @@ float intersects(float a, float b, float c, float d, float p, float q, float r, 
 };
 
 // to compare 
-bool equals(glm::vec3 &a, glm::vec3 &b) {
-	return std::abs(a.x - b.x) < 0.0001f && std::abs(a.y - b.y) < 0.0001f && std::abs(a.z - b.z) < 0.0001f;
+bool equals(Vertex* a, Vertex* b) {
+	return std::abs(a->x - b->x) < 0.0001f && std::abs(a->y - b->y) < 0.0001f && std::abs(a->z - b->z) < 0.0001f;
 }
 
-IPInfo *intersection_points(std::vector<glm::vec3>& verts, Face& face, glm::vec2& line0, glm::vec2& line1) {
+IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& line0, glm::vec2& line1) {
 	std::map<wxString, int> *ips = new std::map<wxString, int>(); // indices of the intersecting points between edges
 	int count = 0;
 
 	int lidx = face.indices.size() - 1; // last index
-	//console.log(face);
-	glm::vec3 *fp = &verts[face.indices[lidx]]; // first point
+	Vertex *fp = verts[face.indices[lidx]]; // first point
 	//console.log(fp);
 	for (size_t i = 0; i < face.indices.size(); i++) {
-		glm::vec3* sp = &verts[face.indices[i]]; // second point
+		Vertex* sp = verts[face.indices[i]]; // second point
 		float dist = intersects(fp->x, fp->y, sp->x, sp->y, line0.x, line0.y, line1.x, line1.y);
 		if (dist == 0) { // same as the first point
 			(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = face.indices[lidx];
 			count++;
-			//console.log('same as first!');
 		}
 		else if (dist == 1) { // same as the last point
 			(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = face.indices[i];
 			count++;
-			//console.log('same as second!');
 		}
 		else if (dist > 0 && dist < 1) { // add a new point and use its index
 	   // check previous point
-			glm::vec3* nv = new glm::vec3(fp->x + (sp->x - fp->x) * dist, fp->y + (sp->y - fp->y) * dist, 0);
+			Vertex* nv = new Vertex(fp->x + (sp->x - fp->x) * dist, fp->y + (sp->y - fp->y) * dist, 0);
 			int found = false;
 			for (size_t v = 0; v < verts.size(); v++) {
-				//if (nv->x==verts[v].x && nv->y == verts[v].y && nv->z == verts[v].z)
-				if(equals(*nv, verts[v]))
+				if(equals(nv, verts[v]))
 				{
 					(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = v;
 					found = true;
@@ -83,9 +79,10 @@ IPInfo *intersection_points(std::vector<glm::vec3>& verts, Face& face, glm::vec2
 			}
 			if (!found) {
 				(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = verts.size();
-				verts.push_back(*nv);
-			}
-			delete nv;
+				verts.push_back(nv);
+			} else
+				delete nv;
+
 			count++;
 		}
 		else {
@@ -100,7 +97,7 @@ IPInfo *intersection_points(std::vector<glm::vec3>& verts, Face& face, glm::vec2
 	return new IPInfo(ips, count);
 }
 
-void cut_faces_Greiner_Hormann(std::vector<glm::vec3> &verts, std::vector<Face> &faces, glm::vec2 &line0, glm::vec2 &line1)
+void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face> &faces, glm::vec2 &line0, glm::vec2 &line1)
 {
 	std::vector<Face> newFaces;
 
@@ -139,7 +136,6 @@ void cut_faces_Greiner_Hormann(std::vector<glm::vec3> &verts, std::vector<Face> 
 			}
 		}
 		if (hasSplit && icount > 1) { // if the face was split, update the old face and add the new one
-		  //console.log('has split');
 			face->indices = indices;
 			newFaces.push_back(newFace);
 		}
@@ -152,9 +148,17 @@ void cut_faces_Greiner_Hormann(std::vector<glm::vec3> &verts, std::vector<Face> 
 		faces.push_back(newFaces[f]);
 }
 
-void Cloth::create(float x1, float y1, float x2, float y2, float z, float segment)
+ClothMesh::~ClothMesh()
 {
-	std::vector<glm::vec3> vertices;
+	for (size_t i = 0; i < m_vertices.size(); i++)
+		delete m_vertices[i];
+
+	for (size_t i = 0; i < m_links.size(); i++)
+		delete m_links[i];
+}
+
+void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float segment)
+{
 	std::vector< unsigned int > indices;
 	std::vector<Face> faces;
 
@@ -163,33 +167,43 @@ void Cloth::create(float x1, float y1, float x2, float y2, float z, float segmen
 	float miny = glm::min(y1, y2);
 	float maxy = glm::max(y1, y2);
 
-	vertices.push_back(glm::vec3(minx, miny, z));
-	vertices.push_back(glm::vec3(maxx, miny, z));
-	vertices.push_back(glm::vec3(maxx, maxy, z));
-	vertices.push_back(glm::vec3(minx, maxy, z));
+	m_vertices.push_back(new Vertex(minx, miny, z));
+	m_vertices.push_back(new Vertex(maxx, miny, z));
+	m_vertices.push_back(new Vertex(maxx, maxy, z));
+	m_vertices.push_back(new Vertex(minx, maxy, z));
 
 	Face face(0, 1, 2, 3);
 	faces.push_back(face);
 
-	//cut_faces_Greiner_Hormann(vertices, faces, glm::vec2(-1e10, 0), glm::vec2(1e10, 0));
+	// cut polygon on the grid/horizontal
 	for (float y = miny + segment; y <= maxy; y += segment) {
-		cut_faces_Greiner_Hormann(vertices, faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
+		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
 	}
 	// cut polygon on the grid/vertical
 	for (float x = minx + segment; x <= maxx; x += segment) {
-		cut_faces_Greiner_Hormann(vertices, faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
+		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
 	}
 
 	/*
 	int wobble = 10;
-	for (size_t i = 0; i < vertices.size(); i++) {
-		vertices[i].x += rand() % wobble - wobble / 2;
-		vertices[i].y += rand() % wobble - wobble / 2;
-		vertices[i].z += rand() % wobble - wobble / 2;
-		//wxLogDebug("vert %d: %f, %f, %f", i, vertices[i].x, vertices[i].y, vertices[i].z);
+	for (size_t i = 0; i < m_vertices.size(); i++) {
+		//vertices[i].x += rand() % wobble - wobble / 2;
+		//vertices[i].y += rand() % wobble - wobble / 2;
+		//vertices[i].z += rand() % wobble - wobble / 2;
+		//wxLogDebug("vert %d: %f, %f, %f", i, m_vertices[i]->x, m_vertices[i]->y, m_vertices[i]->z);
 	}
 	*/
 
+	// create structural links for CLOTH
+	for (Face f : faces) {
+		int pi = f.indices[f.indices.size() - 1];
+		for (int ni : f.indices) {
+			createLink(pi, ni);
+			pi = ni;
+		}
+	}
+
+	// create indices for OPENGL
 	for (Face f : faces) {
 		//wxLogDebug("face");
 		if (f.indices.size() > 2)
@@ -207,8 +221,38 @@ void Cloth::create(float x1, float y1, float x2, float y2, float z, float segmen
 
 	m_draw_mode = GL_TRIANGLES;
 
-	creategl(vertices, indices);
+	//wxLogDebug("num vertices: %d", m_vertices.size());
 
-	vertices.clear();
-	indices.clear();
+	creategl(m_vertices, indices);
 }
+
+void ClothMesh::update()
+{
+	float DAMPING = 0.01f;
+	for (Vertex *v: m_vertices) {
+		if (v->m_pinned)
+			continue;
+
+		glm::vec3 temp = *v;
+
+		v->x += (v->x - v->m_previous.x)* (1 - DAMPING) + m_acceleration.x;
+		v->y += (v->y - v->m_previous.y)* (1 - DAMPING) + m_acceleration.y;
+		v->z += (v->z - v->m_previous.z)* (1 - DAMPING) + m_acceleration.z;
+
+		v->m_previous.x = temp.x;
+		v->m_previous.y = temp.y;
+		v->m_previous.z = temp.z;
+	}
+
+	m_acceleration = glm::vec3();
+
+	updategl(m_vertices);
+}
+
+void ClothMesh::createLink(int v1, int v2)
+{
+	float len = glm::distance((glm::vec3)*m_vertices[v1], (glm::vec3) *m_vertices[v2]);
+	// wxLogDebug("distance: %f", len);
+	m_links.push_back(new Link(v1, v2, len));
+}
+
