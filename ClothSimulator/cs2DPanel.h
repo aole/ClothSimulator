@@ -27,8 +27,6 @@ public:
 	void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy);
 
 private:
-	void drawGrid(wxDC &dc);
-
 	Model* m_model;
 
 	bool m_initialized = false;

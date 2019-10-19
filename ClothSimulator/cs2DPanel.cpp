@@ -2,6 +2,7 @@
 #include "cs2DPanel.h"
 
 #include "wx/dcbuffer.h"
+#include <wx/graphics.h>
 
 wxBEGIN_EVENT_TABLE(cs2DPanel, wxWindow)
 	EVT_SIZE(cs2DPanel::OnSize)
@@ -13,6 +14,7 @@ wxEND_EVENT_TABLE()
 
 cs2DPanel::cs2DPanel(Model* model, wxWindow* parent) : m_model(model), wxWindow(parent, wxID_ANY), m_panx(0), m_pany(0)
 {
+	SetBackgroundStyle(wxBG_STYLE_PAINT);
 	SetBackgroundColour(wxColour(204, 204, 204));
 	SetWindowStyle(wxBORDER_SUNKEN);
 
@@ -36,33 +38,38 @@ void cs2DPanel::OnSize(wxSizeEvent& event)
 
 void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
-	wxBufferedPaintDC dc(this);
+	wxAutoBufferedPaintDC dc(this);
+	wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
 
 	dc.Clear();
 
-	drawGrid(dc);
+	// DRAW GRID
+	wxRect r = GetClientRect();
+	gc->SetBrush(*wxTRANSPARENT_BRUSH);
+	gc->SetPen(wxPen(wxColour(155, 50, 50, 50), 1));
+	// x axis
+	gc->StrokeLine(0, m_pany, r.width, m_pany);
+	gc->SetPen(wxPen(wxColour(50, 155, 50, 50), 1));
+	gc->StrokeLine(m_panx, 0, m_panx, r.height);
 
-	dc.SetPen(*wxMEDIUM_GREY_PEN);
+	gc->SetPen(*wxMEDIUM_GREY_PEN);
+	gc->SetBrush(*wxLIGHT_GREY_BRUSH);
+
+	// DRAW CLOTHES
+	wxGraphicsPath path = gc->CreatePath();
 	for (ClothShape* s : m_model->getShapes()) {
 		if (s->getCount() > 2) {
-			glm::vec2 v1 = s->getVertex(s->getCount() - 1);
-			for (glm::vec2 v2 : s->getVertices()) {
-				dc.DrawLine(v1.x + m_panx, -v1.y + m_pany, v2.x + m_panx, -v2.y + m_pany);
-				v1 = v2;
+			path.MoveToPoint(s->getVertex(0).x + m_panx, -s->getVertex(0).y + m_pany);
+			for (int i = 1; i < s->getCount(); i++) {
+				path.AddLineToPoint(s->getVertex(i).x + m_panx, -s->getVertex(i).y + m_pany);
 			}
+			path.CloseSubpath();
 		}
 	}
-}
+	gc->FillPath(path);
+	gc->StrokePath(path);
 
-void cs2DPanel::drawGrid(wxDC& dc)
-{
-	wxRect r = GetClientRect();
-	dc.SetBrush(*wxTRANSPARENT_BRUSH);
-	dc.SetPen(wxPen(wxColour(255, 150, 150, 50), 1));
-	// x axis
-	dc.DrawLine(0, m_pany, r.width, m_pany);
-	dc.SetPen(wxPen(wxColour(150, 255, 150, 50), 1));
-	dc.DrawLine(m_panx, 0, m_panx, r.height);
+	delete gc;
 }
 
 void cs2DPanel::drawTemporaryRectangle(float minx, float miny, float maxx, float maxy)
