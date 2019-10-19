@@ -10,6 +10,10 @@
 
 #include <wx/tglbtn.h>
 
+BEGIN_EVENT_TABLE(csMainFrame, wxFrame)
+	EVT_CLOSE(csMainFrame::OnClose)
+END_EVENT_TABLE()
+
 csMainFrame::csMainFrame(Model* model, Controller* controller) : m_model(model), m_controller(controller), wxFrame(nullptr, wxID_ANY, "Cloth Simulator", wxPoint(100,100), wxSize(800, 600))
 {
 	CreateMenuBar();

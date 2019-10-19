@@ -1,6 +1,5 @@
 #pragma once
 
-#include "csMainFrame.h"
 #include <Model.h>
 #include <Controller.h>
 
@@ -9,10 +8,16 @@ class csApplication : public wxApp
 public:
 	~csApplication();
 
-	bool OnInit();
+	void activateRenderLoop(bool on);
 
 private:
-	csMainFrame* m_mainFrame = nullptr;
+	bool OnInit();
+	void OnIdle(wxIdleEvent& evt);
+	
+	bool render_loop_on;
+
 	Model* m_model = nullptr;
 	Controller* m_controller = nullptr;
 };
+
+DECLARE_APP(csApplication);

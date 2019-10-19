@@ -51,38 +51,14 @@ void Model::notifyListeners()
 		l->updated();
 }
 
-void Model::simulate(bool simulate)
+void Model::simulate()
 {
-	m_simulate = simulate;
-	//wxLogDebug("m_simulate %i", m_simulate);
-	
-	if (true) {
-		for (int i = 0; i < 500; i++) {
-			//wxLogDebug("Simulating model!");
-			for (ClothShape* s : getShapes())
-				s->simulate();
+	//for (int i = 0; i < 5000; i++) {
+		//wxLogDebug("Simulating model!");
+		for (ClothShape* s : getShapes())
+			s->simulate();
 
-			notifyListeners();
-		}
-	}
-	else {
-		if (m_simulate) {
-			assert(m_thread == nullptr);
-
-			SimulationThread* m_thread = new SimulationThread(this);
-			m_thread->Create();
-			m_thread->Run();
-			wxLogDebug("running thread");
-		}
-		else {
-			if (m_thread) {
-				m_thread->TestDestroy();
-				// wait for previous thread to complete
-				// we cannot kill the thread as it would leave vertices in inconsistant state.
-				while (m_thread->IsRunning()) {}
-
-				m_thread = nullptr;
-			}
-		}
-	}
+		notifyListeners();
+		wxYield();
+	//}
 }

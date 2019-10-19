@@ -8,6 +8,10 @@
 #include <cs2DPanel.h>
 #include <csGLPanel.h>
 
+#include <wx/wx.h>
+
+#include "csApplication.h"
+
 class csMainFrame : public wxFrame, public View
 {
 public:
@@ -20,12 +24,15 @@ public:
 
 	void addViewListener(ViewListener* l);
 
-public:
-	void OnExit(wxCommandEvent& event);
+	void OnClose(wxCloseEvent& evt)
+	{
+		wxGetApp().activateRenderLoop(false);
+		evt.Skip(); // don't stop event, we still want window to close
+	}
+
+	wxDECLARE_EVENT_TABLE();
 
 private:
-	void toggleSimulation(bool simulate);
-
 	Model* m_model;
 	Controller* m_controller;
 

@@ -41,7 +41,7 @@ public:
 	void addActionListener(ModelListener* listener) { m_listeners.push_back(listener); }
 	void notifyListeners();
 
-	void simulate(bool simulate);
+	void simulate();
 
 	std::vector< ClothShape* > getShapes() { return m_shapes; };
 	bool m_simulate;

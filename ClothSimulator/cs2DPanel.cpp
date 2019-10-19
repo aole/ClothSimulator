@@ -46,10 +46,10 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// DRAW GRID
 	wxRect r = GetClientRect();
 	gc->SetBrush(*wxTRANSPARENT_BRUSH);
-	gc->SetPen(wxPen(wxColour(155, 50, 50, 50), 1));
+	gc->SetPen(wxPen(wxColour(155, 50, 50, 100), 1));
 	// x axis
 	gc->StrokeLine(0, m_pany, r.width, m_pany);
-	gc->SetPen(wxPen(wxColour(50, 155, 50, 50), 1));
+	gc->SetPen(wxPen(wxColour(50, 155, 50, 100), 1));
 	gc->StrokeLine(m_panx, 0, m_panx, r.height);
 
 	gc->SetPen(*wxMEDIUM_GREY_PEN);

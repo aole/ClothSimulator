@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "csApplication.h"
 
 void Controller::mouseUp2D(float screenx, float screeny, float logicalx, float logicaly)
 {
@@ -31,5 +32,10 @@ void Controller::mouseMove2D(float screenx, float screeny, float logicalx, float
 
 void Controller::OnToggleSimulation(bool simulate)
 {
-	m_model->simulate(simulate);
+	wxGetApp().activateRenderLoop(simulate);
+}
+
+void Controller::simulate()
+{
+	m_model->simulate();
 }
