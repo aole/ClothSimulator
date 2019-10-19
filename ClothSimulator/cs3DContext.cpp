@@ -16,7 +16,7 @@ float horizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 
 glm::mat4 Projection;
-glm::vec3 CameraPosition = glm::vec3(0, 50, 400);
+glm::vec3 CameraPosition = glm::vec3(0, 150, 700);
 glm::vec3 CameraLookAt = glm::vec3(0, 0, 0);
 glm::vec3 CameraDirection = glm::vec3(0, 0, 0);
 glm::vec3 CameraRight = glm::vec3(1, 0, 0);
@@ -48,16 +48,6 @@ void cs3DContext::clearObjects()
 	for (csGL3DObject* o : m_rendered_objects)
 		delete o;
 	m_rendered_objects.clear();
-}
-
-void cs3DContext::clearObjectsExceptGrid()
-{
-	csGL3DObject* grid = m_rendered_objects[0];
-	for (csGL3DObject* o : m_rendered_objects)
-		if (grid != o)
-			delete o;
-	m_rendered_objects.clear();
-	m_rendered_objects.push_back(grid);
 }
 
 int cs3DContext::init()
@@ -103,17 +93,10 @@ void cs3DContext::setGrid(float width, float depth, float major)
 	m_rendered_objects.push_back(grid);
 }
 
-void cs3DContext::addRectangle(float x1, float y1, float z1, float x2, float y2, float z2)
-{
-	csGLRectangle *rect = new csGLRectangle();
-	rect->create(x1, y1, z1, x2, y2, z2);
-	m_rendered_objects.push_back(rect);
-}
-
-ClothMesh* cs3DContext::createCloth(float x1, float y1, float x2, float y2, float z)
+ClothMesh* cs3DContext::createCloth(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
 {
 	ClothMesh* cloth = new ClothMesh();
-	cloth->create(x1, y1, x2, y2, z, 20);
+	cloth->create(x1, y1, x2, y2, z, segment_length, tensile_strength);
 	m_rendered_objects.push_back(cloth);
 
 	return cloth;

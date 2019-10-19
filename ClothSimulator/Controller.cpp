@@ -5,8 +5,9 @@ void Controller::mouseUp2D(float screenx, float screeny, float logicalx, float l
 	m_lastx = logicalx;
 	m_lasty = logicaly;
 
-	if(m_mouse_left_down)
-		m_model->addRectangle(m_anchorx, m_anchory, m_lastx, m_lasty);
+	if (m_mouse_left_down) {
+		m_model->createCloth(m_anchorx, m_anchory, m_lastx, m_lasty, 10, .99f);
+	}
 	m_mouse_left_down = false;
 }
 

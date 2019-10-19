@@ -157,8 +157,10 @@ ClothMesh::~ClothMesh()
 		delete m_links[i];
 }
 
-void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float segment)
+void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
 {
+	m_tensile_strength = tensile_strength;
+
 	std::vector< unsigned int > indices;
 	std::vector<Face> faces;
 
@@ -169,18 +171,18 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 
 	m_vertices.push_back(new Vertex(minx, miny, z));
 	m_vertices.push_back(new Vertex(maxx, miny, z));
-	m_vertices.push_back(new Vertex(maxx, maxy, z));
-	m_vertices.push_back(new Vertex(minx, maxy, z));
+	m_vertices.push_back(new Vertex(maxx, maxy, z, true));
+	m_vertices.push_back(new Vertex(minx, maxy, z, true));
 
 	Face face(0, 1, 2, 3);
 	faces.push_back(face);
 
 	// cut polygon on the grid/horizontal
-	for (float y = miny + segment; y <= maxy; y += segment) {
+	for (float y = miny + segment_length; y <= maxy; y += segment_length) {
 		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
 	}
 	// cut polygon on the grid/vertical
-	for (float x = minx + segment; x <= maxx; x += segment) {
+	for (float x = minx + segment_length; x <= maxx; x += segment_length) {
 		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
 	}
 
@@ -224,6 +226,43 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 	//wxLogDebug("num vertices: %d", m_vertices.size());
 
 	creategl(m_vertices, indices);
+}
+
+void ClothMesh::constraint()
+{
+	int iterations = 6;
+
+	for (int i = 0; i < iterations; i++) {
+		for (Link* link: m_links) {
+			Vertex *v1 = m_vertices[link->m_v1];
+			Vertex* v2 = m_vertices[link->m_v2];
+
+			glm::vec3 correction(v2->x - v1->x, v2->y - v1->y, v2->z - v1->z);// = (glm::vec3) * v2 - (glm::vec3) * v1;
+			float length = glm::length(correction);
+
+			if (length > 0) {
+				float adj = ((1 - link->m_length / length) * 0.5 * m_tensile_strength);
+				correction.x *= adj;
+				correction.y *= adj;
+				correction.z *= adj;
+
+				if (!v1->m_pinned) {
+					//v1->operator+=(correction);
+					v1->x += correction.x;
+					v1->y += correction.y;
+					v1->z += correction.z;
+				}
+
+				if (!v2->m_pinned) {
+					//v1->operator+=(correction);
+					v2->x -= correction.x;
+					v2->y -= correction.y;
+					v2->z -= correction.z;
+				}
+
+			}
+		}
+	}
 }
 
 void ClothMesh::update()

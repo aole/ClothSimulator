@@ -2,14 +2,14 @@
 #include <algorithm>
 #include "wx/wx.h"
 
-const glm::vec3 GRAVITY(0, -0.1, 0);
+const glm::vec3 GRAVITY(0, -0.031, 0);
 
 void ClothShape::simulate()
 {
 	if (m_mesh) {
 		// GRAVITY
 		m_mesh->addForce(GRAVITY);
-
+		m_mesh->constraint();
 		m_mesh->update();
 	}
 }
@@ -23,7 +23,7 @@ Model::~Model()
 	m_shapes.clear();
 }
 
-void Model::addRectangle(float x1, float y1, float x2, float y2)
+void Model::createCloth(float x1, float y1, float x2, float y2, float segment_length, float tensile_strength)
 {
 	ClothShape* shape = new ClothShape();
 	// clockwize
@@ -40,7 +40,7 @@ void Model::addRectangle(float x1, float y1, float x2, float y2)
 	m_shapes.push_back(shape);
 
 	if (m_3DContext)
-		shape->m_mesh = m_3DContext->createCloth(minx, miny, maxx, maxy, 0);
+		shape->m_mesh = m_3DContext->createCloth(minx, miny, maxx, maxy, 0, segment_length, tensile_strength);
 
 	notifyListeners();
 }
@@ -54,10 +54,10 @@ void Model::notifyListeners()
 void Model::simulate(bool simulate)
 {
 	m_simulate = simulate;
-	wxLogDebug("m_simulate %i", m_simulate);
+	//wxLogDebug("m_simulate %i", m_simulate);
 	
 	if (true) {
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 500; i++) {
 			//wxLogDebug("Simulating model!");
 			for (ClothShape* s : getShapes())
 				s->simulate();

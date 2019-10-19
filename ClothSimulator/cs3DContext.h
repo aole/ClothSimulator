@@ -17,9 +17,7 @@ public:
 	void setGrid(float width, float depth, float major);
 	// 2D
 	// 3D
-	void addRectangle(float x1, float y1, float z1, float x2, float y2, float z2);
-
-	ClothMesh* createCloth(float x1, float y1, float x2, float y2, float z);
+	ClothMesh* createCloth(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength);
 
 	// model
 
@@ -27,7 +25,6 @@ public:
 	void render();
 
 	void clearObjects();
-	void clearObjectsExceptGrid();
 
 private:
 	bool m_initialized;

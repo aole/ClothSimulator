@@ -36,7 +36,7 @@ public:
 
 	void set3DContext(cs3DContext* context) { m_3DContext = context; }
 
-	void addRectangle(float x1, float y1, float x2, float y2);
+	void createCloth(float x1, float y1, float x2, float y2, float segment_length = 10, float tensile_strength = 0.7);
 
 	void addActionListener(ModelListener* listener) { m_listeners.push_back(listener); }
 	void notifyListeners();

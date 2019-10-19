@@ -6,7 +6,7 @@
 class Vertex : public glm::vec3
 {
 public:
-	Vertex(float x, float y, float z) : glm::vec3(x, y, z), m_previous(x, y, z), m_pinned(false) {}
+	Vertex(float x, float y, float z, bool pinned = false) : glm::vec3(x, y, z), m_previous(x, y, z), m_pinned(pinned) {}
 
 	void sync() { m_previous.x = x; m_previous.y = y; m_previous.z = z; }
 

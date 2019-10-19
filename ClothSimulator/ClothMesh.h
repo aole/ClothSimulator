@@ -18,10 +18,11 @@ public:
 	virtual ~ClothMesh();
 
 	virtual void get_color(float color[]) { color[0] = color[1] = color[2] = .3f; };
-	void create(float x1, float y1, float x2, float y2, float z, float segment);
+	void create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength);
 
 	// SIMULATION
 	void addForce(glm::vec3 f) { m_acceleration += f; }
+	void constraint();
 	void update();
 
 private:
@@ -31,4 +32,6 @@ private:
 	std::vector<Link*>m_links;
 
 	glm::vec3 m_acceleration;
+
+	float m_tensile_strength;
 };
