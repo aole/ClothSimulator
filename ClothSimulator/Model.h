@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <ModelListener.h>
-#include <cs3DContext.h>
 #include "ClothMesh.h"
 #include "wx/thread.h"
 #include <wx\log.h>
@@ -31,10 +30,8 @@ private:
 class Model
 {
 public:
-	Model() : m_3DContext(nullptr), m_simulate(false), m_thread(nullptr) {}
+	Model() : m_simulate(false), m_thread(nullptr) {}
 	~Model();
-
-	void set3DContext(cs3DContext* context) { m_3DContext = context; }
 
 	void createCloth(float x1, float y1, float x2, float y2, float segment_length = 10, float tensile_strength = 0.7);
 
@@ -45,9 +42,8 @@ public:
 
 	std::vector< ClothShape* > getShapes() { return m_shapes; };
 	bool m_simulate;
-private:
-	cs3DContext* m_3DContext;
 
+private:
 	std::vector< ClothShape* > m_shapes;
 	std::vector< ModelListener* > m_listeners;
 

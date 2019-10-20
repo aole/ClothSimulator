@@ -3,7 +3,7 @@
 #include "glincludes.h"
 
 #include <wx/glcanvas.h>
-#include <cs3DContext.h>
+#include <OpenGLContext.h>
 #include <View.h>
 #include <ModelListener.h>
 #include <Model.h>
@@ -24,7 +24,6 @@ public:
 private:
 	Model* m_model;
 	wxGLContext *m_GLContext;
-	cs3DContext* m_3DContext;
 
 	int m_winHeight;
 

@@ -1,5 +1,5 @@
 
-#include "cs3DContext.h"
+#include "OpenGLContext.h"
 
 #include <vector>
 #include <fstream>
@@ -36,23 +36,23 @@ GLuint ShaderColorID;
 
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
 
-cs3DContext::cs3DContext(): m_initialized(false), m_programID(0) {}
+OpenGLContext::OpenGLContext(): m_initialized(false), m_programID(0) {}
 
-cs3DContext::~cs3DContext()
+OpenGLContext::~OpenGLContext()
 {
 	clearObjects();
 }
 
-void cs3DContext::clearObjects()
+void OpenGLContext::clearObjects()
 {
 	for (csGL3DObject* o : m_rendered_objects)
 		delete o;
 	m_rendered_objects.clear();
 }
 
-int cs3DContext::init()
+int OpenGLContext::init()
 {
-	if (m_initialized)
+	if (m_initialized) // if already initialized
 		return 2;
 
 	GLenum err = glewInit(); // after the window is created
@@ -78,7 +78,7 @@ int cs3DContext::init()
 	return 1;
 }
 
-void cs3DContext::resize(int width, int height)
+void OpenGLContext::resize(int width, int height)
 {
 	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	Projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 1000.0f);
@@ -86,14 +86,14 @@ void cs3DContext::resize(int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void cs3DContext::setGrid(float width, float depth, float major)
+void OpenGLContext::setGrid(float width, float depth, float major)
 {
 	csGL3DGrid *grid = new csGL3DGrid();
 	grid->create(width, depth, major);
 	m_rendered_objects.push_back(grid);
 }
 
-ClothMesh* cs3DContext::createCloth(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
+ClothMesh* OpenGLContext::createCloth(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
 {
 	ClothMesh* cloth = new ClothMesh();
 	cloth->create(x1, y1, x2, y2, z, segment_length, tensile_strength);
@@ -102,7 +102,7 @@ ClothMesh* cs3DContext::createCloth(float x1, float y1, float x2, float y2, floa
 	return cloth;
 }
 
-void cs3DContext::render()
+void OpenGLContext::render()
 {
 	// setup camera view
 	CameraDirection = glm::vec3(std::cos(verticalAngle) * std::sin(horizontalAngle),

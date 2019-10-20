@@ -1,6 +1,7 @@
 #include "Model.h"
 #include <algorithm>
 #include "wx/wx.h"
+#include <OpenGLContext.h>
 
 const glm::vec3 GRAVITY(0, -0.031, 0);
 
@@ -39,8 +40,7 @@ void Model::createCloth(float x1, float y1, float x2, float y2, float segment_le
 
 	m_shapes.push_back(shape);
 
-	if (m_3DContext)
-		shape->m_mesh = m_3DContext->createCloth(minx, miny, maxx, maxy, 0, segment_length, tensile_strength);
+	shape->m_mesh = OpenGLContext::Instance().createCloth(minx, miny, maxx, maxy, 0, segment_length, tensile_strength);
 
 	notifyListeners();
 }
@@ -53,12 +53,8 @@ void Model::notifyListeners()
 
 void Model::simulate()
 {
-	//for (int i = 0; i < 5000; i++) {
-		//wxLogDebug("Simulating model!");
-		for (ClothShape* s : getShapes())
-			s->simulate();
+	for (ClothShape* s : getShapes())
+		s->simulate();
 
-		notifyListeners();
-		wxYield();
-	//}
+	notifyListeners();
 }

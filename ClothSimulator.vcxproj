@@ -22,7 +22,7 @@
     <ClInclude Include="ClothSimulator\ClothMesh.h" />
     <ClInclude Include="ClothSimulator\Controller.h" />
     <ClInclude Include="ClothSimulator\cs2DPanel.h" />
-    <ClInclude Include="ClothSimulator\cs3DContext.h" />
+    <ClInclude Include="ClothSimulator\OpenGLContext.h" />
     <ClInclude Include="ClothSimulator\csApplication.h" />
     <ClInclude Include="ClothSimulator\csGL3DGrid.h" />
     <ClInclude Include="ClothSimulator\csGLRectangle.h" />
@@ -39,7 +39,7 @@
     <ClCompile Include="ClothSimulator\ClothMesh.cpp" />
     <ClCompile Include="ClothSimulator\Controller.cpp" />
     <ClCompile Include="ClothSimulator\cs2DPanel.cpp" />
-    <ClCompile Include="ClothSimulator\cs3DContext.cpp" />
+    <ClCompile Include="ClothSimulator\OpenGLContext.cpp" />
     <ClCompile Include="ClothSimulator\csApplication.cpp" />
     <ClCompile Include="ClothSimulator\csGL3DGrid.cpp" />
     <ClCompile Include="ClothSimulator\csGL3DObject.cpp" />

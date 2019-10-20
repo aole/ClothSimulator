@@ -34,8 +34,6 @@ csGLPanel::csGLPanel(Model* model, wxWindow *parent, const wxGLAttributes& canva
 		wxLogDebug("OpenGL Core Profile 3.2 successfully set.");
 	}
 
-	m_3DContext = new cs3DContext();
-
 	model->addActionListener(this);
 }
 
@@ -49,11 +47,6 @@ csGLPanel::~csGLPanel()
 		delete m_GLContext;
 		m_GLContext = NULL;
 	}
-
-	if (m_3DContext) {
-		delete m_3DContext;
-		m_3DContext = NULL;
-	}
 }
 
 bool csGLPanel::GLInit()
@@ -63,10 +56,9 @@ bool csGLPanel::GLInit()
 
 	SetCurrent(*m_GLContext);
 
-	int ret = m_3DContext->init();
+	int ret = OpenGLContext::Instance().init();
 	if (ret == 1) {// first time init
-		m_model->set3DContext(m_3DContext);
-		m_3DContext->setGrid(500, 500, 50);
+		OpenGLContext::Instance().setGrid(500, 500, 50);
 	}
 
 	return true;
@@ -79,7 +71,7 @@ void csGLPanel::OnSize(wxSizeEvent& event)
 	const wxSize size = event.GetSize() * GetContentScaleFactor();
 	m_winHeight = size.y;
 
-	m_3DContext->resize(size.x, size.y);
+	OpenGLContext::Instance().resize(size.x, size.y);
 
 	if (!GLInit())
 		return;
@@ -103,7 +95,7 @@ void csGLPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// This should not be needed, while we have only one canvas
 	SetCurrent(*m_GLContext);
 
-	m_3DContext->render();
+	OpenGLContext::Instance().render();
 
 	SwapBuffers();
 	//wxLogDebug("buffers swapped");
