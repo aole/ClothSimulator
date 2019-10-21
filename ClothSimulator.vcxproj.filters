@@ -9,6 +9,10 @@
       <UniqueIdentifier>{7401bd2b-43f4-4dc8-8a15-37773b0c5946}</UniqueIdentifier>
       <Extensions>cpp</Extensions>
     </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{1b5ea82e-5cbf-4602-a720-56965cb0f90e}</UniqueIdentifier>
+      <Extensions>glsl</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClothSimulator\csApplication.h">
@@ -91,5 +95,19 @@
     <ClCompile Include="ClothSimulator\OpenGLContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LitFS.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="LitVS.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="UnLitFS.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="UnLitVS.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

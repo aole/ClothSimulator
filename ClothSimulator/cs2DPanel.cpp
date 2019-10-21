@@ -28,7 +28,7 @@ void cs2DPanel::OnSize(wxSizeEvent& event)
 	if (!m_initialized) {
 		wxRect r = GetClientRect();
 		m_panx = r.width / 2;
-		m_pany = r.height / 2;
+		m_pany = r.height - r.height / 4;
 
 		m_initialized = true;
 	}

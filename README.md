@@ -4,7 +4,7 @@ Program to design to clothes and drape the resulting mesh in 3D.
 Design the clothes in 2D window, then simulate the clothes in 3D window to get realistic folds.
 The cloth is affected by gravity, collision geometry and other forces.
 
-![Screenshot](screenshots/screenshot02.jpg?raw=true)
+![Screenshot](screenshots/demo01.gif?raw=true)
 
 Features
 --------

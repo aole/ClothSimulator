@@ -48,6 +48,12 @@
     <ClCompile Include="ClothSimulator\csMainFrame.cpp" />
     <ClCompile Include="ClothSimulator\Model.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LitFS.glsl" />
+    <None Include="LitVS.glsl" />
+    <None Include="UnLitFS.glsl" />
+    <None Include="UnLitVS.glsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5F30BAF0-F127-4F3F-BF30-0F312C12BFD3}</ProjectGuid>

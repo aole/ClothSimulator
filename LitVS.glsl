@@ -6,6 +6,7 @@ layout(location = 1) in vec3 vertexNormal;
 uniform vec3 shaderColor;
 
 out vec3 fragmentPosition;
+out vec3 fragmentNormal;
 out vec3 fragmentColor;
 
 // Values that stay constant for the whole mesh.
@@ -17,5 +18,6 @@ void main(){
   gl_Position = projection * view * model * vec4(vertexPosition, 1);
   
   fragmentPosition = vec3(model * vec4(vertexPosition, 1.0));
-  fragmentColor = shaderColor; // vec3(.4, .4, .4);
+  fragmentNormal = vertexNormal;
+  fragmentColor = shaderColor;
 }

@@ -3,6 +3,15 @@
 #include "glincludes.h"
 #include "csGL3DObject.h"
 
+class Face
+{
+public:
+	Face() : normal(glm::vec3()) {}
+	Face(int a, int b, int c, int d) : normal(glm::vec3()) { indices.push_back(a); indices.push_back(b); indices.push_back(c); indices.push_back(d); }
+	std::vector<int> indices;
+	glm::vec3 normal;
+};
+
 class Link
 {
 public:
@@ -18,7 +27,7 @@ public:
 	ClothMesh() : m_acceleration(glm::vec3()), m_tensile_strength(0) {}
 	virtual ~ClothMesh();
 
-	virtual void get_color(float color[]) { color[0] = color[1] = color[2] = .3f; };
+	virtual void get_color(float color[]) { color[0] = .8f; color[1] = color[2] = .3f; };
 	void create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength);
 
 	// SIMULATION
@@ -29,9 +38,12 @@ public:
 private:
 	void createLink(int v1, int v2);
 
+	void updateNormals();
+
 	std::vector<Vertex*> m_vertices;
 	std::vector<glm::vec3*> m_normals;
 	std::vector<Link*>m_links;
+	std::vector<Face*>m_faces;
 
 	glm::vec3 m_acceleration;
 

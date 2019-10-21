@@ -18,15 +18,6 @@ public:
 	int count;
 };
 
-class Face
-{
-public:
-	Face() {}
-	Face(int a, int b, int c, int d) { indices.push_back(a); indices.push_back(b); indices.push_back(c); indices.push_back(d); }
-	std::vector<int> indices;
-	glm::vec3 normal;
-};
-
 float intersects(float a, float b, float c, float d, float p, float q, float r, float s) {
 	float det, gamma, lambda;
 	det = (c - a) * (s - q) - (r - p) * (d - b);
@@ -98,15 +89,15 @@ IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& 
 	return new IPInfo(ips, count);
 }
 
-void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face> &faces, glm::vec2 &line0, glm::vec2 &line1)
+void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &faces, glm::vec2 &line0, glm::vec2 &line1)
 {
-	std::vector<Face> newFaces;
+	std::vector<Face*> newFaces;
 
 	// loop thru' all the current faces to be cut by line 0, 1
 	for (size_t f = 0; f < faces.size(); f++) {
-		Face *face = &faces[f];
+		Face *face = faces[f];
 		std::vector<int> indices;
-		Face newFace;
+		Face *newFace = new Face();
 		bool old = true;
 		bool hasSplit = false;
 
@@ -122,14 +113,14 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face> &f
 				if (old)
 					indices.push_back(face->indices[lidx]); // push the first point to the current polygon
 				else
-					if ((newFace.indices.size() == 0) || (newFace.indices.size() > 0 && newFace.indices[newFace.indices.size() - 1] != face->indices[lidx]))
-						newFace.indices.push_back(face->indices[lidx]);
+					if ((newFace->indices.size() == 0) || (newFace->indices.size() > 0 && newFace->indices[newFace->indices.size() - 1] != face->indices[lidx]))
+						newFace->indices.push_back(face->indices[lidx]);
 
 				int ipidx = (*idata->points)[wxString::Format(wxT("%d-%d"), lidx, i)];
 				if (ipidx >= 0) {
 					indices.push_back(ipidx);
-					if ((newFace.indices.size() == 0) || (newFace.indices.size() > 0 && newFace.indices[newFace.indices.size() - 1] != ipidx))
-						newFace.indices.push_back(ipidx);
+					if ((newFace->indices.size() == 0) || (newFace->indices.size() > 0 && newFace->indices[newFace->indices.size() - 1] != ipidx))
+						newFace->indices.push_back(ipidx);
 					old = !old;
 					hasSplit = true;
 				}
@@ -140,6 +131,8 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face> &f
 			face->indices = indices;
 			newFaces.push_back(newFace);
 		}
+		else
+			delete newFace;
 
 		delete idata;
 	}
@@ -151,6 +144,9 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face> &f
 
 ClothMesh::~ClothMesh()
 {
+	for (size_t i = 0; i < m_faces.size(); i++)
+		delete m_faces[i];
+
 	for (size_t i = 0; i < m_vertices.size(); i++)
 		delete m_vertices[i];
 
@@ -161,67 +157,36 @@ ClothMesh::~ClothMesh()
 		delete m_links[i];
 }
 
-void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
+void ClothMesh::updateNormals()
 {
-	m_tensile_strength = tensile_strength;
-
-	std::vector< unsigned int > indices;
-	std::vector<Face> faces;
-
-	float minx = glm::min(x1, x2);
-	float maxx = glm::max(x1, x2);
-	float miny = glm::min(y1, y2);
-	float maxy = glm::max(y1, y2);
-
-	m_vertices.push_back(new Vertex(minx, miny, z));
-	m_vertices.push_back(new Vertex(maxx, miny, z));
-	m_vertices.push_back(new Vertex(maxx, maxy, z, true));
-	m_vertices.push_back(new Vertex(minx, maxy, z, true));
-
-	Face face(0, 1, 2, 3);
-	faces.push_back(face);
-
-	// cut polygon on the grid/horizontal
-	for (float y = miny + segment_length; y <= maxy; y += segment_length) {
-		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
+	// reset all vertices and normals
+	for (auto v : m_vertices) {
+		v->m_face_count = 0;
 	}
-	// cut polygon on the grid/vertical
-	for (float x = minx + segment_length; x <= maxx; x += segment_length) {
-		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
+	for (auto v : m_normals) {
+		v->x = v->y = v->z = 0.0f;
 	}
 
-	// just wiggle in the z coords to give cloth a better initial flow.
-	// also add same amount of normals
-	for (auto v: m_vertices) {
-		v->z += (rand() % 10 - 5)/10.f;
-		m_normals.push_back(new glm::vec3());
-	}
-
-	// create structural links for CLOTH
-	// also calculate the face normal
-	for (Face f : faces) {
+	// calculate the face normal
+	for (auto f : m_faces) {
 		// create normals
-		assert(f.indices.size() > 2);
-		Vertex* v0 = m_vertices.at(f.indices.at(0));
-		Vertex* v1 = m_vertices.at(f.indices.at(1));
-		Vertex* v2 = m_vertices.at(f.indices.at(2));
+		assert(f->indices.size() > 2);
+		Vertex* v0 = m_vertices.at(f->indices.at(0));
+		Vertex* v1 = m_vertices.at(f->indices.at(1));
+		Vertex* v2 = m_vertices.at(f->indices.at(2));
 
 		glm::vec3 v10 = glm::normalize(*v1 - *v0);
 		glm::vec3 v20 = glm::normalize(*v2 - *v0);
-		f.normal = glm::cross(v10, v20);
+		f->normal = glm::cross(v10, v20);
 
-		// structural links and add normals to vertices
+		// add normals to vertices
 		// we'll average out the normals on the vertices later
-		int pi = f.indices[f.indices.size() - 1];
-		for (int ni : f.indices) {
-			createLink(pi, ni);
-			pi = ni;
-
+		for (int ni : f->indices) {
 			Vertex* v = m_vertices.at(ni);
 			glm::vec3* vn = m_normals.at(ni);
-			vn->x += f.normal.x;
-			vn->y += f.normal.y;
-			vn->z += f.normal.z;
+			vn->x += f->normal.x;
+			vn->y += f->normal.y;
+			vn->z += f->normal.z;
 			v->m_face_count += 1;
 		}
 	}
@@ -236,17 +201,68 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 		vn->y /= v->m_face_count;
 		vn->z /= v->m_face_count;
 	}
+}
+
+void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
+{
+	m_tensile_strength = tensile_strength;
+
+	std::vector< unsigned int > indices;
+
+	float minx = glm::min(x1, x2);
+	float maxx = glm::max(x1, x2);
+	float miny = glm::min(y1, y2);
+	float maxy = glm::max(y1, y2);
+
+	m_vertices.push_back(new Vertex(minx, miny, z));
+	m_vertices.push_back(new Vertex(maxx, miny, z));
+	m_vertices.push_back(new Vertex(maxx, maxy, z, true));
+	m_vertices.push_back(new Vertex(minx, maxy, z, true));
+
+	Face *face = new Face(0, 1, 2, 3);
+	m_faces.push_back(face);
+
+	// cut polygon on the grid/horizontal
+	for (float y = miny + segment_length; y <= maxy; y += segment_length) {
+		cut_faces_Greiner_Hormann(m_vertices, m_faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
+	}
+	// cut polygon on the grid/vertical
+	for (float x = minx + segment_length; x <= maxx; x += segment_length) {
+		cut_faces_Greiner_Hormann(m_vertices, m_faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
+	}
+
+	// just wiggle in the z coords to give cloth a better initial flow.
+	// also add same amount of normals
+	for (auto v: m_vertices) {
+		v->z += (rand() % 10 - 5)/10.f;
+		m_normals.push_back(new glm::vec3());
+	}
+
+	// create structural links for CLOTH
+	// also calculate the face normal
+	for (Face *f : m_faces) {
+		// structural links and add normals to vertices
+		// we'll average out the normals on the vertices later
+		int pi = f->indices[f->indices.size() - 1];
+		for (int ni : f->indices) {
+			createLink(pi, ni);
+			pi = ni;
+		}
+	}
+
+	// update normals
+	updateNormals();
 
 	// create indices for OPENGL
-	for (Face f : faces) {
+	for (Face *f : m_faces) {
 		//wxLogDebug("face");
-		if (f.indices.size() > 2)
+		if (f->indices.size() > 2)
 		{
-			for (size_t i = 1; i < f.indices.size()-1; i++) {
-				indices.push_back(f.indices[0]);
+			for (size_t i = 1; i < f->indices.size()-1; i++) {
+				indices.push_back(f->indices[0]);
 				//wxLogDebug("ind %d", f.indices[0]);
 				for (size_t j = i+1; j >= i; j--) {
-					indices.push_back(f.indices[j]);
+					indices.push_back(f->indices[j]);
 					//wxLogDebug("ind %d", f.indices[j]);
 				}
 			}
@@ -316,6 +332,9 @@ void ClothMesh::update()
 	}
 
 	m_acceleration = glm::vec3();
+
+	// update normals
+	updateNormals();
 
 	updategl(m_vertices, m_normals);
 }

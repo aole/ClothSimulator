@@ -10,6 +10,16 @@
 #include <csGLRectangle.h>
 #include <ClothMesh.h>
 
+struct ShaderInfo {
+	GLuint ShaderID;
+	GLuint MxProjectionID;
+	GLuint MxViewID;
+	GLuint MxModelID;
+
+	GLuint ShaderColorID;
+	GLuint LightPositionID;
+};
+
 // horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
 // vertical angle : 0, look at the horizon
@@ -26,18 +36,10 @@ glm::vec3 CameraDirection = glm::vec3(0, 0, 0);
 glm::vec3 CameraRight = glm::vec3(1, 0, 0);
 glm::vec3 CameraUp = glm::vec3(0, 1, 0);
 
-// SHADRES
-GLuint LitID;
-GLuint UnLitID;
-
-// TO SHADER
-GLuint MxProjectionID;
-GLuint MxViewID;
-GLuint MxModelID;
-
-GLuint ShaderColorID;
+glm::vec3 Light = glm::vec3(200, 50, 200);
 
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
+ShaderInfo LitShader, UnlitShader;
 
 OpenGLContext::~OpenGLContext()
 {
@@ -61,10 +63,22 @@ int OpenGLContext::init()
 		wxLogFatalError("glewInit Error! %d", err);
 		return 0;
 	}
-	ShaderColorID = glGetUniformLocation(LitID, "shaderColor");
 
-	UnLitID = LoadShaders("UnLitVS.glsl", "UnLitFS.glsl");
-	LitID = LoadShaders("LitVS.glsl", "LitFS.glsl");
+	// LOAD SHADERS
+	// unlit shader
+	UnlitShader.ShaderID = LoadShaders("UnLitVS.glsl", "UnLitFS.glsl");
+	UnlitShader.MxProjectionID = glGetUniformLocation(UnlitShader.ShaderID, "projection");
+	UnlitShader.MxViewID = glGetUniformLocation(UnlitShader.ShaderID, "view");
+	UnlitShader.MxModelID = glGetUniformLocation(UnlitShader.ShaderID, "model");
+	UnlitShader.ShaderColorID = glGetUniformLocation(UnlitShader.ShaderID, "shaderColor");
+
+	// lit shader
+	LitShader.ShaderID = LoadShaders("LitVS.glsl", "LitFS.glsl");
+	LitShader.MxProjectionID = glGetUniformLocation(LitShader.ShaderID, "projection");
+	LitShader.MxViewID = glGetUniformLocation(LitShader.ShaderID, "view");
+	LitShader.MxModelID = glGetUniformLocation(LitShader.ShaderID, "model");
+	LitShader.ShaderColorID = glGetUniformLocation(LitShader.ShaderID, "shaderColor");
+	LitShader.LightPositionID = glGetUniformLocation(LitShader.ShaderID, "lightPosition");
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -72,12 +86,6 @@ int OpenGLContext::init()
 	glDepthFunc(GL_LESS);
 
 	// these map direct to vertex shader variables
-	MxProjectionID = glGetUniformLocation(LitID, "projection");
-	MxViewID = glGetUniformLocation(LitID, "view");
-	MxModelID = glGetUniformLocation(LitID, "model");
-
-	ShaderColorID = glGetUniformLocation(LitID, "shaderColor");
-
 	m_initialized = true;
 
 	return 1;
@@ -133,26 +141,27 @@ void OpenGLContext::render()
 
 	float color[3];
 	for (csGL3DObject *ro : m_rendered_objects) {
+		ro->get_color(color);
+
 		if (ro->get_shader_type() == SHADER_LIT) {
-			glUseProgram(LitID);
-			// 1st attribute buffer : vertices
-			//glEnableVertexAttribArray(0);
-			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glUseProgram(LitShader.ShaderID);
+			glUniformMatrix4fv(LitShader.MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
+			glUniformMatrix4fv(LitShader.MxViewID, 1, GL_FALSE, &View[0][0]);
+			glUniformMatrix4fv(LitShader.MxModelID, 1, GL_FALSE, &Model[0][0]);
+			
+			glUniform3f(LitShader.ShaderColorID, color[0], color[1], color[2]);
+			glUniform3f(LitShader.LightPositionID, Light.x, Light.y, Light.z);
 		}
 		else {
-			glUseProgram(UnLitID);
-			// 1st attribute buffer : vertices
-			//glEnableVertexAttribArray(0);
-			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glUseProgram(UnlitShader.ShaderID);
+			glUniformMatrix4fv(UnlitShader.MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
+			glUniformMatrix4fv(UnlitShader.MxViewID, 1, GL_FALSE, &View[0][0]);
+			glUniformMatrix4fv(UnlitShader.MxModelID, 1, GL_FALSE, &Model[0][0]);
+
+			glUniform3f(UnlitShader.ShaderColorID, color[0], color[1], color[2]);
 		}
 
 		// pass matrices to vertex shader
-		glUniformMatrix4fv(MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
-		glUniformMatrix4fv(MxViewID, 1, GL_FALSE, &View[0][0]);
-		glUniformMatrix4fv(MxModelID, 1, GL_FALSE, &Model[0][0]);
-
-		ro->get_color(color);
-		glUniform3f(ShaderColorID, color[0], color[1], color[2]);
 
 		ro->render();
 
