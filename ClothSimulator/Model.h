@@ -13,11 +13,12 @@ class SimulationThread;
 class ClothShape
 {
 public:
+	ClothShape() : m_mesh(nullptr) {}
 	void addVertex(float x, float y) { m_vertices.push_back(glm::vec2(x, y)); }
 
 	int getCount() { return m_vertices.size(); }
 	glm::vec2 getVertex(int i) { return m_vertices.at(i); }
-	std::vector<glm::vec2> getVertices() { return m_vertices; }
+	auto &getVertices() const { return m_vertices; }
 
 	void simulate();
 
@@ -40,11 +41,11 @@ public:
 
 	void simulate();
 
-	std::vector< ClothShape* > getShapes() { return m_shapes; };
+	auto &getShapes() { return m_shapes; };
 	bool m_simulate;
 
 private:
-	std::vector< ClothShape* > m_shapes;
+	std::vector< std::shared_ptr<ClothShape> > m_shapes;
 	std::vector< ModelListener* > m_listeners;
 
 	SimulationThread* m_thread;
@@ -56,12 +57,12 @@ public:
 	SimulationThread(Model* model) : m_model(model) {}
 
 private:
-	ExitCode Entry() {
+	ExitCode Entry() override {
 		wxLogDebug("Thread Entry()");
 		
 		while (m_model->m_simulate) {
 			//wxLogDebug("Simulating model!");
-			for (ClothShape* s : m_model->getShapes())
+			for (auto s : m_model->getShapes())
 				s->simulate();
 
 			m_model->notifyListeners();

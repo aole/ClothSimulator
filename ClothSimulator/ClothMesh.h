@@ -15,6 +15,7 @@ public:
 class ClothMesh : public csGL3DObject
 {
 public:
+	ClothMesh() : m_acceleration(glm::vec3()), m_tensile_strength(0) {}
 	virtual ~ClothMesh();
 
 	virtual void get_color(float color[]) { color[0] = color[1] = color[2] = .3f; };

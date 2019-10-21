@@ -36,8 +36,6 @@ GLuint ShaderColorID;
 
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
 
-OpenGLContext::OpenGLContext(): m_initialized(false), m_programID(0) {}
-
 OpenGLContext::~OpenGLContext()
 {
 	clearObjects();

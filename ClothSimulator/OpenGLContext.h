@@ -10,7 +10,6 @@ public:
 	static OpenGLContext& Instance() {
 		// This line only runs once, thus creating the only instance in existence
 		static std::unique_ptr<OpenGLContext> instance(new OpenGLContext);
-
 		// dereferencing the variable here, saves the caller from having to use 
 		// the arrow operator, and removes temptation to try and delete the 
 		// returned instance.
@@ -35,18 +34,15 @@ public:
 
 	void clearObjects();
 
-	// Note that although this should be allowed, 
-	// some compilers may not implement private destructors
-	// This prevents others from deleting our one single instance, which was otherwise created on the heap
 	~OpenGLContext();
 
 private:
-	OpenGLContext();
+	OpenGLContext() : m_initialized(false), m_programID(0) {}
 
 	// Note that the next two functions are not given bodies, thus any attempt 
 	 // to call them implicitly will return as compiler errors. This prevents 
 	 // accidental copying of the only instance of the class.
-	OpenGLContext(const OpenGLContext& old) {}; // disallow copy constructor
+	OpenGLContext(const OpenGLContext& old) : m_initialized(false), m_programID(0) {}; // disallow copy constructor
 	const OpenGLContext& operator=(const OpenGLContext& old) {}; //disallow assignment operator
 
 private:

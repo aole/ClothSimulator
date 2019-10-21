@@ -18,15 +18,12 @@ void ClothShape::simulate()
 Model::~Model()
 {
 	m_listeners.clear();
-
-	for (ClothShape* s : m_shapes)
-		delete s;
-	m_shapes.clear();
 }
 
 void Model::createCloth(float x1, float y1, float x2, float y2, float segment_length, float tensile_strength)
 {
-	ClothShape* shape = new ClothShape();
+	std::shared_ptr<ClothShape> shape = std::make_shared<ClothShape>();
+
 	// clockwize
 	float minx = std::min(x1, x2);
 	float miny = std::min(y1, y2);
@@ -53,7 +50,7 @@ void Model::notifyListeners()
 
 void Model::simulate()
 {
-	for (ClothShape* s : getShapes())
+	for (auto s : getShapes())
 		s->simulate();
 
 	notifyListeners();

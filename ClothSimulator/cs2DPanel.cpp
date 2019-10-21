@@ -57,11 +57,11 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 	// DRAW CLOTHES
 	wxGraphicsPath path = gc->CreatePath();
-	for (ClothShape* s : m_model->getShapes()) {
+	for (auto s : m_model->getShapes()) {
 		if (s->getCount() > 2) {
-			path.MoveToPoint(s->getVertex(0).x + m_panx, -s->getVertex(0).y + m_pany);
+			path.MoveToPoint(s->getVertex(0).x + (double)m_panx, -s->getVertex(0).y + (double)m_pany);
 			for (int i = 1; i < s->getCount(); i++) {
-				path.AddLineToPoint(s->getVertex(i).x + m_panx, -s->getVertex(i).y + m_pany);
+				path.AddLineToPoint(s->getVertex(i).x + (double)m_panx, -s->getVertex(i).y + (double)m_pany);
 			}
 			path.CloseSubpath();
 		}

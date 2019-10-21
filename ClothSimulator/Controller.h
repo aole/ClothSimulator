@@ -9,7 +9,7 @@
 class Controller : public ViewListener
 {
 public:
-	Controller(Model* model) : m_model(model), m_mouse_left_down(false), m_simulate(false) {}
+	Controller(Model* model) : m_model(model), m_mouse_left_down(false), m_simulate(false), m_lastx(0), m_lasty(0), m_anchorx(0), m_anchory(0){}
 
 	void add2DView(View2D* view) { view->addViewListener(this); m_2Dviews.push_back(view); }
 

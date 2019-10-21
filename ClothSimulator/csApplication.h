@@ -6,12 +6,13 @@
 class csApplication : public wxApp
 {
 public:
+	csApplication() : render_loop_on(false) {}
 	~csApplication();
 
 	void activateRenderLoop(bool on);
 
 private:
-	bool OnInit();
+	bool OnInit() override;
 	void OnIdle(wxIdleEvent& evt);
 	
 	bool render_loop_on;
