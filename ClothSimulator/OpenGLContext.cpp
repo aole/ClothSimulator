@@ -28,10 +28,11 @@ glm::mat4 View;
 // Model matrix : an identity matrix (model will be at the origin)
 glm::mat4 Model = glm::mat4(1.0f);
 
-// Our ModelViewProjection : multiplication of our 3 matrices
-glm::mat4 mvp;
+// TO SHADER
+GLuint MxProjectionID;
+GLuint MxViewID;
+GLuint MxModelID;
 
-GLuint MatrixID;
 GLuint ShaderColorID;
 
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
@@ -68,7 +69,10 @@ int OpenGLContext::init()
 	glDepthFunc(GL_LESS);
 
 	// these map direct to vertex shader variables
-	MatrixID = glGetUniformLocation(m_programID, "MVP");
+	MxProjectionID = glGetUniformLocation(m_programID, "projection");
+	MxViewID = glGetUniformLocation(m_programID, "view");
+	MxModelID = glGetUniformLocation(m_programID, "model");
+
 	ShaderColorID = glGetUniformLocation(m_programID, "shaderColor");
 
 	m_initialized = true;
@@ -119,10 +123,13 @@ void OpenGLContext::render()
 		CameraPosition + CameraDirection, // and looks at the origin
 		CameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 	);
-	mvp = Projection * View * Model;
 
 	glUseProgram(m_programID);
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+
+	// pass matrices to vertex shader
+	glUniformMatrix4fv(MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
+	glUniformMatrix4fv(MxViewID, 1, GL_FALSE, &View[0][0]);
+	glUniformMatrix4fv(MxModelID, 1, GL_FALSE, &Model[0][0]);
 
 	// Render
 	glClearColor(.8f, .8f, .8f, 1.f);

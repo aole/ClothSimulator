@@ -126,18 +126,22 @@ Cloth Designer App - V1
       - Vertices
       - Indices
 - Milestone
-  - V1.1
+  - V0.1
     - Create Frame with two Panels (3D OpenGL and 2D canvas)
     - Drag rectangle in 2D Panel
       - Create Corresponding rectangle in 3D Panel
     - UPDATE DESIGN
-  - V1.2
+  - V0.2
     - Create 3D clothes
     - Simulate structural spring and gravity
     - Press SpaceBar to toggle simulation
+  - V0.3
+    - Add opengl lights
 - Code Structure
   - Model
-    - store clothes (Shape in 2D)
+    - stores clothes
+      - CLOTH_SHAPE (2D)
+      - CLOTH_MESH (3D)
     - update listeners (View)
   - Controller
     - listens to View
@@ -162,3 +166,5 @@ Cloth Designer App - V1
     - handle 2d rendering
     - get objects from Model
     - listens to Model
+    - OnMouseUp
+      - update listeners (Controller)
