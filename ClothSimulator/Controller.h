@@ -13,10 +13,15 @@ public:
 
 	void add2DView(View2D* view) { view->addViewListener(this); m_2Dviews.push_back(view); }
 
+	// MOUSE INTERACTIONS
 	void mouseUp2D(float screenx, float screeny, float logicalx, float logicaly);
 	void mouseDown2D(float screenx, float screeny, float logicalx, float logicaly);
 	void mouseMove2D(float screenx, float screeny, float logicalx, float logicaly);
 
+	// KEYBOARD INTERACTIONS
+	void keyDown(int keyCode);
+
+	// MENU INTERACTIONS
 	void OnMenuFileExit(wxFrame *frame) { frame->Close(true); };
 
 	void OnToggleSimulation(bool simulate);

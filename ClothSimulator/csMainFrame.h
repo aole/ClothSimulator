@@ -30,6 +30,8 @@ public:
 		evt.Skip(); // don't stop event, we still want window to close
 	}
 
+	void OnKeyDown(wxKeyEvent& event);
+
 	wxDECLARE_EVENT_TABLE();
 
 private:

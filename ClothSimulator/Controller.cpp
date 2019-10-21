@@ -30,8 +30,22 @@ void Controller::mouseMove2D(float screenx, float screeny, float logicalx, float
 		}
 }
 
+void Controller::keyDown(int keyCode)
+{
+	switch (keyCode)
+	{
+	case WXK_SPACE:
+		OnToggleSimulation(!m_simulate);
+		break;
+	default:
+		wxLogDebug("Other key pressed");
+		break;
+	}
+}
+
 void Controller::OnToggleSimulation(bool simulate)
 {
+	m_simulate = simulate;
 	wxGetApp().activateRenderLoop(simulate);
 }
 
