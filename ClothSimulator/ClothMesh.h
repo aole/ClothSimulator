@@ -30,6 +30,7 @@ private:
 	void createLink(int v1, int v2);
 
 	std::vector<Vertex*> m_vertices;
+	std::vector<glm::vec3*> m_normals;
 	std::vector<Link*>m_links;
 
 	glm::vec3 m_acceleration;

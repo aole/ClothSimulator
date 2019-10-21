@@ -16,17 +16,19 @@ float horizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 
 glm::mat4 Projection;
+glm::mat4 Model = glm::mat4(1.0f);
+
+// Camera matrix
+glm::mat4 View;
 glm::vec3 CameraPosition = glm::vec3(0, 150, 700);
 glm::vec3 CameraLookAt = glm::vec3(0, 0, 0);
 glm::vec3 CameraDirection = glm::vec3(0, 0, 0);
 glm::vec3 CameraRight = glm::vec3(1, 0, 0);
 glm::vec3 CameraUp = glm::vec3(0, 1, 0);
 
-// Camera matrix
-glm::mat4 View;
-
-// Model matrix : an identity matrix (model will be at the origin)
-glm::mat4 Model = glm::mat4(1.0f);
+// SHADRES
+GLuint LitID;
+GLuint UnLitID;
 
 // TO SHADER
 GLuint MxProjectionID;
@@ -59,9 +61,10 @@ int OpenGLContext::init()
 		wxLogFatalError("glewInit Error! %d", err);
 		return 0;
 	}
-	ShaderColorID = glGetUniformLocation(m_programID, "shaderColor");
+	ShaderColorID = glGetUniformLocation(LitID, "shaderColor");
 
-	m_programID = LoadShaders("VertexShader.glsl", "FragmentShader.glsl");
+	UnLitID = LoadShaders("UnLitVS.glsl", "UnLitFS.glsl");
+	LitID = LoadShaders("LitVS.glsl", "LitFS.glsl");
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -69,11 +72,11 @@ int OpenGLContext::init()
 	glDepthFunc(GL_LESS);
 
 	// these map direct to vertex shader variables
-	MxProjectionID = glGetUniformLocation(m_programID, "projection");
-	MxViewID = glGetUniformLocation(m_programID, "view");
-	MxModelID = glGetUniformLocation(m_programID, "model");
+	MxProjectionID = glGetUniformLocation(LitID, "projection");
+	MxViewID = glGetUniformLocation(LitID, "view");
+	MxModelID = glGetUniformLocation(LitID, "model");
 
-	ShaderColorID = glGetUniformLocation(m_programID, "shaderColor");
+	ShaderColorID = glGetUniformLocation(LitID, "shaderColor");
 
 	m_initialized = true;
 
@@ -124,30 +127,39 @@ void OpenGLContext::render()
 		CameraUp  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 
-	glUseProgram(m_programID);
-
-	// pass matrices to vertex shader
-	glUniformMatrix4fv(MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
-	glUniformMatrix4fv(MxViewID, 1, GL_FALSE, &View[0][0]);
-	glUniformMatrix4fv(MxModelID, 1, GL_FALSE, &Model[0][0]);
-
 	// Render
 	glClearColor(.8f, .8f, .8f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 1st attribute buffer : vertices
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
 	float color[3];
 	for (csGL3DObject *ro : m_rendered_objects) {
+		if (ro->get_shader_type() == SHADER_LIT) {
+			glUseProgram(LitID);
+			// 1st attribute buffer : vertices
+			//glEnableVertexAttribArray(0);
+			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		}
+		else {
+			glUseProgram(UnLitID);
+			// 1st attribute buffer : vertices
+			//glEnableVertexAttribArray(0);
+			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		}
+
+		// pass matrices to vertex shader
+		glUniformMatrix4fv(MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
+		glUniformMatrix4fv(MxViewID, 1, GL_FALSE, &View[0][0]);
+		glUniformMatrix4fv(MxModelID, 1, GL_FALSE, &Model[0][0]);
+
 		ro->get_color(color);
 		glUniform3f(ShaderColorID, color[0], color[1], color[2]);
 
 		ro->render();
+
+		//glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
 	}
 
-	glDisableVertexAttribArray(0);
 	glUseProgram(0);
 }
 

@@ -24,6 +24,7 @@ public:
 	Face() {}
 	Face(int a, int b, int c, int d) { indices.push_back(a); indices.push_back(b); indices.push_back(c); indices.push_back(d); }
 	std::vector<int> indices;
+	glm::vec3 normal;
 };
 
 float intersects(float a, float b, float c, float d, float p, float q, float r, float s) {
@@ -153,6 +154,9 @@ ClothMesh::~ClothMesh()
 	for (size_t i = 0; i < m_vertices.size(); i++)
 		delete m_vertices[i];
 
+	for (size_t i = 0; i < m_normals.size(); i++)
+		delete m_normals[i];
+
 	for (size_t i = 0; i < m_links.size(); i++)
 		delete m_links[i];
 }
@@ -186,23 +190,51 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 		cut_faces_Greiner_Hormann(m_vertices, faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
 	}
 
-	/*
-	int wobble = 10;
-	for (size_t i = 0; i < m_vertices.size(); i++) {
-		//vertices[i].x += rand() % wobble - wobble / 2;
-		//vertices[i].y += rand() % wobble - wobble / 2;
-		//vertices[i].z += rand() % wobble - wobble / 2;
-		//wxLogDebug("vert %d: %f, %f, %f", i, m_vertices[i]->x, m_vertices[i]->y, m_vertices[i]->z);
+	// just wiggle in the z coords to give cloth a better initial flow.
+	// also add same amount of normals
+	for (auto v: m_vertices) {
+		v->z += (rand() % 10 - 5)/10.f;
+		m_normals.push_back(new glm::vec3());
 	}
-	*/
 
 	// create structural links for CLOTH
+	// also calculate the face normal
 	for (Face f : faces) {
+		// create normals
+		assert(f.indices.size() > 2);
+		Vertex* v0 = m_vertices.at(f.indices.at(0));
+		Vertex* v1 = m_vertices.at(f.indices.at(1));
+		Vertex* v2 = m_vertices.at(f.indices.at(2));
+
+		glm::vec3 v10 = glm::normalize(*v1 - *v0);
+		glm::vec3 v20 = glm::normalize(*v2 - *v0);
+		f.normal = glm::cross(v10, v20);
+
+		// structural links and add normals to vertices
+		// we'll average out the normals on the vertices later
 		int pi = f.indices[f.indices.size() - 1];
 		for (int ni : f.indices) {
 			createLink(pi, ni);
 			pi = ni;
+
+			Vertex* v = m_vertices.at(ni);
+			glm::vec3* vn = m_normals.at(ni);
+			vn->x += f.normal.x;
+			vn->y += f.normal.y;
+			vn->z += f.normal.z;
+			v->m_face_count += 1;
 		}
+	}
+
+	// average out the normals
+	for (size_t i = 0; i < m_vertices.size();i++) {
+		Vertex* v = m_vertices.at(i);
+		glm::vec3* vn = m_normals.at(i);
+
+		assert(v->m_face_count > 0);
+		vn->x /= v->m_face_count;
+		vn->y /= v->m_face_count;
+		vn->z /= v->m_face_count;
 	}
 
 	// create indices for OPENGL
@@ -225,7 +257,7 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 
 	//wxLogDebug("num vertices: %d", m_vertices.size());
 
-	creategl(m_vertices, indices);
+	creategl(m_vertices, m_normals, indices, GL_DYNAMIC_DRAW);
 }
 
 void ClothMesh::constraint()
@@ -285,7 +317,7 @@ void ClothMesh::update()
 
 	m_acceleration = glm::vec3();
 
-	updategl(m_vertices);
+	updategl(m_vertices, m_normals);
 }
 
 void ClothMesh::createLink(int v1, int v2)

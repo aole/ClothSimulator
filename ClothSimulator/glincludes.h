@@ -6,3 +6,8 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+enum SHADER_TYPE {
+	SHADER_UNLIT,
+	SHADER_LIT
+};

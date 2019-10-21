@@ -37,18 +37,16 @@ public:
 	~OpenGLContext();
 
 private:
-	OpenGLContext() : m_initialized(false), m_programID(0) {}
+	OpenGLContext() : m_initialized(false) {}
 
 	// Note that the next two functions are not given bodies, thus any attempt 
 	 // to call them implicitly will return as compiler errors. This prevents 
 	 // accidental copying of the only instance of the class.
-	OpenGLContext(const OpenGLContext& old) : m_initialized(false), m_programID(0) {}; // disallow copy constructor
+	OpenGLContext(const OpenGLContext& old) : m_initialized(false) {}; // disallow copy constructor
 	const OpenGLContext& operator=(const OpenGLContext& old) {}; //disallow assignment operator
 
 private:
 	bool m_initialized;
 	
-	GLint m_programID;
-
 	std::vector< csGL3DObject* > m_rendered_objects;
 };
