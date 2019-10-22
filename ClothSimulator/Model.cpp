@@ -3,7 +3,7 @@
 #include "wx/wx.h"
 #include <OpenGLContext.h>
 
-const glm::vec3 GRAVITY(0, -0.031, 0);
+const glm::vec3 GRAVITY(0, -0.01, 0);
 
 void ClothShape::simulate()
 {
@@ -54,4 +54,8 @@ void Model::simulate()
 		s->simulate();
 
 	notifyListeners();
+}
+
+void Model::getNearestClothPoint(float x, float y, std::vector<Vector2*>& points)
+{
 }

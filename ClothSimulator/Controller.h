@@ -31,6 +31,7 @@ private:
 	std::vector<View2D*> m_2Dviews;
 
 	bool m_mouse_left_down;
+	std::vector<Vector2*> m_highlighted;
 
 	float m_lastx, m_lasty;
 	float m_anchorx, m_anchory;

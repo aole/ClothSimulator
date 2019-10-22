@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <ViewListener.h>
+#include <Model.h>
 
 class View
 {
@@ -15,4 +16,5 @@ class View2D : public View
 {
 public:
 	virtual void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy) = 0;
+	virtual void setHighlightedPoints(std::vector<Vector2*>& points) = 0;
 };

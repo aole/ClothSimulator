@@ -137,6 +137,15 @@ Cloth Designer App - V1
     - Press SpaceBar to toggle simulation
   - V0.3
     - Add opengl lights
+  - V0.4
+    - Display Cloth points and highlight on mouse move.
+    - Drag Cloth points to reshape.
+    - Button to reset 3D cloth position.
+  - V0.5
+    - Button to pin Cloth points (temporary feature)
+    - Ctrl-click to split cloth edges
+    - MERGE in MASTER
+    - Update Readme
 - Code Structure
   - Model
     - stores clothes
@@ -159,7 +168,7 @@ Cloth Designer App - V1
     - create context::grid
     - recreate context::shapes if updated (from 2D to 3D)
     - listens to Model
-  - cs3DContext
+  - OpenGLContext
     - handle opengl rendering
     - store opengl structures
   - cs2DPanel (View)

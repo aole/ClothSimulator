@@ -87,6 +87,10 @@ void cs2DPanel::drawTemporaryRectangle(float minx, float miny, float maxx, float
 	dc.DrawRectangle(rect);
 }
 
+void cs2DPanel::setHighlightedPoints(std::vector<Vector2*>& points)
+{
+}
+
 void cs2DPanel::OnMouseMove(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();

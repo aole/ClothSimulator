@@ -43,18 +43,22 @@ IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& 
 	std::map<wxString, int> *ips = new std::map<wxString, int>(); // indices of the intersecting points between edges
 	int count = 0;
 
-	int lidx = face.indices.size() - 1; // last index
+	size_t lidx = face.indices.size() - 1; // last index
 	Vertex *fp = verts[face.indices[lidx]]; // first point
 	//console.log(fp);
 	for (size_t i = 0; i < face.indices.size(); i++) {
 		Vertex* sp = verts[face.indices[i]]; // second point
 		float dist = intersects(fp->x, fp->y, sp->x, sp->y, line0.x, line0.y, line1.x, line1.y);
 		if (dist == 0) { // same as the first point
-			(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = face.indices[lidx];
+			wxString key;
+			key << lidx << "-" << i;
+			(*ips)[key] = face.indices[lidx];
 			count++;
 		}
 		else if (dist == 1) { // same as the last point
-			(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = face.indices[i];
+			wxString key;
+			key << lidx << "-" << i;
+			(*ips)[key] = face.indices[i];
 			count++;
 		}
 		else if (dist > 0 && dist < 1) { // add a new point and use its index
@@ -64,13 +68,17 @@ IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& 
 			for (size_t v = 0; v < verts.size(); v++) {
 				if(equals(nv, verts[v]))
 				{
-					(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = v;
+					wxString key;
+					key << lidx << "-" << i;
+					(*ips)[key] = v;
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
-				(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = verts.size();
+				wxString key;
+				key << lidx << "-" << i;
+				(*ips)[key] = verts.size();
 				verts.push_back(nv);
 			} else
 				delete nv;
@@ -78,7 +86,9 @@ IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& 
 			count++;
 		}
 		else {
-			(*ips)[wxString::Format(wxT("%d-%d"), lidx, i)] = -1;
+			wxString key;
+			key << lidx << "-" << i;
+			(*ips)[key] = -1;
 		}
 
 		// make second point the first
@@ -107,7 +117,7 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 
 		// if there are intersections
 		if (icount > 1) {
-			int lidx = face->indices.size() - 1; // last index
+			size_t lidx = face->indices.size() - 1; // last index
 			// create a new face and adjust the old one
 			for (size_t i = 0; i < face->indices.size(); i++) {
 				if (old)
@@ -115,8 +125,9 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 				else
 					if ((newFace->indices.size() == 0) || (newFace->indices.size() > 0 && newFace->indices[newFace->indices.size() - 1] != face->indices[lidx]))
 						newFace->indices.push_back(face->indices[lidx]);
-
-				int ipidx = (*idata->points)[wxString::Format(wxT("%d-%d"), lidx, i)];
+				wxString key;
+				key << lidx << "-" << i;
+				int ipidx = (*idata->points)[key];
 				if (ipidx >= 0) {
 					indices.push_back(ipidx);
 					if ((newFace->indices.size() == 0) || (newFace->indices.size() > 0 && newFace->indices[newFace->indices.size() - 1] != ipidx))

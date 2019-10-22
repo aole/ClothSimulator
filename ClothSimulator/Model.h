@@ -10,14 +10,24 @@
 
 class SimulationThread;
 
+class Vector2
+{
+public:
+	Vector2() :x(0), y(0) {}
+	Vector2(float vx, float vy) : x(vx), y(vy) {}
+
+public:
+	float x, y;
+};
+
 class ClothShape
 {
 public:
 	ClothShape() : m_mesh(nullptr) {}
-	void addVertex(float x, float y) { m_vertices.push_back(glm::vec2(x, y)); }
+	void addVertex(float x, float y) { m_vertices.push_back( Vector2(x, y)); }
 
 	int getCount() { return m_vertices.size(); }
-	glm::vec2 getVertex(int i) { return m_vertices.at(i); }
+	auto getVertex(int i) { return m_vertices.at(i); }
 	auto &getVertices() const { return m_vertices; }
 
 	void simulate();
@@ -25,7 +35,7 @@ public:
 	ClothMesh* m_mesh;
 
 private:
-	std::vector<glm::vec2> m_vertices;
+	std::vector<Vector2> m_vertices;
 };
 
 class Model
@@ -43,6 +53,8 @@ public:
 
 	auto &getShapes() { return m_shapes; };
 	bool m_simulate;
+
+	void getNearestClothPoint(float x, float y, std::vector<Vector2*>& points);
 
 private:
 	std::vector< std::shared_ptr<ClothShape> > m_shapes;

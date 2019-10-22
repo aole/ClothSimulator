@@ -24,7 +24,8 @@ public:
 
 	void updated() { Refresh(false); };
 
-	void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy);
+	void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy) override;
+	void setHighlightedPoints(std::vector<Vector2*>& points) override;
 
 private:
 	Model* m_model;
