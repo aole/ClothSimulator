@@ -17,5 +17,6 @@ class View2D : public View
 public:
 	virtual void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy) = 0;
 	virtual void setHighlightedPoints(std::vector<Vector2*>& points) = 0;
+	virtual void setSelectedPoints(std::vector<Vector2*>& points) = 0;
 	virtual void update() = 0;
 };

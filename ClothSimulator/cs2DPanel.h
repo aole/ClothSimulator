@@ -26,6 +26,7 @@ public:
 
 	void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy) override;
 	void setHighlightedPoints(std::vector<Vector2*>& points) override;
+	void setSelectedPoints(std::vector<Vector2*>& points) override;
 	void update() override { Refresh(); }
 
 private:
@@ -35,6 +36,7 @@ private:
 	int m_panx, m_pany;
 
 	std::vector<Vector2*> highlight_points;
+	std::vector<Vector2*> select_points;
 
 	wxOverlay m_overlay;
 

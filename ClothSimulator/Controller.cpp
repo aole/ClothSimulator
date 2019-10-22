@@ -6,17 +6,18 @@ void Controller::mouseUp2D(float, float, float logicalx, float logicaly)
 	m_lastx = logicalx;
 	m_lasty = logicaly;
 
-	if (m_selected.empty()) {
-		if (m_mouse_left_down) {
+	if (m_mouse_left_down) {
+		if (m_selected.empty() && m_creating_rect) {
 			m_model->createCloth(m_anchorx, m_anchory, m_lastx, m_lasty, 10, .99f);
 		}
-	}
-	else {
-		for (auto v : m_selected) {
-			m_model->recreateCloth(v->parent);
+		else {
+			for (auto v : m_selected) {
+				m_model->recreateCloth(v->parent);
+			}
 		}
 	}
 	m_mouse_left_down = false;
+	m_creating_rect = false;
 }
 
 void Controller::mouseDown2D(float, float, float logicalx, float logicaly)
@@ -26,6 +27,8 @@ void Controller::mouseDown2D(float, float, float logicalx, float logicaly)
 
 	// dragging points
 	m_selected = m_highlighted;
+	for (auto v : m_2Dviews)
+		v->setSelectedPoints(m_selected);
 
 	m_mouse_left_down = true;
 }
@@ -34,6 +37,7 @@ void Controller::mouseMove2D(float, float, float logicalx, float logicaly)
 {
 	if (m_mouse_left_down) {
 		if (m_selected.empty()) {
+			m_creating_rect = true;
 			// new cloth
 			for (auto v : m_2Dviews) {
 				v->drawTemporaryRectangle(m_anchorx, m_anchory, logicalx, logicaly);

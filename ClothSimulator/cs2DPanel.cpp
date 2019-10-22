@@ -72,6 +72,14 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	gc->FillPath(path);
 	gc->StrokePath(path);
 
+	// draw selected vertices
+	if (!select_points.empty()) {
+		for (auto v : select_points) {
+			double x = (double)v->x + m_panx;
+			double y = (double)-v->y + m_pany;
+			gc->DrawEllipse(x - 5, y - 5, 10, 10);
+		}
+	}
 	// draw highlighted vertices
 	if (!highlight_points.empty()) {
 		for (auto v : highlight_points) {
@@ -102,6 +110,14 @@ void cs2DPanel::setHighlightedPoints(std::vector<Vector2*>& points)
 {
 	highlight_points.clear();
 	highlight_points = points;
+
+	Refresh();
+}
+
+void cs2DPanel::setSelectedPoints(std::vector<Vector2*>& points)
+{
+	select_points.clear();
+	select_points = points;
 
 	Refresh();
 }
