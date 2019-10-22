@@ -5,6 +5,12 @@
 
 const glm::vec3 GRAVITY(0, -0.01, 0);
 
+ClothShape::~ClothShape()
+{
+	for (auto v : m_points)
+		delete v;
+}
+
 void ClothShape::simulate()
 {
 	if (m_mesh) {
@@ -50,12 +56,33 @@ void Model::notifyListeners()
 
 void Model::simulate()
 {
-	for (auto s : getShapes())
+	for (auto s : m_shapes)
 		s->simulate();
 
 	notifyListeners();
 }
 
-void Model::getNearestClothPoint(float x, float y, std::vector<Vector2*>& points)
+float Model::getNearestClothPoint(float x, float y, std::vector<Vector2*>& points)
 {
+	float min = 999999999.f; // std::numeric_limits<float>::max();
+	Vector2* minv = nullptr;
+
+	for (auto s : m_shapes)
+	{
+		for (auto v : s->getPoints())
+		{
+			float d = v->distance(x, y);
+			if (d < min) {
+				min = d;
+				minv = v;
+			}
+		}
+	}
+
+	if (minv) {
+		points.push_back(minv);
+		return min;
+	}
+	else
+		return -1;
 }

@@ -59,16 +59,27 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	wxGraphicsPath path = gc->CreatePath();
 	for (auto s : m_model->getShapes()) {
 		if (s->getCount() > 2) {
-			path.MoveToPoint(s->getVertex(0).x + (double)m_panx, -s->getVertex(0).y + (double)m_pany);
+			path.MoveToPoint(s->getPoint(0)->x + (double)m_panx, -s->getPoint(0)->y + (double)m_pany);
 			for (int i = 1; i < s->getCount(); i++) {
-				path.AddLineToPoint(s->getVertex(i).x + (double)m_panx, -s->getVertex(i).y + (double)m_pany);
+				path.AddLineToPoint(s->getPoint(i)->x + (double)m_panx, -s->getPoint(i)->y + (double)m_pany);
 			}
 			path.CloseSubpath();
 		}
+		for (auto v : s->getPoints())
+			path.AddEllipse(v->x + (double)m_panx - 2, -v->y + (double)m_pany -2, 4, 4);
 	}
+
 	gc->FillPath(path);
 	gc->StrokePath(path);
 
+	// draw highlighted vertices
+	if (!highlight_points.empty()) {
+		for (auto v : highlight_points) {
+			double x = (double)v->x + m_panx;
+			double y = (double)-v->y + m_pany;
+			gc->DrawEllipse(x - 5, y - 5, 10, 10);
+		}
+	}
 	delete gc;
 }
 
@@ -89,6 +100,10 @@ void cs2DPanel::drawTemporaryRectangle(float minx, float miny, float maxx, float
 
 void cs2DPanel::setHighlightedPoints(std::vector<Vector2*>& points)
 {
+	highlight_points.clear();
+	highlight_points = points;
+
+	Refresh();
 }
 
 void cs2DPanel::OnMouseMove(wxMouseEvent& event)
@@ -96,8 +111,8 @@ void cs2DPanel::OnMouseMove(wxMouseEvent& event)
 	wxPoint pos = event.GetPosition();
 	wxClientDC dc(this);
 
-	long x = dc.DeviceToLogicalX(pos.x);
-	long y = dc.DeviceToLogicalY(pos.y);
+	int x = dc.DeviceToLogicalX(pos.x);
+	int y = dc.DeviceToLogicalY(pos.y);
 
 	for (ViewListener* l : m_listeners)
 		l->mouseMove2D(pos.x, pos.y, x - m_panx, -(y - m_pany));

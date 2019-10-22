@@ -31,7 +31,9 @@ private:
 	Model* m_model;
 
 	bool m_initialized = false;
-	long m_panx, m_pany;
+	int m_panx, m_pany;
+
+	std::vector<Vector2*> highlight_points;
 
 	wxOverlay m_overlay;
 

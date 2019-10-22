@@ -16,6 +16,8 @@ public:
 	Vector2() :x(0), y(0) {}
 	Vector2(float vx, float vy) : x(vx), y(vy) {}
 
+	float distance(float vx, float vy) { return sqrtf((x - vx) * (x - vx) + (y - vy) * (y - vy)); }
+
 public:
 	float x, y;
 };
@@ -24,18 +26,20 @@ class ClothShape
 {
 public:
 	ClothShape() : m_mesh(nullptr) {}
-	void addVertex(float x, float y) { m_vertices.push_back( Vector2(x, y)); }
+	~ClothShape();
 
-	int getCount() { return m_vertices.size(); }
-	auto getVertex(int i) { return m_vertices.at(i); }
-	auto &getVertices() const { return m_vertices; }
+	void addVertex(float x, float y) { m_points.push_back( new Vector2(x, y)); }
+
+	int getCount() { return m_points.size(); }
+	auto getPoint(int i) { return m_points.at(i); }
+	auto &getPoints() const { return m_points; }
 
 	void simulate();
 
 	ClothMesh* m_mesh;
 
 private:
-	std::vector<Vector2> m_vertices;
+	std::vector<Vector2*> m_points;
 };
 
 class Model
@@ -54,7 +58,7 @@ public:
 	auto &getShapes() { return m_shapes; };
 	bool m_simulate;
 
-	void getNearestClothPoint(float x, float y, std::vector<Vector2*>& points);
+	float getNearestClothPoint(float x, float y, std::vector<Vector2*>& points);
 
 private:
 	std::vector< std::shared_ptr<ClothShape> > m_shapes;
