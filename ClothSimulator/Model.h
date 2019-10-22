@@ -9,17 +9,18 @@
 #include <wx\log.h>
 
 class SimulationThread;
+class ClothShape;
 
-class Vector2
+class Vector2 : public glm::vec2
 {
 public:
-	Vector2() :x(0), y(0) {}
-	Vector2(float vx, float vy) : x(vx), y(vy) {}
+	Vector2(ClothShape* par) : Vector2(0, 0, par) {}
+	Vector2(float vx, float vy, ClothShape* par) : glm::vec2(vx, vy), parent(par) {}
 
 	float distance(float vx, float vy) { return sqrtf((x - vx) * (x - vx) + (y - vy) * (y - vy)); }
 
 public:
-	float x, y;
+	ClothShape* parent;
 };
 
 class ClothShape
@@ -28,7 +29,7 @@ public:
 	ClothShape() : m_mesh(nullptr) {}
 	~ClothShape();
 
-	void addVertex(float x, float y) { m_points.push_back( new Vector2(x, y)); }
+	void addVertex(float x, float y) { m_points.push_back(new Vector2(x, y, this)); }
 
 	int getCount() { return m_points.size(); }
 	auto getPoint(int i) { return m_points.at(i); }
@@ -50,6 +51,9 @@ public:
 
 	void createCloth(float x1, float y1, float x2, float y2, float segment_length = 10, float tensile_strength = 0.7);
 
+	void recreateCloth(ClothShape* shape);
+	void resetClothes();
+
 	void addActionListener(ModelListener* listener) { m_listeners.push_back(listener); }
 	void notifyListeners();
 
@@ -61,7 +65,7 @@ public:
 	float getNearestClothPoint(float x, float y, std::vector<Vector2*>& points);
 
 private:
-	std::vector< std::shared_ptr<ClothShape> > m_shapes;
+	std::vector< ClothShape* > m_shapes;
 	std::vector< ModelListener* > m_listeners;
 
 	SimulationThread* m_thread;

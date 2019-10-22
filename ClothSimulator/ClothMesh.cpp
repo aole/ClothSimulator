@@ -155,17 +155,7 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 
 ClothMesh::~ClothMesh()
 {
-	for (size_t i = 0; i < m_faces.size(); i++)
-		delete m_faces[i];
-
-	for (size_t i = 0; i < m_vertices.size(); i++)
-		delete m_vertices[i];
-
-	for (size_t i = 0; i < m_normals.size(); i++)
-		delete m_normals[i];
-
-	for (size_t i = 0; i < m_links.size(); i++)
-		delete m_links[i];
+	clean();
 }
 
 void ClothMesh::updateNormals()
@@ -214,24 +204,35 @@ void ClothMesh::updateNormals()
 	}
 }
 
-void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength)
+void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, float tensile_strength)
 {
 	m_tensile_strength = tensile_strength;
+	m_segment_length = segment_length;
 
-	std::vector< unsigned int > indices;
+	float minx = 9999999;// std::numeric_limits<float>::max();
+	float maxx = -9999999;// std::numeric_limits<float>::min();
+	float miny = 9999999;// std::numeric_limits<float>::max();
+	float maxy = -9999999;// std::numeric_limits<float>::min();
 
-	float minx = glm::min(x1, x2);
-	float maxx = glm::max(x1, x2);
-	float miny = glm::min(y1, y2);
-	float maxy = glm::max(y1, y2);
-
-	m_vertices.push_back(new Vertex(minx, miny, z));
-	m_vertices.push_back(new Vertex(maxx, miny, z));
-	m_vertices.push_back(new Vertex(maxx, maxy, z, true));
-	m_vertices.push_back(new Vertex(minx, maxy, z, true));
-
-	Face *face = new Face(0, 1, 2, 3);
+	int i = 0;
+	Face* face = new Face();
 	m_faces.push_back(face);
+	for (auto v : vertices) {
+		if (v.x < minx)
+			minx = v.x;
+		if (v.x > maxx)
+			maxx = v.x;
+		if (v.y < miny)
+			miny = v.y;
+		if (v.y > maxy)
+			maxy = v.y;
+		
+		m_vertices.push_back(new Vertex(v));
+		face->indices.push_back(i++);
+	}
+
+	// TEMP pin couple of vertices
+	m_vertices[2]->m_pinned = m_vertices[3]->m_pinned = true;
 
 	// cut polygon on the grid/horizontal
 	for (float y = miny + segment_length; y <= maxy; y += segment_length) {
@@ -265,6 +266,8 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 	updateNormals();
 
 	// create indices for OPENGL
+	std::vector< unsigned int > indices;
+
 	for (Face *f : m_faces) {
 		//wxLogDebug("face");
 		if (f->indices.size() > 2)
@@ -285,6 +288,12 @@ void ClothMesh::create(float x1, float y1, float x2, float y2, float z, float se
 	//wxLogDebug("num vertices: %d", m_vertices.size());
 
 	creategl(m_vertices, m_normals, indices, GL_DYNAMIC_DRAW);
+}
+
+void ClothMesh::reCreate(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength)
+{
+	clean();
+	create(vertices, segment_length, tensile_strength);
 }
 
 void ClothMesh::constraint()
@@ -355,5 +364,24 @@ void ClothMesh::createLink(int v1, int v2)
 	float len = glm::distance((glm::vec3)*m_vertices[v1], (glm::vec3) *m_vertices[v2]);
 	// wxLogDebug("distance: %f", len);
 	m_links.push_back(new Link(v1, v2, len));
+}
+
+void ClothMesh::clean()
+{
+	for (size_t i = 0; i < m_faces.size(); i++)
+		delete m_faces[i];
+	m_faces.clear();
+
+	for (size_t i = 0; i < m_vertices.size(); i++)
+		delete m_vertices[i];
+	m_vertices.clear();
+
+	for (size_t i = 0; i < m_normals.size(); i++)
+		delete m_normals[i];
+	m_normals.clear();
+
+	for (size_t i = 0; i < m_links.size(); i++)
+		delete m_links[i];
+	m_links.clear();
 }
 

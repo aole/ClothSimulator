@@ -25,7 +25,8 @@ public:
 	void setGrid(float width, float depth, float major);
 	// 2D
 	// 3D
-	ClothMesh* createCloth(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength);
+	ClothMesh* createCloth(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
+	void reCreateCloth(ClothMesh* mesh, std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
 
 	// model
 

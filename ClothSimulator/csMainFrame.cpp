@@ -47,8 +47,13 @@ void csMainFrame::CreateToolStatusBar()
 {
 	wxToolBar* toolbar = CreateToolBar();
 
-	wxToggleButton* btnSimulate = new wxToggleButton(toolbar, 19999, "Simulate");
-	Bind(wxEVT_TOGGLEBUTTON, [=](wxCommandEvent&) { m_controller->OnToggleSimulation(btnSimulate->GetValue()); }, 19999);
+	wxToggleButton* btnSimulate = new wxToggleButton(toolbar, 20000, "Simulate");
+	Bind(wxEVT_TOGGLEBUTTON, [=](wxCommandEvent&) { m_controller->OnToggleSimulation(btnSimulate->GetValue()); }, 20000);
+	toolbar->AddControl(btnSimulate);
+
+	wxButton* btnReset = new wxButton(toolbar, 20001, "Reset");
+	Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { m_controller->OnRestCloth(); }, 20001);
+	toolbar->AddControl(btnReset);
 
 	toolbar->Realize();
 }

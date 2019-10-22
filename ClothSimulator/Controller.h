@@ -25,6 +25,8 @@ public:
 	void OnMenuFileExit(wxFrame *frame) { frame->Close(true); };
 
 	void OnToggleSimulation(bool simulate);
+	void OnRestCloth();
+
 	void simulate();
 private:
 	Model* m_model;
@@ -32,6 +34,7 @@ private:
 
 	bool m_mouse_left_down;
 	std::vector<Vector2*> m_highlighted;
+	std::vector<Vector2*> m_selected;
 
 	float m_lastx, m_lasty;
 	float m_anchorx, m_anchory;

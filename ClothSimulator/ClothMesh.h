@@ -24,19 +24,25 @@ public:
 class ClothMesh : public csGL3DObject
 {
 public:
-	ClothMesh() : m_acceleration(glm::vec3()), m_tensile_strength(0) {}
+	ClothMesh() : m_acceleration(glm::vec3()), m_segment_length(0), m_tensile_strength(0) {}
 	virtual ~ClothMesh();
 
 	virtual void get_color(float color[]) { color[0] = .8f; color[1] = color[2] = .3f; };
-	void create(float x1, float y1, float x2, float y2, float z, float segment_length, float tensile_strength);
+
+	void create(std::vector<glm::vec2> &vertices, float segment_length, float tensile_strength);
+	void reCreate(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
 
 	// SIMULATION
 	void addForce(glm::vec3 f) { m_acceleration += f; }
 	void constraint();
 	void update();
 
+	float m_segment_length;
+	float m_tensile_strength;
+
 private:
 	void createLink(int v1, int v2);
+	void clean();
 
 	void updateNormals();
 
@@ -46,6 +52,4 @@ private:
 	std::vector<Face*>m_faces;
 
 	glm::vec3 m_acceleration;
-
-	float m_tensile_strength;
 };
