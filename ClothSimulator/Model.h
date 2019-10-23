@@ -15,12 +15,15 @@ class Vector2 : public glm::vec2
 {
 public:
 	Vector2(ClothShape* par) : Vector2(0, 0, par) {}
-	Vector2(float vx, float vy, ClothShape* par) : glm::vec2(vx, vy), parent(par) {}
+	Vector2(float vx, float vy, ClothShape* par, bool p = false) : glm::vec2(vx, vy), parent(par), pin(p) {}
 
 	float distance(float vx, float vy) { return sqrtf((x - vx) * (x - vx) + (y - vy) * (y - vy)); }
 
+	void setPin(bool p);
+
 public:
 	ClothShape* parent;
+	bool pin;
 };
 
 class ClothShape
@@ -29,13 +32,14 @@ public:
 	ClothShape() : m_mesh(nullptr) {}
 	~ClothShape();
 
-	void addVertex(float x, float y) { m_points.push_back(new Vector2(x, y, this)); }
+	void addVertex(float x, float y, bool pin = false) { m_points.push_back(new Vector2(x, y, this, pin)); }
 
 	int getCount() { return m_points.size(); }
 	auto getPoint(int i) { return m_points.at(i); }
 	auto &getPoints() const { return m_points; }
 
 	void simulate();
+	void setPin(Vector2* v, bool pin) { m_mesh->setPin(std::find(m_points.begin(), m_points.end(), v)-m_points.begin(), pin); }
 
 	ClothMesh* m_mesh;
 

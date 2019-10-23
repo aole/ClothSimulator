@@ -32,6 +32,8 @@ public:
 	void create(std::vector<glm::vec2> &vertices, float segment_length, float tensile_strength);
 	void reCreate(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
 
+	void setPin(int i, bool pin) { m_vertices[i]->m_pinned = pin; }
+
 	// SIMULATION
 	void addForce(glm::vec3 f) { m_acceleration += f; }
 	void constraint();

@@ -93,6 +93,14 @@ void Controller::OnRestCloth()
 	m_model->resetClothes();
 }
 
+void Controller::OnPinPoint()
+{
+	for (auto v : m_selected) {
+		v->setPin(!v->pin);
+	}
+	m_model->notifyListeners();
+}
+
 void Controller::simulate()
 {
 	m_model->simulate();

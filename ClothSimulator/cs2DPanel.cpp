@@ -52,31 +52,40 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	gc->SetPen(wxPen(wxColour(50, 155, 50, 100), 1));
 	gc->StrokeLine(m_panx, 0, m_panx, r.height);
 
-	gc->SetPen(*wxMEDIUM_GREY_PEN);
 	gc->SetBrush(*wxLIGHT_GREY_BRUSH);
 
 	// DRAW CLOTHES
-	wxGraphicsPath path = gc->CreatePath();
 	for (auto s : m_model->getShapes()) {
+		gc->SetPen(*wxMEDIUM_GREY_PEN);
 		if (s->getCount() > 2) {
+			wxGraphicsPath path = gc->CreatePath();
 			path.MoveToPoint(s->getPoint(0)->x + (double)m_panx, -s->getPoint(0)->y + (double)m_pany);
 			for (int i = 1; i < s->getCount(); i++) {
 				path.AddLineToPoint(s->getPoint(i)->x + (double)m_panx, -s->getPoint(i)->y + (double)m_pany);
 			}
 			path.CloseSubpath();
+			gc->FillPath(path);
+			gc->StrokePath(path);
 		}
-		for (auto v : s->getPoints())
-			path.AddEllipse(v->x + (double)m_panx - 2, -v->y + (double)m_pany -2, 4, 4);
+		for (auto v : s->getPoints()) {
+			if (v->pin)
+				gc->SetPen(wxPen(wxColour(200, 50, 50), 1));
+			else
+				gc->SetPen(*wxMEDIUM_GREY_PEN);
+			gc->DrawEllipse(v->x + (double)m_panx - 2, -v->y + (double)m_pany - 2, 4, 4);
+		}
 	}
 
-	gc->FillPath(path);
-	gc->StrokePath(path);
 
 	// draw selected vertices
 	if (!select_points.empty()) {
 		for (auto v : select_points) {
 			double x = (double)v->x + m_panx;
 			double y = (double)-v->y + m_pany;
+			if(v->pin)
+				gc->SetPen(wxPen(wxColour(200, 50, 50), 1));
+			else
+				gc->SetPen(*wxMEDIUM_GREY_PEN);
 			gc->DrawEllipse(x - 5, y - 5, 10, 10);
 		}
 	}
@@ -85,6 +94,10 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 		for (auto v : highlight_points) {
 			double x = (double)v->x + m_panx;
 			double y = (double)-v->y + m_pany;
+			if (v->pin)
+				gc->SetPen(wxPen(wxColour(200, 50, 50), 1));
+			else
+				gc->SetPen(*wxMEDIUM_GREY_PEN);
 			gc->DrawEllipse(x - 5, y - 5, 10, 10);
 		}
 	}

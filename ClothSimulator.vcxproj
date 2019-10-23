@@ -25,7 +25,6 @@
     <ClInclude Include="ClothSimulator\OpenGLContext.h" />
     <ClInclude Include="ClothSimulator\csApplication.h" />
     <ClInclude Include="ClothSimulator\csGL3DGrid.h" />
-    <ClInclude Include="ClothSimulator\csGLRectangle.h" />
     <ClInclude Include="ClothSimulator\csMainFrame.h" />
     <ClInclude Include="ClothSimulator\csGLPanel.h" />
     <ClInclude Include="ClothSimulator\csGL3DObject.h" />
@@ -44,7 +43,6 @@
     <ClCompile Include="ClothSimulator\csGL3DGrid.cpp" />
     <ClCompile Include="ClothSimulator\csGL3DObject.cpp" />
     <ClCompile Include="ClothSimulator\csGLPanel.cpp" />
-    <ClCompile Include="ClothSimulator\csGLRectangle.cpp" />
     <ClCompile Include="ClothSimulator\csMainFrame.cpp" />
     <ClCompile Include="ClothSimulator\Model.cpp" />
   </ItemGroup>

@@ -39,18 +39,26 @@ void Model::createCloth(float x1, float y1, float x2, float y2, float segment_le
 	float maxx = std::max(x1, x2);
 	float maxy = std::max(y1, y2);
 
+	shape->addVertex(maxx, maxy, true);
+	shape->addVertex(minx, maxy, true);
 	shape->addVertex(minx, miny);
 	shape->addVertex(maxx, miny);
-	shape->addVertex(maxx, maxy);
-	shape->addVertex(minx, maxy);
 
 	m_shapes.push_back(shape);
 
 	std::vector<glm::vec2> vertices;
-	for (auto v : shape->getPoints())
+	std::vector<int> pins;
+
+	for (auto v : shape->getPoints()) {
 		vertices.push_back(glm::vec2(v->x, v->y));
+	}
 
 	shape->m_mesh = OpenGLContext::Instance().createCloth(vertices, segment_length, tensile_strength);
+
+	for (int i = 0;i < shape->getCount();i++) {
+		if(shape->getPoint(i)->pin)
+			shape->m_mesh->setPin(i, true);
+	}
 
 	notifyListeners();
 }
@@ -67,6 +75,11 @@ void Model::recreateCloth(ClothShape* shape)
 		vertices.push_back(*v);
 
 	OpenGLContext::Instance().reCreateCloth(shape->m_mesh, vertices, segment_length, tensile_strength);
+
+	for (int i = 0;i < shape->getCount();i++) {
+		if (shape->getPoint(i)->pin)
+			shape->m_mesh->setPin(i, true);
+	}
 
 	notifyListeners();
 }
@@ -114,4 +127,9 @@ float Model::getNearestClothPoint(float x, float y, std::vector<Vector2*>& point
 	}
 	else
 		return -1;
+}
+
+void Vector2::setPin(bool p)
+{
+	pin = p; parent->setPin(this, p);
 }

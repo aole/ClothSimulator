@@ -26,6 +26,7 @@ public:
 
 	void OnToggleSimulation(bool simulate);
 	void OnRestCloth();
+	void OnPinPoint();
 
 	void simulate();
 private:

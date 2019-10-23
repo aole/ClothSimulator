@@ -39,7 +39,6 @@ void csMainFrame::CreateMenuBar()
 
 	SetMenuBar(menuBar);
 
-	//Bind(wxEVT_MENU, &csMainFrame::OnExit, this, wxID_EXIT);
 	Bind(wxEVT_MENU, [=](wxCommandEvent&) { m_controller->OnMenuFileExit(this); }, wxID_EXIT);
 }
 
@@ -54,6 +53,10 @@ void csMainFrame::CreateToolStatusBar()
 	wxButton* btnReset = new wxButton(toolbar, 20001, "Reset");
 	Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { m_controller->OnRestCloth(); }, 20001);
 	toolbar->AddControl(btnReset);
+
+	wxButton* btnPin = new wxButton(toolbar, 20002, "(Un)Pin");
+	Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { m_controller->OnPinPoint(); }, 20002);
+	toolbar->AddControl(btnPin);
 
 	toolbar->Realize();
 }

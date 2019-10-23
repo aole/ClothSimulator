@@ -7,7 +7,6 @@
 
 #include <wx/wx.h>
 #include <csGL3DGrid.h>
-#include <csGLRectangle.h>
 #include <ClothMesh.h>
 
 struct ShaderInfo {

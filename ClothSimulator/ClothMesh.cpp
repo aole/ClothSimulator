@@ -231,9 +231,6 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, f
 		face->indices.push_back(i++);
 	}
 
-	// TEMP pin couple of vertices
-	m_vertices[2]->m_pinned = m_vertices[3]->m_pinned = true;
-
 	// cut polygon on the grid/horizontal
 	for (float y = miny + segment_length; y <= maxy; y += segment_length) {
 		cut_faces_Greiner_Hormann(m_vertices, m_faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
