@@ -264,25 +264,19 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, f
 
 	// create indices for OPENGL
 	std::vector< unsigned int > indices;
-
 	for (Face *f : m_faces) {
-		//wxLogDebug("face");
 		if (f->indices.size() > 2)
 		{
 			for (size_t i = 1; i < f->indices.size()-1; i++) {
 				indices.push_back(f->indices[0]);
-				//wxLogDebug("ind %d", f.indices[0]);
 				for (size_t j = i+1; j >= i; j--) {
 					indices.push_back(f->indices[j]);
-					//wxLogDebug("ind %d", f.indices[j]);
 				}
 			}
 		}
 	}
 
 	m_draw_mode = GL_TRIANGLES;
-
-	//wxLogDebug("num vertices: %d", m_vertices.size());
 
 	creategl(m_vertices, m_normals, indices, GL_DYNAMIC_DRAW);
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "wx/wx.h"
 #include <OpenGLContext.h>
+#include <glm/gtx/closest_point.hpp>
 
 const glm::vec3 GRAVITY(0, -0.01, 0);
 
@@ -84,6 +85,11 @@ void Model::recreateCloth(ClothShape* shape)
 	notifyListeners();
 }
 
+Vector2* Model::addClothPoint(Vector2IP& ip)
+{
+	return ip.parent->insertVertex(ip.x, ip.y, ip.insert_at);
+}
+
 void Model::resetClothes()
 {
 	for (auto s : m_shapes)
@@ -127,6 +133,35 @@ float Model::getNearestClothPoint(float x, float y, std::vector<Vector2*>& point
 	}
 	else
 		return -1;
+}
+
+float Model::getNearestEdgePoint(float x, float y, Vector2IP* mip)
+{
+	assert(mip);
+
+	float min = 999999999.f; // std::numeric_limits<float>::max();
+	glm::vec2 mp(x, y);
+
+	for (auto s : m_shapes)
+	{
+		auto vl = s->getLast();
+		int idx = 0;
+		for (auto v : s->getPoints())
+		{
+			glm::vec2 ip = glm::closestPointOnLine(mp, *vl, *v);
+			float d = glm::distance(mp, ip);
+
+			if (d < min) {
+				min = d;
+				mip->set(ip.x, ip.y, s, idx);
+			}
+
+			vl = v;
+			idx++;
+		}
+	}
+
+	return min;
 }
 
 void Vector2::setPin(bool p)
