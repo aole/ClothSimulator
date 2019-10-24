@@ -21,6 +21,7 @@ public:
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseDown(wxMouseEvent& event);
 	void OnMouseUp(wxMouseEvent& event);
+	void OnCaptureLost(wxMouseCaptureLostEvent& event);
 
 	void updated() { Refresh(false); };
 

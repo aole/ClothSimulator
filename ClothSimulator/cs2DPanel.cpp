@@ -5,12 +5,15 @@
 #include <wx/graphics.h>
 
 wxBEGIN_EVENT_TABLE(cs2DPanel, wxWindow)
-	EVT_SIZE(cs2DPanel::OnSize)
-	EVT_PAINT(cs2DPanel::OnPaint)
-	EVT_MOTION(cs2DPanel::OnMouseMove)
-	EVT_LEFT_DOWN(cs2DPanel::OnMouseDown)
-	EVT_LEFT_UP(cs2DPanel::OnMouseUp)
+EVT_SIZE(cs2DPanel::OnSize)
+EVT_PAINT(cs2DPanel::OnPaint)
+EVT_MOTION(cs2DPanel::OnMouseMove)
+EVT_LEFT_DOWN(cs2DPanel::OnMouseDown)
+EVT_LEFT_UP(cs2DPanel::OnMouseUp)
+EVT_MOUSE_CAPTURE_LOST(cs2DPanel::OnCaptureLost)
 wxEND_EVENT_TABLE()
+
+bool mouse_captured = false;
 
 cs2DPanel::cs2DPanel(Model* model, wxWindow* parent) : m_model(model), wxWindow(parent, wxID_ANY), m_panx(0), m_pany(0)
 {
@@ -163,6 +166,7 @@ void cs2DPanel::OnMouseDown(wxMouseEvent& event)
 	wxClientDC dc(this);
 
 	CaptureMouse();
+	mouse_captured = true;
 
 	long x = dc.DeviceToLogicalX(pos.x);
 	long y = dc.DeviceToLogicalY(pos.y);
@@ -175,7 +179,9 @@ void cs2DPanel::OnMouseUp(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
 
-	ReleaseMouse();
+	if(mouse_captured)
+		ReleaseMouse();
+
 	{
 		wxClientDC dc(this);
 
@@ -188,4 +194,9 @@ void cs2DPanel::OnMouseUp(wxMouseEvent& event)
 	} // use xcurly braces or reset will fail assert
 
 	m_overlay.Reset();
+}
+
+void cs2DPanel::OnCaptureLost(wxMouseCaptureLostEvent& event)
+{
+	mouse_captured = false;
 }
