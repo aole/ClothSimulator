@@ -59,25 +59,29 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 		gc->SetPen(*wxMEDIUM_GREY_PEN);
 		// draw polygons
 		for (auto poly : s->m_polygons) {
-			//if (s->getCount() > 2) {
-				wxGraphicsPath path = gc->CreatePath();
-				int idx = poly.indices.front();
-				auto v = s->getPoint(idx);
-				path.MoveToPoint(v->x + (double)m_panx, -v->y + (double)m_pany);
-				for (idx=1; idx < poly.indices.size(); idx++) {
-					v = s->getPoint(idx);
-					path.AddLineToPoint(v->x + (double)m_panx, -v->y + (double)m_pany);
-				}
-				path.CloseSubpath();
-				gc->FillPath(path);
-				gc->StrokePath(path);
-			//}
+			//wxLogDebug("drawing");
+			//printpoly(&poly);
+			wxGraphicsPath path = gc->CreatePath();
+			int idx = poly.indices[0];
+			auto v = s->getPoint(idx);
+			path.MoveToPoint(v->x + (double)m_panx, -v->y + (double)m_pany);
+			for (idx = 1; idx < poly.indices.size(); idx++) {
+				v = s->getPoint(poly.indices[idx]);
+				path.AddLineToPoint(v->x + (double)m_panx, -v->y + (double)m_pany);
+			}
+			path.CloseSubpath();
+			gc->FillPath(path);
+			gc->StrokePath(path);
 		}
-		for (auto v : s->getPoints()) {
+		for (int i = 0;i < s->getCount();i++) {
+			auto v = s->getPoint(i);
 			if (v->pin)
 				gc->SetPen(wxPen(wxColour(200, 50, 50), 1));
 			else
 				gc->SetPen(*wxMEDIUM_GREY_PEN);
+			wxString vs;
+			vs << i;
+			dc.DrawText(vs, v->x + (double)m_panx - 2, -v->y + (double)m_pany - 2);
 			gc->DrawEllipse(v->x + (double)m_panx - 2, -v->y + (double)m_pany - 2, 4, 4);
 		}
 	}

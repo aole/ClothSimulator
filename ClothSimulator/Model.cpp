@@ -1,3 +1,5 @@
+#define PI 3.14159265358979323846
+
 #include "Model.h"
 #include <algorithm>
 #include "wx/wx.h"
@@ -6,8 +8,90 @@
 
 const glm::vec3 GRAVITY(0, -0.01, 0);
 
-void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &polys) {
+float turn(Vector2* a, Vector2* b, Vector2* v) {
+	float ab = atan2(b->y - a->y, b->x - a->x);
+	float av = atan2(v->y - a->y, v->x - a->x);
+	float d = av - ab;
+	d = d < -PI? d + PI * 2 : d;
+	d = d > PI ? d - PI * 2 : d;
 
+	return d;
+}
+
+void printpoly(Polygon2* p) {
+	wxString msg;
+	msg << "    ";
+	for (auto i : p->indices)
+		msg << i << ",";
+	wxLogDebug(msg);
+}
+
+void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
+	wxLogDebug("convexify");
+
+	std::vector<Polygon2> newps;
+	for (auto poly : ps) {
+		int first_idx = 0;
+		int second_idx = 1;
+		int start_idx = 0;
+		int last_idx = 2;
+		
+		Polygon2* old_poly = new Polygon2();
+		old_poly->indices.push_back(poly.indices[first_idx]);
+		old_poly->indices.push_back(poly.indices[second_idx]);
+		Polygon2* new_poly = new Polygon2();
+		Polygon2* cur_poly = old_poly;
+
+		bool turned = false;
+		while (last_idx != start_idx) {
+			Vector2* v0 = points[poly.indices[first_idx]];
+			Vector2* v1 = points[poly.indices[second_idx]];
+			Vector2* v2 = points[poly.indices[last_idx]];
+
+			float t = turn(v0, v1, v2);
+			if (t < 0 && !turned) { // took a right turn
+				wxLogDebug("  turning on %i, %i", second_idx, last_idx);
+				turned = true;
+				cur_poly = cur_poly == old_poly ? new_poly : old_poly;
+				cur_poly->indices.push_back(poly.indices[first_idx + 1]);
+				cur_poly->indices.push_back(poly.indices[last_idx]);
+			}
+			else if (t >= 0 && turned) { // back on left turn
+				wxLogDebug("  back on %i, %i", second_idx, last_idx);
+				turned = false;
+				cur_poly->indices.push_back(poly.indices[last_idx]);
+				cur_poly = cur_poly == old_poly ? new_poly : old_poly;
+				cur_poly->indices.push_back(poly.indices[last_idx]);
+				newps.push_back(*new_poly);
+				wxLogDebug("  add new poly1: %i", new_poly->indices.size());
+				printpoly(new_poly);
+				delete new_poly;
+				new_poly = new Polygon2();
+			}
+			else if (turned) {
+				cur_poly->indices.push_back(poly.indices[last_idx]);
+			}
+			else{
+				cur_poly->indices.push_back(poly.indices[last_idx]);
+				first_idx = second_idx;
+				second_idx = last_idx;
+			}
+			last_idx++;
+			last_idx %= poly.indices.size();
+		}
+		newps.push_back(*old_poly);
+		wxLogDebug("  add old poly: %i", old_poly->indices.size());
+		printpoly(old_poly);
+		if (turned) {
+			new_poly->indices.push_back(poly.indices[last_idx]);
+			wxLogDebug("  add new poly2: %i", new_poly->indices.size());
+			printpoly(new_poly);
+			newps.push_back(*new_poly);
+		}
+		delete old_poly;
+		delete new_poly;
+	}
+	ps = newps;
 }
 
 ClothShape::~ClothShape()

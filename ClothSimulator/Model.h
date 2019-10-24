@@ -47,6 +47,8 @@ public:
 	std::vector<int> indices;
 };
 
+void printpoly(Polygon2* p);
+
 class ClothShape
 {
 public:
