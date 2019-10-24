@@ -26,65 +26,102 @@ void printpoly(Polygon2* p) {
 	wxLogDebug(msg);
 }
 
+int getNonConcaveFirstIndex(const std::vector<Vector2*>& points, const Polygon2& poly) {
+	size_t fi = 0;
+	size_t pi = poly.indices.size() - 1;
+	size_t ppi = poly.indices.size() - 2;
+
+	while (fi < poly.indices.size()) {
+		Vector2* v1 = points[poly.indices[fi]];
+		Vector2* v0 = points[poly.indices[pi]];
+		Vector2* v2 = points[poly.indices[(fi + 1) % poly.indices.size()]];
+		Vector2* vm1 = points[poly.indices[ppi]];
+
+		float t = turn(v0, v1, v2);
+		float t2 = turn(vm1, v0, v1);
+		if (t < 0 || t2 < 0) {
+			ppi = pi;
+			pi = fi;
+			fi++;
+		}
+		else
+			return fi;
+	}
+	assert(false);
+}
+
 void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
-	wxLogDebug("convexify");
+	wxLogDebug("========\nconvexify");
 
 	std::vector<Polygon2> newps;
 	for (auto poly : ps) {
-		int first_idx = 0;
-		int second_idx = 1;
-		int start_idx = 0;
-		int last_idx = 2;
-		
+		// check if the first index is itself a center point in couple of edges that are concave.
+		int first_idx = getNonConcaveFirstIndex(points, poly);
+		int second_idx = (first_idx+1) % poly.indices.size();
+		int start_idx = first_idx;
+		int last_idx = (first_idx+2) % poly.indices.size();
+		int prev_idx = last_idx;
+
 		Polygon2* old_poly = new Polygon2();
 		old_poly->indices.push_back(poly.indices[first_idx]);
-		old_poly->indices.push_back(poly.indices[second_idx]);
+		wxLogDebug("  add to old. %i", first_idx);
+
 		Polygon2* new_poly = new Polygon2();
-		Polygon2* cur_poly = old_poly;
 
 		bool turned = false;
+		bool continue_loop = true;
 		while (last_idx != start_idx) {
+			//if (last_idx == start_idx)
+				//continue_loop = false;
+
 			Vector2* v0 = points[poly.indices[first_idx]];
 			Vector2* v1 = points[poly.indices[second_idx]];
 			Vector2* v2 = points[poly.indices[last_idx]];
 
 			float t = turn(v0, v1, v2);
-			if (t < 0 && !turned) { // took a right turn
-				wxLogDebug("  turning on %i, %i", second_idx, last_idx);
+			wxLogDebug("  checking %i, %i, %i", first_idx, second_idx, last_idx);
+
+			if (t < 0 && !turned) { // took a right turn (split to new poly)
+				wxLogDebug("   turning. %i", second_idx);
 				turned = true;
-				cur_poly = cur_poly == old_poly ? new_poly : old_poly;
-				cur_poly->indices.push_back(poly.indices[first_idx + 1]);
-				cur_poly->indices.push_back(poly.indices[last_idx]);
+				new_poly->indices.push_back(poly.indices[second_idx]);
+				new_poly->indices.push_back(poly.indices[last_idx]);
+				old_poly->indices.push_back(poly.indices[second_idx]);
 			}
-			else if (t >= 0 && turned) { // back on left turn
-				wxLogDebug("  back on %i, %i", second_idx, last_idx);
+			else if (t >= 0 && turned) { // back on left turn (back on old poly)
 				turned = false;
-				cur_poly->indices.push_back(poly.indices[last_idx]);
-				cur_poly = cur_poly == old_poly ? new_poly : old_poly;
-				cur_poly->indices.push_back(poly.indices[last_idx]);
+				new_poly->indices.push_back(poly.indices[last_idx]);
 				newps.push_back(*new_poly);
-				wxLogDebug("  add new poly1: %i", new_poly->indices.size());
+				wxLogDebug("   back ... add new poly1");
 				printpoly(new_poly);
 				delete new_poly;
 				new_poly = new Polygon2();
-			}
-			else if (turned) {
-				cur_poly->indices.push_back(poly.indices[last_idx]);
-			}
-			else{
-				cur_poly->indices.push_back(poly.indices[last_idx]);
 				first_idx = second_idx;
 				second_idx = last_idx;
 			}
+			else if (turned) {
+				wxLogDebug("   on new. %i", last_idx);
+				new_poly->indices.push_back(poly.indices[last_idx]);
+			}
+			else{
+				wxLogDebug("   on old. %i", second_idx);
+				old_poly->indices.push_back(poly.indices[second_idx]);
+				first_idx = second_idx;
+				second_idx = last_idx;
+			}
+			prev_idx = last_idx;
 			last_idx++;
 			last_idx %= poly.indices.size();
 		}
+
+		if(!turned)
+			old_poly->indices.push_back(poly.indices[prev_idx]);
 		newps.push_back(*old_poly);
-		wxLogDebug("  add old poly: %i", old_poly->indices.size());
+		wxLogDebug("  add old poly");
 		printpoly(old_poly);
 		if (turned) {
 			new_poly->indices.push_back(poly.indices[last_idx]);
-			wxLogDebug("  add new poly2: %i", new_poly->indices.size());
+			wxLogDebug("  add new poly2");
 			printpoly(new_poly);
 			newps.push_back(*new_poly);
 		}

@@ -172,7 +172,7 @@ void ClothMesh::updateNormals()
 	for (auto f : m_faces) {
 		// create normals
 		if (f->indices.size() < 2)
-			wxLogError("Found %i sided face!", f->indices.size());
+			wxLogError("Found %i sided face!", (int)f->indices.size());
 
 		Vertex* v0 = m_vertices.at(f->indices.at(0));
 		Vertex* v1 = m_vertices.at(f->indices.at(1));
