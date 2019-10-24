@@ -92,7 +92,15 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 			else if (t >= 0 && turned) { // back on left turn (back on old poly)
 				turned = false;
 				new_poly->indices.push_back(poly.indices[last_idx]);
-				newps.push_back(*new_poly);
+
+				// recurse check this poly
+				std::vector<Polygon2> psr;
+				psr.push_back(*new_poly);
+				convexify(points, psr);
+				for (auto rp : psr) {
+					newps.push_back(rp);
+				}
+				//newps.push_back(*new_poly);
 				wxLogDebug("   back ... add new poly1");
 				printpoly(new_poly);
 				delete new_poly;
