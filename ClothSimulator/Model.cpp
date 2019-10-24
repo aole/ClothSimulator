@@ -47,8 +47,8 @@ int getNonConcaveFirstIndex(const std::vector<Vector2*>& points, const Polygon2&
 		else
 			return fi;
 	}
-	assert(false);
-	return -1;
+	wxLogError("getNonConcaveFirstIndex: did not find a convex point");
+	return 0;
 }
 
 void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
@@ -71,16 +71,24 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 
 		bool turned = false;
 		bool continue_loop = true;
-		while (last_idx != start_idx) {
-			//if (last_idx == start_idx)
-				//continue_loop = false;
-
+		while (true) {
+		//while(poly.indices[last_idx]==poly.indices[start_idx]) {
 			Vector2* v0 = points[poly.indices[first_idx]];
 			Vector2* v1 = points[poly.indices[second_idx]];
 			Vector2* v2 = points[poly.indices[last_idx]];
 
 			float t = turn(v0, v1, v2);
 			wxLogDebug("  checking %i, %i, %i", first_idx, second_idx, last_idx);
+
+			if (last_idx == start_idx) {
+				if (t < 0 && turned) {
+					start_idx++;
+					start_idx %= poly.indices.size();
+					old_poly->indices.erase(old_poly->indices.begin());
+				}
+				else
+					break;
+			}
 
 			if (t < 0 && !turned) { // took a right turn (split to new poly)
 				wxLogDebug("   turning. %i", second_idx);
@@ -100,6 +108,7 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 				for (auto rp : psr) {
 					newps.push_back(rp);
 				}
+
 				//newps.push_back(*new_poly);
 				wxLogDebug("   back ... add new poly1");
 				printpoly(new_poly);
@@ -126,13 +135,19 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 		if(!turned)
 			old_poly->indices.push_back(poly.indices[prev_idx]);
 		newps.push_back(*old_poly);
-		wxLogDebug("  add old poly");
+		wxLogDebug(" add old poly");
 		printpoly(old_poly);
 		if (turned) {
 			new_poly->indices.push_back(poly.indices[last_idx]);
-			wxLogDebug("  add new poly2");
-			printpoly(new_poly);
-			newps.push_back(*new_poly);
+			wxLogDebug(" add new poly2");
+
+			// recurse check this poly
+			std::vector<Polygon2> psr;
+			psr.push_back(*new_poly);
+			convexify(points, psr);
+			for (auto rp : psr) {
+				newps.push_back(rp);
+			}
 		}
 		delete old_poly;
 		delete new_poly;
