@@ -6,10 +6,24 @@
 
 const glm::vec3 GRAVITY(0, -0.01, 0);
 
+void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &polys) {
+
+}
+
 ClothShape::~ClothShape()
 {
 	for (auto v : m_points)
 		delete v;
+}
+
+void ClothShape::updateShape()
+{
+	m_polygons.clear();
+	// create concave polygon of all the vertices (clockwize)
+	Polygon2 p(m_points.size());
+	m_polygons.push_back(p);
+	// split the polygon recursively until only a set of convex polygons are left
+	convexify(m_points, m_polygons);
 }
 
 void ClothShape::simulate()
@@ -54,6 +68,8 @@ void Model::createCloth(float x1, float y1, float x2, float y2, float segment_le
 		vertices.push_back(glm::vec2(v->x, v->y));
 	}
 
+	shape->updateShape();
+
 	shape->m_mesh = OpenGLContext::Instance().createCloth(vertices, segment_length, tensile_strength);
 
 	for (int i = 0;i < shape->getCount();i++) {
@@ -74,6 +90,8 @@ void Model::recreateCloth(ClothShape* shape)
 	std::vector<glm::vec2> vertices;
 	for (auto v : shape->getPoints())
 		vertices.push_back(*v);
+
+	shape->updateShape();
 
 	OpenGLContext::Instance().reCreateCloth(shape->m_mesh, vertices, segment_length, tensile_strength);
 

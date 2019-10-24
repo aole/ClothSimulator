@@ -64,6 +64,7 @@ void Controller::mouseMove2D(float, float, float logicalx, float logicaly)
 			for (auto v : m_selected) {
 				v->x += logicalx - m_lastx;
 				v->y += logicaly - m_lasty;
+				v->parent->updateShape();
 				for (auto v : m_2Dviews)
 					v->update();
 			}

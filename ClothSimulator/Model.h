@@ -39,6 +39,14 @@ public:
 	int insert_at;
 };
 
+class Polygon2 {
+public:
+	Polygon2(int c = 0) { for (int i = 0;i < c;i++) indices.push_back(i); }
+
+public:
+	std::vector<int> indices;
+};
+
 class ClothShape
 {
 public:
@@ -46,7 +54,8 @@ public:
 	~ClothShape();
 
 	void addVertex(float x, float y, bool pin = false) { m_points.push_back(new Vector2(x, y, this, pin)); }
-	Vector2* insertVertex(float x, float y, int insert_at) { Vector2* v = new Vector2(x, y, this); m_points.insert(m_points.begin()+insert_at, v); return v; }
+	Vector2* insertVertex(float x, float y, int insert_at) { Vector2* v = new Vector2(x, y, this); m_points.insert(m_points.begin()+insert_at, v); updateShape(); return v; }
+	void updateShape();
 
 	int getCount() { return m_points.size(); }
 	auto getPoint(int i) { return m_points.at(i); }
@@ -57,6 +66,7 @@ public:
 	void setPin(Vector2* v, bool pin) { m_mesh->setPin(std::find(m_points.begin(), m_points.end(), v)-m_points.begin(), pin); }
 
 	ClothMesh* m_mesh;
+	std::vector<Polygon2> m_polygons;
 
 private:
 	std::vector<Vector2*> m_points;

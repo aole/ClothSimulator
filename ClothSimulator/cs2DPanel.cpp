@@ -57,15 +57,21 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// DRAW CLOTHES
 	for (auto s : m_model->getShapes()) {
 		gc->SetPen(*wxMEDIUM_GREY_PEN);
-		if (s->getCount() > 2) {
-			wxGraphicsPath path = gc->CreatePath();
-			path.MoveToPoint(s->getPoint(0)->x + (double)m_panx, -s->getPoint(0)->y + (double)m_pany);
-			for (int i = 1; i < s->getCount(); i++) {
-				path.AddLineToPoint(s->getPoint(i)->x + (double)m_panx, -s->getPoint(i)->y + (double)m_pany);
-			}
-			path.CloseSubpath();
-			gc->FillPath(path);
-			gc->StrokePath(path);
+		// draw polygons
+		for (auto poly : s->m_polygons) {
+			//if (s->getCount() > 2) {
+				wxGraphicsPath path = gc->CreatePath();
+				int idx = poly.indices.front();
+				auto v = s->getPoint(idx);
+				path.MoveToPoint(v->x + (double)m_panx, -v->y + (double)m_pany);
+				for (idx=1; idx < poly.indices.size(); idx++) {
+					v = s->getPoint(idx);
+					path.AddLineToPoint(v->x + (double)m_panx, -v->y + (double)m_pany);
+				}
+				path.CloseSubpath();
+				gc->FillPath(path);
+				gc->StrokePath(path);
+			//}
 		}
 		for (auto v : s->getPoints()) {
 			if (v->pin)
