@@ -103,6 +103,12 @@ void csGL3DObject::updategl(std::vector<Vertex*>& vertices, std::vector< glm::ve
 	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_DYNAMIC_DRAW);
 }
 
+csGL3DObject::~csGL3DObject()
+{
+	glDeleteBuffers(1, &m_elementbuffer);
+	glDeleteBuffers(1, &m_vertexbuffer);
+}
+
 void csGL3DObject::render()
 {
 	//glBindVertexArray(m_VertexArrayID);

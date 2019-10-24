@@ -22,6 +22,7 @@ public:
 	void keyDown(int keyCode);
 
 	// MENU INTERACTIONS
+	void OnMenuFileNew(wxFrame* frame) { m_model->resetAll(); m_model->notifyListeners(); };
 	void OnMenuFileExit(wxFrame *frame) { frame->Close(true); };
 
 	void OnToggleSimulation(bool simulate);

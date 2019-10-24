@@ -32,6 +32,7 @@ void csMainFrame::CreateMenuBar()
 {
 	wxMenu* menuFile = new wxMenu;
 
+	menuFile->Append(wxID_NEW);
 	menuFile->Append(wxID_EXIT);
 
 	wxMenuBar* menuBar = new wxMenuBar;
@@ -39,6 +40,7 @@ void csMainFrame::CreateMenuBar()
 
 	SetMenuBar(menuBar);
 
+	Bind(wxEVT_MENU, [=](wxCommandEvent&) { m_controller->OnMenuFileNew(this); }, wxID_NEW);
 	Bind(wxEVT_MENU, [=](wxCommandEvent&) { m_controller->OnMenuFileExit(this); }, wxID_EXIT);
 }
 

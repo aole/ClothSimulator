@@ -19,7 +19,7 @@ public:
 
 class csGL3DObject {
 public:
-	virtual ~csGL3DObject() {};
+	virtual ~csGL3DObject();
 
 	void render();
 	virtual void get_color(float color[]) { color[0] = color[1] = color[2] = .5f; };

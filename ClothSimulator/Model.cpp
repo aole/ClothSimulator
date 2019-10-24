@@ -48,6 +48,7 @@ int getNonConcaveFirstIndex(const std::vector<Vector2*>& points, const Polygon2&
 			return fi;
 	}
 	assert(false);
+	return -1;
 }
 
 void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
@@ -159,9 +160,7 @@ void ClothShape::simulate()
 
 Model::~Model()
 {
-	for (auto s : m_shapes)
-		delete s;
-
+	resetAll();
 	m_listeners.clear();
 }
 
@@ -233,6 +232,16 @@ void Model::resetClothes()
 {
 	for (auto s : m_shapes)
 		recreateCloth(s);
+}
+
+void Model::resetAll()
+{
+	for (auto s : m_shapes) {
+		OpenGLContext::Instance().deleteCloth(s->m_mesh);
+		delete s->m_mesh;
+		delete s;
+	}
+	m_shapes.clear();
 }
 
 void Model::notifyListeners()

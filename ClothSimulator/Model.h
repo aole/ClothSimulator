@@ -81,10 +81,10 @@ public:
 	~Model();
 
 	void createCloth(float x1, float y1, float x2, float y2, float segment_length = 10, float tensile_strength = 0.7);
-
 	void recreateCloth(ClothShape* shape);
 	Vector2* addClothPoint(Vector2IP& ip);
 	void resetClothes();
+	void resetAll();
 
 	void addActionListener(ModelListener* listener) { m_listeners.push_back(listener); }
 	void notifyListeners();

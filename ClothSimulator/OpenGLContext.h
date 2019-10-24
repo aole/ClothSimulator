@@ -4,6 +4,7 @@
 #include "ClothMesh.h"
 
 #include <memory>
+#include <algorithm>
 
 class OpenGLContext {
 public:
@@ -28,6 +29,9 @@ public:
 	ClothMesh* createCloth(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
 	void reCreateCloth(ClothMesh* mesh, std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
 
+	void deleteCloth(ClothMesh* cloth) {
+		m_rendered_objects.erase(std::remove(m_rendered_objects.begin(), m_rendered_objects.end(), cloth), m_rendered_objects.end());;
+	};
 	// model
 
 	// render
