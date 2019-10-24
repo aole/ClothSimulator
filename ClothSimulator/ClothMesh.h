@@ -3,6 +3,14 @@
 #include "glincludes.h"
 #include "csGL3DObject.h"
 
+class Polygon2 {
+public:
+	Polygon2(int c = 0) { for (int i = 0; i < c; i++) indices.push_back(i); }
+
+public:
+	std::vector<int> indices;
+};
+
 class Face
 {
 public:
@@ -29,8 +37,8 @@ public:
 
 	virtual void get_color(float color[]) { color[0] = .8f; color[1] = color[2] = .3f; };
 
-	void create(std::vector<glm::vec2> &vertices, float segment_length, float tensile_strength);
-	void reCreate(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength);
+	void create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength);
+	void reCreate(std::vector<glm::vec2>& vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength);
 
 	void setPin(int i, bool pin) { m_vertices[i]->m_pinned = pin; }
 

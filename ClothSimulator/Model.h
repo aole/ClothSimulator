@@ -39,14 +39,6 @@ public:
 	int insert_at;
 };
 
-class Polygon2 {
-public:
-	Polygon2(int c = 0) { for (int i = 0;i < c;i++) indices.push_back(i); }
-
-public:
-	std::vector<int> indices;
-};
-
 void printpoly(Polygon2* p);
 
 class ClothShape

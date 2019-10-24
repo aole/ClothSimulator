@@ -190,7 +190,7 @@ void Model::createCloth(float x1, float y1, float x2, float y2, float segment_le
 
 	shape->updateShape();
 
-	shape->m_mesh = OpenGLContext::Instance().createCloth(vertices, segment_length, tensile_strength);
+	shape->m_mesh = OpenGLContext::Instance().createCloth(vertices, shape->m_polygons, segment_length, tensile_strength);
 
 	for (int i = 0;i < shape->getCount();i++) {
 		if(shape->getPoint(i)->pin)
@@ -213,7 +213,7 @@ void Model::recreateCloth(ClothShape* shape)
 
 	shape->updateShape();
 
-	OpenGLContext::Instance().reCreateCloth(shape->m_mesh, vertices, segment_length, tensile_strength);
+	OpenGLContext::Instance().reCreateCloth(shape->m_mesh, vertices, shape->m_polygons, segment_length, tensile_strength);
 
 	for (int i = 0;i < shape->getCount();i++) {
 		if (shape->getPoint(i)->pin)

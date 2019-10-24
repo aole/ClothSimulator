@@ -206,7 +206,7 @@ void ClothMesh::updateNormals()
 	}
 }
 
-void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, float tensile_strength)
+void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength)
 {
 	m_tensile_strength = tensile_strength;
 	m_segment_length = segment_length;
@@ -217,8 +217,6 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, f
 	float maxy = -9999999;// std::numeric_limits<float>::min();
 
 	int i = 0;
-	Face* face = new Face();
-	m_faces.push_back(face);
 	for (auto v : vertices) {
 		if (v.x < minx)
 			minx = v.x;
@@ -230,7 +228,14 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, f
 			maxy = v.y;
 		
 		m_vertices.push_back(new Vertex(v));
-		face->indices.push_back(i++);
+	}
+	
+	for (auto poly : polygons) {
+		Face* face = new Face();
+		m_faces.push_back(face);
+
+		for(auto i: poly.indices)
+			face->indices.push_back(i);
 	}
 
 	// cut polygon on the grid/horizontal
@@ -283,10 +288,10 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, float segment_length, f
 	creategl(m_vertices, m_normals, indices, GL_DYNAMIC_DRAW);
 }
 
-void ClothMesh::reCreate(std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength)
+void ClothMesh::reCreate(std::vector<glm::vec2>& vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength)
 {
 	clean();
-	create(vertices, segment_length, tensile_strength);
+	create(vertices, polygons, segment_length, tensile_strength);
 }
 
 void ClothMesh::constraint()

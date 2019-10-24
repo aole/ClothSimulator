@@ -105,18 +105,18 @@ void OpenGLContext::setGrid(float width, float depth, float major)
 	m_rendered_objects.push_back(grid);
 }
 
-ClothMesh* OpenGLContext::createCloth(std::vector<glm::vec2> &vertices, float segment_length, float tensile_strength)
+ClothMesh* OpenGLContext::createCloth(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength)
 {
 	ClothMesh* cloth = new ClothMesh();
-	cloth->create(vertices, segment_length, tensile_strength);
+	cloth->create(vertices, polygons, segment_length, tensile_strength);
 	m_rendered_objects.push_back(cloth);
 
 	return cloth;
 }
 
-void OpenGLContext::reCreateCloth(ClothMesh* mesh, std::vector<glm::vec2>& vertices, float segment_length, float tensile_strength)
+void OpenGLContext::reCreateCloth(ClothMesh* mesh, std::vector<glm::vec2>& vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength)
 {
-	mesh->reCreate(vertices, segment_length, tensile_strength);
+	mesh->reCreate(vertices, polygons, segment_length, tensile_strength);
 }
 
 void OpenGLContext::render()
