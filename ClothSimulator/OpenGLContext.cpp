@@ -81,6 +81,8 @@ int OpenGLContext::init()
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
+
+	//glEnable(GL_POLYGON_SMOOTH);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
@@ -165,8 +167,7 @@ void OpenGLContext::render()
 			glUniform3f(UnlitShader.ShaderColorID, color[0], color[1], color[2]);
 		}
 
-		// pass matrices to vertex shader
-
+		//glEnable(GL_FLAT);
 		ro->render();
 
 		//glDisableVertexAttribArray(0);

@@ -100,13 +100,15 @@ void csGL3DObject::updategl(std::vector<Vertex*>& vertices, std::vector< glm::ve
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
 
-	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_DYNAMIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, data.size() * sizeof(float), &data[0]);
 }
 
 csGL3DObject::~csGL3DObject()
 {
 	glDeleteBuffers(1, &m_elementbuffer);
 	glDeleteBuffers(1, &m_vertexbuffer);
+	//glDeleteVertexArrays(1, &m_VertexArrayID);
 }
 
 void csGL3DObject::render()
@@ -121,6 +123,8 @@ void csGL3DObject::render()
 		glVertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(i * 3 * sizeof(float)));
 		glEnableVertexAttribArray(i);
 	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	//wxLogDebug("rendering %d, %d", m_draw_mode, m_draw_count);
 	glDrawElements(
