@@ -18,6 +18,40 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ClothSimulator\ClothMesh.h" />
+    <ClInclude Include="ClothSimulator\Controller.h" />
+    <ClInclude Include="ClothSimulator\cs2DPanel.h" />
+    <ClInclude Include="ClothSimulator\OpenGLContext.h" />
+    <ClInclude Include="ClothSimulator\csApplication.h" />
+    <ClInclude Include="ClothSimulator\csGL3DGrid.h" />
+    <ClInclude Include="ClothSimulator\csMainFrame.h" />
+    <ClInclude Include="ClothSimulator\csGLPanel.h" />
+    <ClInclude Include="ClothSimulator\csGL3DObject.h" />
+    <ClInclude Include="ClothSimulator\glincludes.h" />
+    <ClInclude Include="ClothSimulator\Model.h" />
+    <ClInclude Include="ClothSimulator\ModelListener.h" />
+    <ClInclude Include="ClothSimulator\View.h" />
+    <ClInclude Include="ClothSimulator\ViewListener.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ClothSimulator\ClothMesh.cpp" />
+    <ClCompile Include="ClothSimulator\Controller.cpp" />
+    <ClCompile Include="ClothSimulator\cs2DPanel.cpp" />
+    <ClCompile Include="ClothSimulator\OpenGLContext.cpp" />
+    <ClCompile Include="ClothSimulator\csApplication.cpp" />
+    <ClCompile Include="ClothSimulator\csGL3DGrid.cpp" />
+    <ClCompile Include="ClothSimulator\csGL3DObject.cpp" />
+    <ClCompile Include="ClothSimulator\csGLPanel.cpp" />
+    <ClCompile Include="ClothSimulator\csMainFrame.cpp" />
+    <ClCompile Include="ClothSimulator\Model.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LitFS.glsl" />
+    <None Include="LitVS.glsl" />
+    <None Include="UnLitFS.glsl" />
+    <None Include="UnLitVS.glsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5F30BAF0-F127-4F3F-BF30-0F312C12BFD3}</ProjectGuid>
@@ -29,21 +63,25 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -65,48 +103,56 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\SDL2-2.0.10\include;external\glm;external\glew-2.1.0\include;include;external\FreeImage\Dist\x32;external\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>external\glew-2.1.0\lib\Release\Win32;external\FreeImage\Dist\x32;external\SDL2-2.0.10\lib\x86;$(LibraryPath)</LibraryPath>
-    <SourcePath>$(SourcePath)</SourcePath>
+    <IncludePath>ClothSimulator;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <SourcePath>ClothSimulator;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\SDL2-2.0.10\include;external\glm;external\glew-2.1.0\include;include;external\FreeImage\Dist\x32;external\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>external\glew-2.1.0\lib\Release\Win32;external\FreeImage\Dist\x32;external\SDL2-2.0.10\lib\x86;$(LibraryPath)</LibraryPath>
-    <SourcePath>$(SourcePath)</SourcePath>
+    <IncludePath>ClothSimulator;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <SourcePath>ClothSimulator;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>external\SDL2-2.0.10\include;external\glm;external\glew-2.1.0\include;include;external\FreeImage\Dist\x32;external\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>external\glew-2.1.0\lib\Release\Win32;external\FreeImage\Dist\x32;external\SDL2-2.0.10\lib\x86;$(LibraryPath)</LibraryPath>
-    <SourcePath>$(SourcePath)</SourcePath>
+    <IncludePath>ClothSimulator;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <SourcePath>ClothSimulator;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>external\SDL2-2.0.10\include;external\glm;external\glew-2.1.0\include;include;external\FreeImage\Dist\x32;external\boost_1_71_0;$(IncludePath)</IncludePath>
-    <LibraryPath>external\glew-2.1.0\lib\Release\Win32;external\FreeImage\Dist\x32;external\SDL2-2.0.10\lib\x86;$(LibraryPath)</LibraryPath>
-    <SourcePath>$(SourcePath)</SourcePath>
+    <IncludePath>ClothSimulator;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <SourcePath>ClothSimulator;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;GLM_ENABLE_EXPERIMENTAL;WXDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\SDKs\glew-2.1.0\include;C:\SDKs\wxWidgets-3.1.2\include;C:\SDKs\wxWidgets-3.1.2\include\msvc;C:\SDKs\glm-0.9.9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <PrecompiledHeaderFile />
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;SDL2test.lib;SDL2main.lib;opengl32.lib;glew32s.lib;MSIMG32.LIB;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDKs\wxWidgets-3.1.2\lib\vc_lib;C:\SDKs\glew-2.1.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;GLM_ENABLE_EXPERIMENTAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\SDKs\glew-2.1.0\include;C:\SDKs\wxWidgets-3.1.2\include;C:\SDKs\wxWidgets-3.1.2\include\msvc;C:\SDKs\glm-0.9.9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>WXDEBUG</UndefinePreprocessorDefinitions>
+      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -114,45 +160,35 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;SDL2test.lib;SDL2main.lib;opengl32.lib;glew32s.lib;MSIMG32.LIB;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDKs\wxWidgets-3.1.2\lib\vc_lib;C:\SDKs\glew-2.1.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;GLM_ENABLE_EXPERIMENTAL;WXDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\SDKs\glew-2.1.0\include;C:\SDKs\wxWidgets-3.1.2\include;C:\SDKs\wxWidgets-3.1.2\include\msvc;C:\SDKs\glm-0.9.9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;SDL2test.lib;SDL2main.lib;opengl32.lib;glew32s.lib;MSIMG32.LIB;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDKs\wxWidgets-3.1.2\lib\vc_x64_lib;C:\SDKs\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;GLM_ENABLE_EXPERIMENTAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\SDKs\glew-2.1.0\include;C:\SDKs\wxWidgets-3.1.2\include;C:\SDKs\wxWidgets-3.1.2\include\msvc;C:\SDKs\glm-0.9.9.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>WXDEBUG</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;SDL2test.lib;SDL2main.lib;opengl32.lib;glew32s.lib;MSIMG32.LIB;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDKs\wxWidgets-3.1.2\lib\vc_x64_lib;C:\SDKs\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\btoolbar.cpp" />
-    <ClCompile Include="src\bwindow.cpp" />
-    <ClCompile Include="src\clothchangelistener.cpp" />
-    <ClCompile Include="src\glwindow.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\segment.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\btoolbar.h" />
-    <ClInclude Include="include\bwindow.h" />
-    <ClInclude Include="include\clothchangelistener.h" />
-    <ClInclude Include="include\controller.h" />
-    <ClInclude Include="include\glwindow.h" />
-    <ClInclude Include="include\openglcontext.h" />
-    <ClInclude Include="include\segment.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

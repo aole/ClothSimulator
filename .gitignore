@@ -37,8 +37,8 @@
 *.pdb
 *.ilk
 *.user
-*.filters
 .vs/ClothSimulator/v16/.suo
 
 # Ignore Debug folder
 Debug
+/.vs/ClothSimulator/v16/TestStore/0
