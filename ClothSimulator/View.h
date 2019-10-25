@@ -3,6 +3,8 @@
 #include <ViewListener.h>
 #include <Model.h>
 
+#include "wx/wx.h"
+
 class View
 {
 public:
@@ -19,4 +21,5 @@ public:
 	virtual void setHighlightedPoints(std::vector<Vector2*>& points) = 0;
 	virtual void setSelectedPoints(std::vector<Vector2*>& points) = 0;
 	virtual void update() = 0;
+	virtual void setImage(wxImage& image) = 0;
 };

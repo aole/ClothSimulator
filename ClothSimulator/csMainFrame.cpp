@@ -70,6 +70,9 @@ void csMainFrame::CreatePanels()
 	// ========== CLOTH EDIT PANEL ==========
 	m_2DView = new cs2DPanel(m_model, splitter);
 	m_controller->add2DView(m_2DView);
+	m_2DView->DragAcceptFiles(true);
+
+	m_2DView->Connect(wxEVT_DROP_FILES, wxDropFilesEventHandler(csMainFrame::On2DDropFiles), NULL, this);
 
 	// ========== 3D OPENGL PANEL ==========
 	wxGLAttributes vAttrs;

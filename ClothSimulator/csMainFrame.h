@@ -32,6 +32,8 @@ public:
 
 	void OnKeyDown(wxKeyEvent& event);
 
+	void On2DDropFiles(wxDropFilesEvent& event) { if (event.GetNumberOfFiles() == 1) m_controller->On2DFileDropped(event.GetFiles()[0]); }
+
 	wxDECLARE_EVENT_TABLE();
 
 private:

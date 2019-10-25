@@ -15,7 +15,7 @@ wxEND_EVENT_TABLE()
 
 bool mouse_captured = false;
 
-cs2DPanel::cs2DPanel(Model* model, wxWindow* parent) : m_model(model), wxWindow(parent, wxID_ANY), m_panx(0), m_pany(0)
+cs2DPanel::cs2DPanel(Model* model, wxWindow* parent) : m_model(model), wxWindow(parent, wxID_ANY), m_panx(0), m_pany(0), m_display_image(false), m_image_width(0), m_image_height(0)
 {
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
 	SetBackgroundColour(wxColour(204, 204, 204));
@@ -45,6 +45,11 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
 
 	dc.Clear();
+
+	if (m_display_image) {
+		// place the image in the middle x and over y
+		gc->DrawBitmap(m_image, (int)m_panx-m_image_width/2, (int)m_pany-m_image_height, m_image_width, m_image_height);
+	}
 
 	// DRAW GRID
 	wxRect r = GetClientRect();
@@ -146,6 +151,19 @@ void cs2DPanel::setSelectedPoints(std::vector<Vector2*>& points)
 	select_points = points;
 
 	Refresh();
+}
+
+void cs2DPanel::setImage(wxImage& image)
+{
+	wxClientDC dc(this);
+	wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
+	m_image = gc->CreateBitmapFromImage(image);
+	m_image_width = image.GetWidth();
+	m_image_height = image.GetHeight();
+
+	m_display_image = true;
+
+	delete gc;
 }
 
 void cs2DPanel::OnMouseMove(wxMouseEvent& event)

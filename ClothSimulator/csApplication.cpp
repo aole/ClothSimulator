@@ -30,6 +30,8 @@ bool csApplication::OnInit()
 {
 	render_loop_on = false;
 
+	wxInitAllImageHandlers();
+
 	m_model = new Model();
 
 	m_controller = new Controller(m_model);

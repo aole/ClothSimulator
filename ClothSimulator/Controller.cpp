@@ -105,6 +105,16 @@ void Controller::mouseMove2D(float, float, float logicalx, float logicaly)
 	m_lasty = logicaly;
 }
 
+void Controller::On2DFileDropped(wxString filename)
+{
+	wxLogDebug("file '%s' dropped", filename);
+	m_image = wxImage(filename);
+
+	for (auto v : m_2Dviews) {
+		v->setImage(m_image);
+	}
+}
+
 void Controller::keyDown(int keyCode)
 {
 	switch (keyCode)

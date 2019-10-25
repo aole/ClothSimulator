@@ -8,6 +8,7 @@
 
 #include "wx/wx.h"
 #include "wx/overlay.h"
+#include <wx/graphics.h>
 
 class cs2DPanel : public wxWindow, public ModelListener, public View2D
 {
@@ -30,6 +31,8 @@ public:
 	void setSelectedPoints(std::vector<Vector2*>& points) override;
 	void update() override { Refresh(); }
 
+	void setImage(wxImage& image) override;
+
 private:
 	Model* m_model;
 
@@ -40,6 +43,10 @@ private:
 	std::vector<Vector2*> select_points;
 
 	wxOverlay m_overlay;
+
+	wxGraphicsBitmap m_image;
+	bool m_display_image;
+	int m_image_width, m_image_height;
 
 	wxDECLARE_EVENT_TABLE();
 };

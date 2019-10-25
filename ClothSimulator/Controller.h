@@ -18,6 +18,8 @@ public:
 	void mouseDown2D(float screenx, float screeny, float logicalx, float logicaly);
 	void mouseMove2D(float screenx, float screeny, float logicalx, float logicaly);
 
+	void On2DFileDropped(wxString filename);
+
 	// KEYBOARD INTERACTIONS
 	void keyDown(int keyCode);
 
@@ -46,4 +48,6 @@ private:
 	float m_anchorx, m_anchory;
 
 	bool m_simulate;
+
+	wxImage m_image;
 };
