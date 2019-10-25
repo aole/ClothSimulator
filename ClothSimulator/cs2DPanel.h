@@ -18,10 +18,13 @@ public:
 public:
 	void OnSize(wxSizeEvent& event);
 	void OnPaint(wxPaintEvent& event);
+	void OnEraseBackground(wxEraseEvent& event) {}
 
 	void OnMouseMove(wxMouseEvent& event);
-	void OnMouseDown(wxMouseEvent& event);
-	void OnMouseUp(wxMouseEvent& event);
+	void OnLeftMouseDown(wxMouseEvent& event);
+	void OnLeftMouseUp(wxMouseEvent& event);
+	void OnMiddleMouseDown(wxMouseEvent& event);
+	void OnMiddleMouseUp(wxMouseEvent& event);
 	void OnCaptureLost(wxMouseCaptureLostEvent& event);
 
 	void updated() { Refresh(false); };
@@ -29,9 +32,12 @@ public:
 	void drawTemporaryRectangle(float minx, float miny, float maxx, float maxy) override;
 	void setHighlightedPoints(std::vector<Vector2*>& points) override;
 	void setSelectedPoints(std::vector<Vector2*>& points) override;
+
+	void pan(float dx, float dy) override;
 	void update() override { Refresh(); }
 
 	void setImage(wxImage& image) override;
+	void hideImage() override { m_display_image = false; }
 
 private:
 	Model* m_model;

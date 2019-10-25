@@ -5,6 +5,7 @@ Design the clothes in 2D window, then simulate the clothes in 3D window to get r
 The cloth is affected by gravity, collision geometry and other forces.
 
 ![Screenshot](screenshots/demo01.gif?raw=true)
+![Screenshot](screenshots/demo02.gif?raw=true)
 
 Features
 --------

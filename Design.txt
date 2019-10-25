@@ -142,10 +142,20 @@ Cloth Designer App - V1
     - Drag Cloth points to reshape.
     - Button to reset 3D cloth position.
   - V0.5
+    - Click select Cloth points
     - Button to pin Cloth points (temporary feature)
     - Ctrl-click to split cloth edges
+  - V0.6
+    - Convexify Cloth shape
+    - File -> New
+  - V0.7
+    - Drop image file on 2D panel and set as background
+    - Pan 2D panel with middle mouse.
+    - Toggle Opengl wireframe mode.
+  - V0.8
     - MERGE in MASTER
     - Update Readme
+    - Fix mesh
 - Code Structure
   - Model
     - stores clothes

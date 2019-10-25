@@ -22,4 +22,6 @@ public:
 	virtual void setSelectedPoints(std::vector<Vector2*>& points) = 0;
 	virtual void update() = 0;
 	virtual void setImage(wxImage& image) = 0;
+	virtual void hideImage() = 0;
+	virtual void pan(float dx, float dy) = 0;
 };

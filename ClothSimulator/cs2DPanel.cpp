@@ -8,9 +8,12 @@ wxBEGIN_EVENT_TABLE(cs2DPanel, wxWindow)
 EVT_SIZE(cs2DPanel::OnSize)
 EVT_PAINT(cs2DPanel::OnPaint)
 EVT_MOTION(cs2DPanel::OnMouseMove)
-EVT_LEFT_DOWN(cs2DPanel::OnMouseDown)
-EVT_LEFT_UP(cs2DPanel::OnMouseUp)
+EVT_LEFT_DOWN(cs2DPanel::OnLeftMouseDown)
+EVT_LEFT_UP(cs2DPanel::OnLeftMouseUp)
+EVT_MIDDLE_DOWN(cs2DPanel::OnMiddleMouseDown)
+EVT_MIDDLE_UP(cs2DPanel::OnMiddleMouseUp)
 EVT_MOUSE_CAPTURE_LOST(cs2DPanel::OnCaptureLost)
+EVT_ERASE_BACKGROUND(cs2DPanel::OnEraseBackground)
 wxEND_EVENT_TABLE()
 
 bool mouse_captured = false;
@@ -153,6 +156,12 @@ void cs2DPanel::setSelectedPoints(std::vector<Vector2*>& points)
 	Refresh();
 }
 
+void cs2DPanel::pan(float dx, float dy)
+{
+	wxLogDebug("pan by: %f, %f", dx, dy);
+	m_panx += dx; m_pany += dy; update();
+}
+
 void cs2DPanel::setImage(wxImage& image)
 {
 	wxClientDC dc(this);
@@ -174,11 +183,12 @@ void cs2DPanel::OnMouseMove(wxMouseEvent& event)
 	int x = dc.DeviceToLogicalX(pos.x);
 	int y = dc.DeviceToLogicalY(pos.y);
 
+	wxLogDebug("Mouse move: %i, %i", x - m_panx, -(y - m_pany));
 	for (ViewListener* l : m_listeners)
 		l->mouseMove2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
 }
 
-void cs2DPanel::OnMouseDown(wxMouseEvent& event)
+void cs2DPanel::OnLeftMouseDown(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
 	wxClientDC dc(this);
@@ -190,10 +200,10 @@ void cs2DPanel::OnMouseDown(wxMouseEvent& event)
 	long y = dc.DeviceToLogicalY(pos.y);
 
 	for (ViewListener* l : m_listeners)
-		l->mouseDown2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
+		l->leftMouseDown2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
 }
 
-void cs2DPanel::OnMouseUp(wxMouseEvent& event)
+void cs2DPanel::OnLeftMouseUp(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
 
@@ -207,7 +217,43 @@ void cs2DPanel::OnMouseUp(wxMouseEvent& event)
 		long y = dc.DeviceToLogicalY(pos.y);
 
 		for (ViewListener* l : m_listeners)
-			l->mouseUp2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
+			l->leftMouseUp2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
+
+	} // use xcurly braces or reset will fail assert
+
+	m_overlay.Reset();
+}
+
+void cs2DPanel::OnMiddleMouseDown(wxMouseEvent& event)
+{
+	wxPoint pos = event.GetPosition();
+	wxClientDC dc(this);
+
+	CaptureMouse();
+	mouse_captured = true;
+
+	long x = dc.DeviceToLogicalX(pos.x);
+	long y = dc.DeviceToLogicalY(pos.y);
+
+	for (ViewListener* l : m_listeners)
+		l->middleMouseDown2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
+}
+
+void cs2DPanel::OnMiddleMouseUp(wxMouseEvent& event)
+{
+	wxPoint pos = event.GetPosition();
+
+	if(mouse_captured)
+		ReleaseMouse();
+
+	{
+		wxClientDC dc(this);
+
+		long x = dc.DeviceToLogicalX(pos.x);
+		long y = dc.DeviceToLogicalY(pos.y);
+
+		for (ViewListener* l : m_listeners)
+			l->middleMouseUp2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
 
 	} // use xcurly braces or reset will fail assert
 

@@ -1,7 +1,7 @@
 #include "Controller.h"
 #include "csApplication.h"
 
-void Controller::mouseUp2D(float, float, float logicalx, float logicaly)
+void Controller::leftMouseUp2D(float, float, float logicalx, float logicaly)
 {
 	m_lastx = logicalx;
 	m_lasty = logicaly;
@@ -20,7 +20,7 @@ void Controller::mouseUp2D(float, float, float logicalx, float logicaly)
 	m_creating_rect = false;
 }
 
-void Controller::mouseDown2D(float, float, float logicalx, float logicaly)
+void Controller::leftMouseDown2D(float, float, float logicalx, float logicaly)
 {
 	m_lastx = m_anchorx = logicalx;
 	m_lasty = m_anchory = logicaly;
@@ -50,7 +50,20 @@ void Controller::mouseDown2D(float, float, float logicalx, float logicaly)
 	m_mouse_left_down = true;
 }
 
-void Controller::mouseMove2D(float, float, float logicalx, float logicaly)
+void Controller::middleMouseUp2D(float, float, float, float)
+{
+	m_mouse_middle_down = false;
+}
+
+void Controller::middleMouseDown2D(float screenx, float screeny, float logicalx, float logicaly)
+{
+	m_lastx = screenx;
+	m_lasty = screeny;
+
+	m_mouse_middle_down = true;
+}
+
+void Controller::mouseMove2D(float screenx, float screeny, float logicalx, float logicaly)
 {
 	if (m_mouse_left_down) {
 		if (m_selected.empty() && !wxGetKeyState(WXK_CONTROL)) {
@@ -69,6 +82,16 @@ void Controller::mouseMove2D(float, float, float logicalx, float logicaly)
 					v->update();
 			}
 		}
+
+		m_lastx = logicalx;
+		m_lasty = logicaly;
+	}
+	else if (m_mouse_middle_down) {
+		for (auto v : m_2Dviews)
+			v->pan(screenx - m_lastx, screeny - m_lasty);
+
+		m_lastx = screenx;
+		m_lasty = screeny;
 	}
 	else
 		// cloth point highlight
@@ -100,14 +123,11 @@ void Controller::mouseMove2D(float, float, float logicalx, float logicaly)
 			v->setHighlightedPoints(m_highlighted);
 		}
 	}
-
-	m_lastx = logicalx;
-	m_lasty = logicaly;
 }
 
 void Controller::On2DFileDropped(wxString filename)
 {
-	wxLogDebug("file '%s' dropped", filename);
+	wxLogDebug("File '%s' dropped on 2D Panel.", filename);
 	m_image = wxImage(filename);
 
 	for (auto v : m_2Dviews) {
@@ -125,6 +145,15 @@ void Controller::keyDown(int keyCode)
 	default:
 		break;
 	}
+}
+
+void Controller::OnMenuFileNew(wxFrame* frame)
+{
+	for (auto v : m_2Dviews) {
+		v->hideImage();
+	}
+	m_model->resetAll();
+	m_model->notifyListeners();
 }
 
 void Controller::OnToggleSimulation(bool simulate)
