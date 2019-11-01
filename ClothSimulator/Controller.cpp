@@ -1,6 +1,8 @@
 #include "Controller.h"
 #include "csApplication.h"
 
+#include <wx/textfile.h>
+
 void Controller::leftMouseUp2D(float, float, float logicalx, float logicaly)
 {
 	m_lastx = logicalx;
@@ -154,6 +156,24 @@ void Controller::OnMenuFileNew(wxFrame* frame)
 	}
 	m_model->resetAll();
 	m_model->notifyListeners();
+}
+
+void Controller::OnMenuFileAddObject(wxFrame* frame)
+{
+	wxLogDebug("OnMenuFileAddObject");
+	wxTextFile objfile("Objects/FlagPole.obj");
+	bool success = objfile.Open();
+	wxLogDebug("opened: %i", success);
+
+	for (wxString str = objfile.GetFirstLine(); !objfile.Eof(); str = objfile.GetNextLine())
+	{
+		if (str.StartsWith("o ")) { // new object
+			wxString name = str.SubString(2, 0);
+			wxLogDebug(name);
+		}
+	}
+
+	objfile.Close();
 }
 
 void Controller::OnToggleSimulation(bool simulate)

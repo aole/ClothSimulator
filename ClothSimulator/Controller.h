@@ -27,6 +27,7 @@ public:
 
 	// MENU INTERACTIONS
 	void OnMenuFileNew(wxFrame* frame);
+	void OnMenuFileAddObject(wxFrame* frame);
 	void OnMenuFileExit(wxFrame *frame) { frame->Close(true); };
 
 	void OnToggleSimulation(bool simulate);

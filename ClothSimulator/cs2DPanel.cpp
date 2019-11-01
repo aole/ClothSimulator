@@ -158,7 +158,7 @@ void cs2DPanel::setSelectedPoints(std::vector<Vector2*>& points)
 
 void cs2DPanel::pan(float dx, float dy)
 {
-	wxLogDebug("pan by: %f, %f", dx, dy);
+	//wxLogDebug("pan by: %f, %f", dx, dy);
 	m_panx += dx; m_pany += dy; update();
 }
 
@@ -183,7 +183,7 @@ void cs2DPanel::OnMouseMove(wxMouseEvent& event)
 	int x = dc.DeviceToLogicalX(pos.x);
 	int y = dc.DeviceToLogicalY(pos.y);
 
-	wxLogDebug("Mouse move: %i, %i", x - m_panx, -(y - m_pany));
+	//wxLogDebug("Mouse move: %i, %i", x - m_panx, -(y - m_pany));
 	for (ViewListener* l : m_listeners)
 		l->mouseMove2D(pos.x, pos.y, x - m_panx, -(y - m_pany));
 }
