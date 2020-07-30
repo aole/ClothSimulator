@@ -4,6 +4,8 @@
 #include "wx/dcbuffer.h"
 #include <wx/graphics.h>
 
+bool DEBUG_DISPLAY_VERTEX_NUMBER = false;
+
 wxBEGIN_EVENT_TABLE(cs2DPanel, wxWindow)
 EVT_SIZE(cs2DPanel::OnSize)
 EVT_PAINT(cs2DPanel::OnPaint)
@@ -65,6 +67,8 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 	gc->SetBrush(*wxLIGHT_GREY_BRUSH);
 
+	wxPen penPin = *wxThePenList->FindOrCreatePen(wxColour(200, 50, 50), 2);
+
 	// DRAW CLOTHES
 	for (auto s : m_model->getShapes()) {
 		gc->SetPen(*wxMEDIUM_GREY_PEN);
@@ -87,12 +91,15 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 		for (int i = 0;i < s->getCount();i++) {
 			auto v = s->getPoint(i);
 			if (v->pin)
-				gc->SetPen(wxPen(wxColour(200, 50, 50), 1));
+				gc->SetPen(penPin);
 			else
 				gc->SetPen(*wxMEDIUM_GREY_PEN);
-			wxString vs;
-			vs << i;
-			dc.DrawText(vs, v->x + (double)m_panx - 2, -v->y + (double)m_pany - 2);
+
+			if (DEBUG_DISPLAY_VERTEX_NUMBER) {
+				wxString vs;
+				vs << i;
+				dc.DrawText(vs, v->x + (double)m_panx - 2, -v->y + (double)m_pany - 2);
+			}
 			gc->DrawEllipse(v->x + (double)m_panx - 2, -v->y + (double)m_pany - 2, 4, 4);
 		}
 	}

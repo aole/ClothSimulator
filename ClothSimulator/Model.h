@@ -20,6 +20,7 @@ public:
 	void set(float vx, float vy, ClothShape* par = nullptr) { x = vx; y = vy; if (par) parent = par; }
 
 	float distance(float vx, float vy) { return sqrtf((x - vx) * (x - vx) + (y - vy) * (y - vy)); }
+	void translate(float dx, float dy) { x += dx; y += dy; }
 
 	void setPin(bool p);
 
@@ -50,6 +51,7 @@ public:
 	void addVertex(float x, float y, bool pin = false) { m_points.push_back(new Vector2(x, y, this, pin)); }
 	Vector2* insertVertex(float x, float y, int insert_at) { Vector2* v = new Vector2(x, y, this); m_points.insert(m_points.begin()+insert_at, v); updateShape(); return v; }
 	void updateShape();
+	void translateShape(int dx, int dy);
 
 	int getCount() { return m_points.size(); }
 	auto getPoint(int i) { return m_points.at(i); }
@@ -58,6 +60,7 @@ public:
 
 	void simulate();
 	void setPin(Vector2* v, bool pin) { m_mesh->setPin(std::find(m_points.begin(), m_points.end(), v)-m_points.begin(), pin); }
+	bool pointInside(float x, float y);
 
 	ClothMesh* m_mesh;
 	std::vector<Polygon2> m_polygons;
@@ -86,6 +89,7 @@ public:
 	auto &getShapes() { return m_shapes; };
 	bool m_simulate;
 
+	ClothShape* getShapeUnderPoint(float x, float y);
 	float getNearestClothPoint(float x, float y, std::vector<Vector2*>& points);
 	float getNearestEdgePoint(float x, float y, Vector2IP* points);
 

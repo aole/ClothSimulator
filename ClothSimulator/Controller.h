@@ -46,6 +46,7 @@ private:
 
 	std::vector<Vector2*> m_highlighted;
 	std::vector<Vector2*> m_selected;
+	ClothShape* m_selected_shape;
 	Vector2IP m_intersection_point;
 	bool intersected;
 

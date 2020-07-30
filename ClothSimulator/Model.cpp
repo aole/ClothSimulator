@@ -23,7 +23,7 @@ void printpoly(Polygon2* p) {
 	msg << "    ";
 	for (auto i : p->indices)
 		msg << i << ",";
-	wxLogDebug(msg);
+	//wxLogDebug(msg);
 }
 
 int getNonConcaveFirstIndex(const std::vector<Vector2*>& points, const Polygon2& poly) {
@@ -47,12 +47,12 @@ int getNonConcaveFirstIndex(const std::vector<Vector2*>& points, const Polygon2&
 		else
 			return fi;
 	}
-	wxLogError("getNonConcaveFirstIndex: did not find a convex point");
+	//wxLogError("getNonConcaveFirstIndex: did not find a convex point");
 	return 0;
 }
 
 void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
-	wxLogDebug("========\nconvexify");
+	//wxLogDebug("========\nconvexify");
 
 	std::vector<Polygon2> newps;
 	for (auto poly : ps) {
@@ -65,7 +65,7 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 
 		Polygon2* old_poly = new Polygon2();
 		old_poly->indices.push_back(poly.indices[first_idx]);
-		wxLogDebug("  add to old. %i", first_idx);
+		//wxLogDebug("  add to old. %i", first_idx);
 
 		Polygon2* new_poly = new Polygon2();
 
@@ -78,7 +78,7 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 			Vector2* v2 = points[poly.indices[last_idx]];
 
 			float t = turn(v0, v1, v2);
-			wxLogDebug("  checking %i, %i, %i", first_idx, second_idx, last_idx);
+			//wxLogDebug("  checking %i, %i, %i", first_idx, second_idx, last_idx);
 
 			if (last_idx == start_idx) {
 				if (t < 0 && turned) {
@@ -91,7 +91,7 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 			}
 
 			if (t < 0 && !turned) { // took a right turn (split to new poly)
-				wxLogDebug("   turning. %i", second_idx);
+				//wxLogDebug("   turning. %i", second_idx);
 				turned = true;
 				new_poly->indices.push_back(poly.indices[second_idx]);
 				new_poly->indices.push_back(poly.indices[last_idx]);
@@ -110,7 +110,7 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 				}
 
 				//newps.push_back(*new_poly);
-				wxLogDebug("   back ... add new poly1");
+				//wxLogDebug("   back ... add new poly1");
 				printpoly(new_poly);
 				delete new_poly;
 				new_poly = new Polygon2();
@@ -118,11 +118,11 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 				second_idx = last_idx;
 			}
 			else if (turned) {
-				wxLogDebug("   on new. %i", last_idx);
+				//wxLogDebug("   on new. %i", last_idx);
 				new_poly->indices.push_back(poly.indices[last_idx]);
 			}
 			else{
-				wxLogDebug("   on old. %i", second_idx);
+				//wxLogDebug("   on old. %i", second_idx);
 				old_poly->indices.push_back(poly.indices[second_idx]);
 				first_idx = second_idx;
 				second_idx = last_idx;
@@ -135,11 +135,11 @@ void convexify(const std::vector<Vector2*> &points, std::vector<Polygon2> &ps) {
 		if(!turned)
 			old_poly->indices.push_back(poly.indices[prev_idx]);
 		newps.push_back(*old_poly);
-		wxLogDebug(" add old poly");
+		//wxLogDebug(" add old poly");
 		printpoly(old_poly);
 		if (turned) {
 			new_poly->indices.push_back(poly.indices[last_idx]);
-			wxLogDebug(" add new poly2");
+			//wxLogDebug(" add new poly2");
 
 			// recurse check this poly
 			std::vector<Polygon2> psr;
@@ -171,6 +171,13 @@ void ClothShape::updateShape()
 	convexify(m_points, m_polygons);
 }
 
+void ClothShape::translateShape(int dx, int dy)
+{
+	for (auto v : m_points) {
+		v->translate(dx, dy);
+	}
+}
+
 void ClothShape::simulate()
 {
 	if (m_mesh) {
@@ -179,6 +186,43 @@ void ClothShape::simulate()
 		m_mesh->constraint();
 		m_mesh->update();
 	}
+}
+
+// http://www.eecs.umich.edu/courses/eecs380/HANDOUTS/PROJ2/InsidePoly.html
+bool ClothShape::pointInside(float x, float y)
+{
+	//wxLogDebug("MP: %f, %f", x, y);
+
+	int i;
+	double angle = 0;
+	double dtheta, theta1, theta2;
+
+	Vector2* p1 = m_points[m_points.size()-1];
+	for (Vector2* p2 : m_points) {
+		//wxLogDebug("P: %f, %f", p2->x, p2->y);
+
+		float x1 = p1->x - x;
+		float y1 = p1->y - y;
+		float x2 = p2->x - x;
+		float y2 = p2->y - y;
+
+		theta1 = atan2(y1, x1);
+		theta2 = atan2(y2, x2);
+		dtheta = theta2 - theta1;
+		
+		while (dtheta > PI)
+			dtheta -= PI+PI;
+		while (dtheta < -PI)
+			dtheta += PI+PI;
+
+		angle += dtheta;
+		p1 = p2;
+	}
+
+	if (abs(angle) < PI)
+		return(FALSE);
+	else
+		return(TRUE);
 }
 
 Model::~Model()
@@ -279,6 +323,16 @@ void Model::simulate()
 		s->simulate();
 
 	notifyListeners();
+}
+
+ClothShape* Model::getShapeUnderPoint(float x, float y)
+{
+	for (auto shape : m_shapes) {
+		if (shape->pointInside(x, y))
+			return shape;
+	}
+
+	return NULL;
 }
 
 float Model::getNearestClothPoint(float x, float y, std::vector<Vector2*>& points)

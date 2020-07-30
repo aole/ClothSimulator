@@ -45,6 +45,9 @@ void Controller::leftMouseDown2D(float, float, float logicalx, float logicaly)
 		for (auto v : m_2Dviews)
 			v->update();
 	}
+	else if (!intersected) {
+		m_selected_shape = m_model->getShapeUnderPoint(logicalx, logicaly);
+	}
 
 	for (auto v : m_2Dviews) {
 		v->setSelectedPoints(m_selected);
@@ -71,10 +74,17 @@ void Controller::mouseMove2D(float screenx, float screeny, float logicalx, float
 {
 	if (m_mouse_left_down) {
 		if (m_selected.empty() && !wxGetKeyState(WXK_CONTROL)) {
-			m_creating_rect = true;
-			// new cloth
-			for (auto v : m_2Dviews) {
-				v->drawTemporaryRectangle(m_anchorx, m_anchory, logicalx, logicaly);
+			if (m_selected_shape) {
+				m_selected_shape->translateShape(logicalx - m_lastx, logicaly - m_lasty);
+				for (auto v : m_2Dviews)
+					v->update();
+			}
+			else {
+				m_creating_rect = true;
+				// new cloth
+				for (auto v : m_2Dviews) {
+					v->drawTemporaryRectangle(m_anchorx, m_anchory, logicalx, logicaly);
+				}
 			}
 		}
 		if (!m_selected.empty()) {
