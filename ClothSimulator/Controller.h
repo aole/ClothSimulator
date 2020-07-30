@@ -33,6 +33,7 @@ public:
 	void OnToggleSimulation(bool simulate);
 	void OnRestCloth();
 	void OnPinPoint();
+	void OnWireframeToggle(bool show);
 
 	void simulate();
 private:

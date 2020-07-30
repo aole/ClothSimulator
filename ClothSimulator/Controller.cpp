@@ -3,6 +3,8 @@
 
 #include <wx/textfile.h>
 
+bool render_wireframe = false;
+
 void Controller::leftMouseUp2D(float, float, float logicalx, float logicaly)
 {
 	m_lastx = logicalx;
@@ -193,6 +195,12 @@ void Controller::OnPinPoint()
 	for (auto v : m_selected) {
 		v->setPin(!v->pin);
 	}
+	m_model->notifyListeners();
+}
+
+void Controller::OnWireframeToggle(bool show)
+{
+	render_wireframe = show;
 	m_model->notifyListeners();
 }
 

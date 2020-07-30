@@ -206,6 +206,7 @@ void ClothMesh::updateNormals()
 	}
 }
 
+// Create 3D Grid to render from the cloth's 2D vertices
 void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength)
 {
 	m_tensile_strength = tensile_strength;
@@ -216,7 +217,8 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& 
 	float miny = 9999999;// std::numeric_limits<float>::max();
 	float maxy = -9999999;// std::numeric_limits<float>::min();
 
-	int i = 0;
+	// find extent of the 2D cloth
+	// add initial vertices
 	for (auto v : vertices) {
 		if (v.x < minx)
 			minx = v.x;
@@ -230,6 +232,7 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& 
 		m_vertices.push_back(new Vertex(v));
 	}
 	
+	// create 3D faces from the 2D polygons of the cloth
 	for (auto poly : polygons) {
 		Face* face = new Face();
 		m_faces.push_back(face);
@@ -238,17 +241,17 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& 
 			face->indices.push_back(i);
 	}
 
-	// cut polygon on the grid/horizontal
+	// cut faces on the grid horizontally
 	for (float y = miny + segment_length; y <= maxy; y += segment_length) {
 		cut_faces_Greiner_Hormann(m_vertices, m_faces, glm::vec2(-1e10, y), glm::vec2(1e10, y));
 	}
-	// cut polygon on the grid/vertical
+	// cut faces on the grid vertically
 	for (float x = minx + segment_length; x <= maxx; x += segment_length) {
 		cut_faces_Greiner_Hormann(m_vertices, m_faces, glm::vec2(x, -1e10), glm::vec2(x, 1e10));
 	}
 
 	// just wiggle in the z coords to give cloth a better initial flow.
-	// also add same amount of normals
+	// also add normals
 	for (auto v: m_vertices) {
 		v->z += (rand() % 10 - 5)/10.f;
 		m_normals.push_back(new glm::vec3());
@@ -285,6 +288,7 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& 
 
 	m_draw_mode = GL_TRIANGLES;
 
+	// create opengl render mesh
 	creategl(m_vertices, m_normals, indices, GL_DYNAMIC_DRAW);
 }
 

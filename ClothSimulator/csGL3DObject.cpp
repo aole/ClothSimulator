@@ -1,5 +1,6 @@
 
 #include "csGL3DObject.h"
+#include "csApplication.h"
 
 #include <wx\log.h>
 
@@ -124,7 +125,10 @@ void csGL3DObject::render()
 		glEnableVertexAttribArray(i);
 	}
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (render_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	//wxLogDebug("rendering %d, %d", m_draw_mode, m_draw_count);
 	glDrawElements(

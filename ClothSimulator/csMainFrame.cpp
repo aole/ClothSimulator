@@ -65,6 +65,10 @@ void csMainFrame::CreateToolStatusBar()
 	Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { m_controller->OnPinPoint(); }, 20002);
 	toolbar->AddControl(btnPin);
 
+	wxCheckBox* chkWF = new wxCheckBox(toolbar, 20003, "Wireframe");
+	Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&) { m_controller->OnWireframeToggle(chkWF->GetValue()); }, 20003);
+	toolbar->AddControl(chkWF);
+
 	toolbar->Realize();
 }
 

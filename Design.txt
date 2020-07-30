@@ -136,8 +136,9 @@ Cloth Designer App - V1
     - Simulate structural spring and gravity
     - Press SpaceBar to toggle simulation
   - V0.3
-    - Add opengl lights
+    - Add button to toggle wireframe
   - V0.4
+    - Add opengl lights
     - Display Cloth points and highlight on mouse move.
     - Drag Cloth points to reshape.
     - Button to reset 3D cloth position.
@@ -156,6 +157,7 @@ Cloth Designer App - V1
     - MERGE in MASTER
     - Update Readme
     - Fix mesh
+    
 - Code Structure
   - Model
     - stores clothes

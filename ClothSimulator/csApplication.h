@@ -3,6 +3,8 @@
 #include <Model.h>
 #include <Controller.h>
 
+extern bool render_wireframe;
+
 class csApplication : public wxApp
 {
 public:
