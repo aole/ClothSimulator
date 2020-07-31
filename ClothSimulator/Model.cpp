@@ -6,6 +6,8 @@
 #include <OpenGLContext.h>
 #include <glm/gtx/closest_point.hpp>
 
+#define DEBUG_CONVEXIFY FALSE
+
 const glm::vec3 GRAVITY(0, -0.01, 0);
 
 float turn(Vector2* a, Vector2* b, Vector2* v) {
@@ -168,7 +170,8 @@ void ClothShape::updateShape()
 	Polygon2 p(m_points.size());
 	m_polygons.push_back(p);
 	// split the polygon recursively until only a set of convex polygons are left
-	convexify(m_points, m_polygons);
+	if (DEBUG_CONVEXIFY)
+		convexify(m_points, m_polygons);
 }
 
 void ClothShape::translateShape(int dx, int dy)

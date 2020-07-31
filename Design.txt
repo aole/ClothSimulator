@@ -158,3 +158,9 @@ Cloth Designer App - V1
     - listens to Model
     - OnMouseUp
       - update listeners (Controller)
+
+- Mouse Flow
+    - LMD (cs2DPanel)
+        - ViewListener
+        - Controller
+        

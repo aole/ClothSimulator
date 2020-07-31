@@ -130,17 +130,19 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 				int ipidx = (*idata->points)[key];
 				if (ipidx >= 0) {
 					indices.push_back(ipidx);
-					if ((newFace->indices.size() == 0) || (newFace->indices.size() > 0 && newFace->indices[newFace->indices.size() - 1] != ipidx))
-						newFace->indices.push_back(ipidx);
+					newFace->indices.push_back(ipidx);
 					old = !old;
 					hasSplit = true;
+					if (old) { // current face changed to old
+						newFaces.push_back(newFace);
+						newFace = new Face();
+					}
 				}
 				lidx = i;
 			}
 		}
 		if (hasSplit && icount > 1) { // if the face was split, update the old face and add the new one
 			face->indices = indices;
-			newFaces.push_back(newFace);
 		}
 		else
 			delete newFace;

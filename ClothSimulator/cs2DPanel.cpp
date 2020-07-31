@@ -51,11 +51,6 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 	dc.Clear();
 
-	if (m_display_image) {
-		// place the image in the middle x and over y
-		gc->DrawBitmap(m_image, (int)m_panx-m_image_width/2, (int)m_pany-m_image_height, m_image_width, m_image_height);
-	}
-
 	// DRAW GRID
 	wxRect r = GetClientRect();
 	gc->SetBrush(*wxTRANSPARENT_BRUSH);
@@ -65,7 +60,7 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	gc->SetPen(wxPen(wxColour(50, 155, 50, 100), 1));
 	gc->StrokeLine(m_panx, 0, m_panx, r.height);
 
-	gc->SetBrush(*wxLIGHT_GREY_BRUSH);
+	gc->SetBrush(*wxGREY_BRUSH);
 
 	wxPen penPin = *wxThePenList->FindOrCreatePen(wxColour(200, 50, 50), 2);
 
@@ -74,8 +69,6 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 		gc->SetPen(*wxMEDIUM_GREY_PEN);
 		// draw polygons
 		for (auto poly : s->m_polygons) {
-			//wxLogDebug("drawing");
-			//printpoly(&poly);
 			wxGraphicsPath path = gc->CreatePath();
 			int idx = poly.indices[0];
 			auto v = s->getPoint(idx);
@@ -129,6 +122,12 @@ void cs2DPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 			gc->DrawEllipse(x - 5, y - 5, 10, 10);
 		}
 	}
+
+	if (m_display_image) {
+		// place the image in the middle x and over y
+		gc->DrawBitmap(m_image, (int)m_panx - m_image_width / 2, (int)m_pany - m_image_height, m_image_width, m_image_height);
+	}
+
 	delete gc;
 }
 
@@ -171,6 +170,13 @@ void cs2DPanel::pan(float dx, float dy)
 
 void cs2DPanel::setImage(wxImage& image)
 {
+	if (!image.HasAlpha())
+		image.InitAlpha();
+
+	byte* alphabuf = new byte[image.GetWidth() * image.GetHeight()];
+	std::fill_n(alphabuf, image.GetWidth() * image.GetHeight(), 100);
+	image.SetAlpha(alphabuf);
+
 	wxClientDC dc(this);
 	wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
 	m_image = gc->CreateBitmapFromImage(image);
@@ -200,8 +206,8 @@ void cs2DPanel::OnLeftMouseDown(wxMouseEvent& event)
 	wxPoint pos = event.GetPosition();
 	wxClientDC dc(this);
 
-	CaptureMouse();
-	mouse_captured = true;
+	if (!this->HasCapture())
+		CaptureMouse();
 
 	long x = dc.DeviceToLogicalX(pos.x);
 	long y = dc.DeviceToLogicalY(pos.y);
@@ -214,7 +220,7 @@ void cs2DPanel::OnLeftMouseUp(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
 
-	if(mouse_captured)
+	if (this->HasCapture())
 		ReleaseMouse();
 
 	{
@@ -236,8 +242,8 @@ void cs2DPanel::OnMiddleMouseDown(wxMouseEvent& event)
 	wxPoint pos = event.GetPosition();
 	wxClientDC dc(this);
 
-	CaptureMouse();
-	mouse_captured = true;
+	if (!this->HasCapture())
+		CaptureMouse();
 
 	long x = dc.DeviceToLogicalX(pos.x);
 	long y = dc.DeviceToLogicalY(pos.y);
@@ -250,7 +256,7 @@ void cs2DPanel::OnMiddleMouseUp(wxMouseEvent& event)
 {
 	wxPoint pos = event.GetPosition();
 
-	if(mouse_captured)
+	if (this->HasCapture())
 		ReleaseMouse();
 
 	{
