@@ -5,6 +5,15 @@
 #include <map>
 #include <stdlib.h> // rand()
 
+/* -- debugging memory leak
+#define _CRTDBG_MAP_ALLOC
+
+#ifdef _DEBUG
+#define new new( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#else
+#define new new
+#endif
+*/
 
 class Edge {
 public:
@@ -192,10 +201,18 @@ void ClothMesh::updateNormals()
 		Vertex* v = m_vertices.at(i);
 		glm::vec3* vn = m_normals.at(i);
 
-		assert(v->m_face_count > 0);
-		vn->x /= v->m_face_count;
-		vn->y /= v->m_face_count;
-		vn->z /= v->m_face_count;
+#if _DEBUG
+		if (v->m_face_count == 0) {
+			wxLogDebug("Vertex: %d, face count: %d", i, v->m_face_count);
+		}
+		else {
+#endif
+			vn->x /= v->m_face_count;
+			vn->y /= v->m_face_count;
+			vn->z /= v->m_face_count;
+#if _DEBUG
+		}
+#endif
 	}
 }
 
@@ -363,24 +380,20 @@ void ClothMesh::createLink(int v1, int v2)
 
 void ClothMesh::clean()
 {
-	//for (size_t i = 0; i < m_faces.size(); i++)
-		//delete m_faces[i];
-	//m_faces.clear();
-	std::vector<Face*>().swap(m_faces);
+	for (size_t i = 0; i < m_faces.size(); i++)
+		delete m_faces[i];
+	m_faces.clear();
 
-	//for (size_t i = 0; i < m_vertices.size(); i++)
-		//delete m_vertices[i];
-	//m_vertices.clear();
-	std::vector<Vertex*>().swap(m_vertices);
+	for (size_t i = 0; i < m_vertices.size(); i++)
+		delete m_vertices[i];
+	m_vertices.clear();
 
-	//for (size_t i = 0; i < m_normals.size(); i++)
-		//delete m_normals[i];
-	//m_normals.clear();
-	std::vector<glm::vec3*>().swap(m_normals);
+	for (size_t i = 0; i < m_normals.size(); i++)
+		delete m_normals[i];
+	m_normals.clear();
 
-	//for (size_t i = 0; i < m_links.size(); i++)
-		//delete m_links[i];
-	//m_links.clear();
-	std::vector<Link*>().swap(m_links);
+	for (size_t i = 0; i < m_links.size(); i++)
+		delete m_links[i];
+	m_links.clear();
 }
 
