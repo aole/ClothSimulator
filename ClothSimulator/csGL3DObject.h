@@ -36,9 +36,6 @@ protected:
 
 	void creategl(std::vector< Vertex* >& vertices, std::vector< glm::vec3* >& normals, std::vector< unsigned int >& indices, GLenum usage = GL_STATIC_DRAW);
 
-	void updategl(std::vector< Vertex* >& vertices);
-	void updategl(std::vector< glm::vec3 >& vertices);
-
 	void updategl(std::vector< Vertex* >& vertices, std::vector< glm::vec3* >& normals);
 
 	GLenum m_draw_mode;

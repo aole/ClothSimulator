@@ -195,8 +195,6 @@ void ClothShape::simulate()
 bool ClothShape::pointInside(float x, float y)
 {
 	//wxLogDebug("MP: %f, %f", x, y);
-
-	int i;
 	double angle = 0;
 	double dtheta, theta1, theta2;
 

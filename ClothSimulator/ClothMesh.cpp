@@ -5,17 +5,29 @@
 #include <map>
 #include <stdlib.h> // rand()
 
+
+class Edge {
+public:
+	Edge(size_t a, size_t b) { if (a < b) { i1 = a; i2 = b; } else { i1 = b; i2 = b; } }
+	size_t i1, i2;
+};
+bool operator<(const Edge &a, const Edge& b) { if (a.i1 == b.i1) return a.i2 < b.i2; else return a.i1 < b.i1; }
+bool operator==(const Edge &a, const Edge& b) { return (a.i1 == b.i1 &&  a.i2 == b.i2); }
+
 class IPInfo
 {
 public:
-	~IPInfo() {
-		if (points)
-			delete points;
+	IPInfo() { count = 0; }
+	void add(size_t i1, size_t i2, int p) { 
+		Edge e (i1, i2);
+		points[e] = p; count++;
 	}
-	IPInfo(std::map<wxString, int>* pts, int cnt) { points = pts; count = cnt; }
+	int get(size_t i1, size_t i2) { return points[Edge(i1, i2)]; }
+	void reset() { points.clear(); count = 0; }
 
-	std::map<wxString, int> *points;
+	std::map<Edge, int> points;
 	int count;
+
 };
 
 float intersects(float a, float b, float c, float d, float p, float q, float r, float s) {
@@ -39,10 +51,7 @@ bool equals(Vertex* a, Vertex* b) {
 	return std::abs(a->x - b->x) < 0.0001f && std::abs(a->y - b->y) < 0.0001f && std::abs(a->z - b->z) < 0.0001f;
 }
 
-IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& line0, glm::vec2& line1) {
-	std::map<wxString, int> *ips = new std::map<wxString, int>(); // indices of the intersecting points between edges
-	int count = 0;
-
+void intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& line0, glm::vec2& line1, IPInfo &ipinfo) {
 	size_t lidx = face.indices.size() - 1; // last index
 	Vertex *fp = verts[face.indices[lidx]]; // first point
 	//console.log(fp);
@@ -50,58 +59,43 @@ IPInfo *intersection_points(std::vector<Vertex*>& verts, Face& face, glm::vec2& 
 		Vertex* sp = verts[face.indices[i]]; // second point
 		float dist = intersects(fp->x, fp->y, sp->x, sp->y, line0.x, line0.y, line1.x, line1.y);
 		if (dist == 0) { // same as the first point
-			wxString key;
-			key << lidx << "-" << i;
-			(*ips)[key] = face.indices[lidx];
-			count++;
+			ipinfo.add(lidx, i, face.indices[lidx]);
 		}
 		else if (dist == 1) { // same as the last point
-			wxString key;
-			key << lidx << "-" << i;
-			(*ips)[key] = face.indices[i];
-			count++;
+			ipinfo.add(lidx, i, face.indices[i]);
 		}
 		else if (dist > 0 && dist < 1) { // add a new point and use its index
 	   // check previous point
 			Vertex* nv = new Vertex(fp->x + (sp->x - fp->x) * dist, fp->y + (sp->y - fp->y) * dist, 0);
-			int found = false;
+			bool found = false;
 			for (size_t v = 0; v < verts.size(); v++) {
 				if(equals(nv, verts[v]))
 				{
-					wxString key;
-					key << lidx << "-" << i;
-					(*ips)[key] = v;
+					ipinfo.add(lidx, i, v);
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
-				wxString key;
-				key << lidx << "-" << i;
-				(*ips)[key] = verts.size();
+				ipinfo.add(lidx, i, verts.size());
 				verts.push_back(nv);
 			} else
 				delete nv;
-
-			count++;
 		}
 		else {
-			wxString key;
-			key << lidx << "-" << i;
-			(*ips)[key] = -1;
+			ipinfo.add(lidx, i, -1);
 		}
 
 		// make second point the first
 		fp = sp;
 		lidx = i;
 	}
-
-	return new IPInfo(ips, count);
 }
 
 void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &faces, glm::vec2 &line0, glm::vec2 &line1)
 {
 	std::vector<Face*> newFaces;
+	IPInfo ipinfo;
 
 	// loop thru' all the current faces to be cut by line 0, 1
 	for (size_t f = 0; f < faces.size(); f++) {
@@ -112,8 +106,9 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 		bool hasSplit = false;
 
 		// check if the line intersects this face
-		IPInfo *idata = intersection_points(verts, *face, line0, line1);
-		int icount = idata->count;
+		ipinfo.reset();
+		intersection_points(verts, *face, line0, line1, ipinfo);
+		int icount = ipinfo.count;
 
 		// if there are intersections
 		if (icount > 1) {
@@ -125,9 +120,8 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 				else
 					if ((newFace->indices.size() == 0) || (newFace->indices.size() > 0 && newFace->indices[newFace->indices.size() - 1] != face->indices[lidx]))
 						newFace->indices.push_back(face->indices[lidx]);
-				wxString key;
-				key << lidx << "-" << i;
-				int ipidx = (*idata->points)[key];
+
+				int ipidx = ipinfo.get(lidx, i);
 				if (ipidx >= 0) {
 					indices.push_back(ipidx);
 					newFace->indices.push_back(ipidx);
@@ -144,10 +138,7 @@ void cut_faces_Greiner_Hormann(std::vector<Vertex*> &verts, std::vector<Face*> &
 		if (hasSplit && icount > 1) { // if the face was split, update the old face and add the new one
 			face->indices = indices;
 		}
-		else
-			delete newFace;
-
-		delete idata;
+		delete newFace;
 	}
 
 	// add the new faces
@@ -372,20 +363,24 @@ void ClothMesh::createLink(int v1, int v2)
 
 void ClothMesh::clean()
 {
-	for (size_t i = 0; i < m_faces.size(); i++)
-		delete m_faces[i];
-	m_faces.clear();
+	//for (size_t i = 0; i < m_faces.size(); i++)
+		//delete m_faces[i];
+	//m_faces.clear();
+	std::vector<Face*>().swap(m_faces);
 
-	for (size_t i = 0; i < m_vertices.size(); i++)
-		delete m_vertices[i];
-	m_vertices.clear();
+	//for (size_t i = 0; i < m_vertices.size(); i++)
+		//delete m_vertices[i];
+	//m_vertices.clear();
+	std::vector<Vertex*>().swap(m_vertices);
 
-	for (size_t i = 0; i < m_normals.size(); i++)
-		delete m_normals[i];
-	m_normals.clear();
+	//for (size_t i = 0; i < m_normals.size(); i++)
+		//delete m_normals[i];
+	//m_normals.clear();
+	std::vector<glm::vec3*>().swap(m_normals);
 
-	for (size_t i = 0; i < m_links.size(); i++)
-		delete m_links[i];
-	m_links.clear();
+	//for (size_t i = 0; i < m_links.size(); i++)
+		//delete m_links[i];
+	//m_links.clear();
+	std::vector<Link*>().swap(m_links);
 }
 
