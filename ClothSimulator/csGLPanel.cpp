@@ -8,6 +8,9 @@
 wxBEGIN_EVENT_TABLE(csGLPanel, wxGLCanvas)
 	EVT_SIZE(csGLPanel::OnSize)
 	EVT_PAINT(csGLPanel::OnPaint)
+	EVT_MOTION(csGLPanel::OnMouseMove)
+	EVT_LEFT_DOWN(csGLPanel::OnLeftMouseDown)
+	EVT_LEFT_UP(csGLPanel::OnLeftMouseUp)
 wxEND_EVENT_TABLE()
 
 csGLPanel::csGLPanel(Model* model, wxWindow *parent, const wxGLAttributes& canvasAttrs) : wxGLCanvas(parent, canvasAttrs), m_winHeight(0)
@@ -71,7 +74,8 @@ void csGLPanel::OnSize(wxSizeEvent& event)
 	const wxSize size = event.GetSize() * GetContentScaleFactor();
 	m_winHeight = size.y;
 
-	OpenGLContext::Instance().resize(size.x, size.y);
+	//OpenGLContext::Instance().resize(size.x, size.y);
+	m_model->resize_window(size.x, size.y);
 
 	if (!GLInit())
 		return;
@@ -95,10 +99,51 @@ void csGLPanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 	// This should not be needed, while we have only one canvas
 	SetCurrent(*m_GLContext);
 
-	OpenGLContext::Instance().render();
+	OpenGLContext::Instance().render(m_model->get_world());
 
 	SwapBuffers();
 	//wxLogDebug("buffers swapped");
+}
+
+void csGLPanel::OnMouseMove(wxMouseEvent& event)
+{
+	wxPoint pos = event.GetPosition();
+	wxClientDC dc(this);
+
+	int x = dc.DeviceToLogicalX(pos.x);
+	int y = dc.DeviceToLogicalY(pos.y);
+}
+
+void csGLPanel::OnLeftMouseDown(wxMouseEvent& event)
+{
+	wxPoint pos = event.GetPosition();
+	wxClientDC dc(this);
+
+	if (!this->HasCapture())
+		CaptureMouse();
+
+	long x = dc.DeviceToLogicalX(pos.x);
+	long y = dc.DeviceToLogicalY(pos.y);
+	double ux, uy, uz;
+
+	m_model->unproject(x, y, &ux, &uy, &uz);
+	wxLogDebug("xy: %d, %d. uxy: %f, %f, %f", x, y, ux, uy, uz);
+}
+
+void csGLPanel::OnLeftMouseUp(wxMouseEvent& event)
+{
+	wxPoint pos = event.GetPosition();
+
+	if (this->HasCapture())
+		ReleaseMouse();
+
+	{
+		wxClientDC dc(this);
+
+		long x = dc.DeviceToLogicalX(pos.x);
+		long y = dc.DeviceToLogicalY(pos.y);
+
+	} // use xcurly braces or reset will fail assert
 }
 
 void csGLPanel::updated()

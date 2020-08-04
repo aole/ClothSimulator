@@ -33,6 +33,7 @@
     <ClInclude Include="ClothSimulator\ModelListener.h" />
     <ClInclude Include="ClothSimulator\View.h" />
     <ClInclude Include="ClothSimulator\ViewListener.h" />
+    <ClInclude Include="clothsimulator\World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClothSimulator\ClothMesh.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="ClothSimulator\csGLPanel.cpp" />
     <ClCompile Include="ClothSimulator\csMainFrame.cpp" />
     <ClCompile Include="ClothSimulator\Model.cpp" />
+    <ClCompile Include="clothsimulator\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LitFS.glsl" />

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <OpenGLContext.h>
+//#include <OpenGLContext.h>
+#include "World.h"
 #include "ClothMesh.h"
 
 #include <memory>
@@ -19,9 +20,6 @@ public:
 
 	int init();
 
-	// camera / view
-	void resize(int width, int height);
-
 	// grid
 	void setGrid(float width, float depth, float major);
 	// 2D
@@ -30,12 +28,12 @@ public:
 	void reCreateCloth(ClothMesh* mesh, std::vector<glm::vec2>& vertices, std::vector<Polygon2>& polygons, float segment_length, float tensile_strength);
 
 	void deleteCloth(ClothMesh* cloth) {
-		m_rendered_objects.erase(std::remove(m_rendered_objects.begin(), m_rendered_objects.end(), cloth), m_rendered_objects.end());;
-	};
+		m_rendered_objects.erase(std::remove(m_rendered_objects.begin(), m_rendered_objects.end(), cloth), m_rendered_objects.end());
+	}
 	// model
 
 	// render
-	void render();
+	void render(World &world);
 
 	void clearObjects();
 

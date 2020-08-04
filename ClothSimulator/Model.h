@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glincludes.h"
+#include "World.h"
 
 #include <vector>
 #include <ModelListener.h>
@@ -93,11 +94,17 @@ public:
 	float getNearestClothPoint(float x, float y, std::vector<Vector2*>& points);
 	float getNearestEdgePoint(float x, float y, Vector2IP* points);
 
+	World &get_world() { return world; }
+	void resize_window(int x, int y) { world.resize_window(x, y); }
+
+	void unproject(int x, int y, double* ux, double* uy, double *uz);
 private:
 	std::vector< ClothShape* > m_shapes;
 	std::vector< ModelListener* > m_listeners;
 
 	SimulationThread* m_thread;
+
+	World world;
 };
 
 class SimulationThread : public wxThread

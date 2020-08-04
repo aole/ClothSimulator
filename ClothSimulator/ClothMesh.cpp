@@ -203,7 +203,7 @@ void ClothMesh::updateNormals()
 
 #if _DEBUG
 		if (v->m_face_count == 0) {
-			wxLogDebug("Vertex: %d, face count: %d", i, v->m_face_count);
+			wxLogDebug("Vertex: %u, face count: %d", i, v->m_face_count);
 		}
 		else {
 #endif
@@ -241,6 +241,7 @@ void ClothMesh::create(std::vector<glm::vec2> &vertices, std::vector<Polygon2>& 
 		
 		m_vertices.push_back(new Vertex(v));
 	}
+	wxLogDebug("Vert: %f, %f %f, %f", minx, miny, maxx, maxy);
 	
 	// create 3D faces from the 2D polygons of the cloth
 	for (auto poly : polygons) {

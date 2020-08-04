@@ -19,24 +19,6 @@ struct ShaderInfo {
 	GLuint LightPositionID;
 };
 
-// horizontal angle : toward -Z
-float horizontalAngle = 3.14f;
-// vertical angle : 0, look at the horizon
-float verticalAngle = 0.0f;
-
-glm::mat4 Projection;
-glm::mat4 Model = glm::mat4(1.0f);
-
-// Camera matrix
-glm::mat4 View;
-glm::vec3 CameraPosition = glm::vec3(0, 150, 700);
-glm::vec3 CameraLookAt = glm::vec3(0, 0, 0);
-glm::vec3 CameraDirection = glm::vec3(0, 0, 0);
-glm::vec3 CameraRight = glm::vec3(1, 0, 0);
-glm::vec3 CameraUp = glm::vec3(0, 1, 0);
-
-glm::vec3 Light = glm::vec3(200, 50, 200);
-
 GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
 ShaderInfo LitShader, UnlitShader;
 
@@ -92,14 +74,6 @@ int OpenGLContext::init()
 	return 1;
 }
 
-void OpenGLContext::resize(int width, int height)
-{
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	Projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 1000.0f);
-
-	glViewport(0, 0, width, height);
-}
-
 void OpenGLContext::setGrid(float width, float depth, float major)
 {
 	csGL3DGrid *grid = new csGL3DGrid();
@@ -121,26 +95,8 @@ void OpenGLContext::reCreateCloth(ClothMesh* mesh, std::vector<glm::vec2>& verti
 	mesh->reCreate(vertices, polygons, segment_length, tensile_strength);
 }
 
-void OpenGLContext::render()
+void OpenGLContext::render(World &world)
 {
-	// setup camera view
-	CameraDirection = glm::vec3(std::cos(verticalAngle) * std::sin(horizontalAngle),
-		std::sin(verticalAngle),
-		std::cos(verticalAngle) * std::cos(horizontalAngle));
-
-	CameraRight = glm::vec3(
-		std::sin(horizontalAngle - 3.14f / 2.0f),
-		0,
-		std::cos(horizontalAngle - 3.14f / 2.0f)
-	);
-	CameraUp = glm::cross(CameraRight, CameraDirection);
-
-	View = glm::lookAt(
-		CameraPosition, // Camera position, in World Space
-		CameraPosition + CameraDirection, // and looks at the origin
-		CameraUp  // Head is up (set to 0,-1,0 to look upside-down)
-	);
-
 	// Render
 	glClearColor(.8f, .8f, .8f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -151,18 +107,19 @@ void OpenGLContext::render()
 
 		if (ro->get_shader_type() == SHADER_LIT) {
 			glUseProgram(LitShader.ShaderID);
-			glUniformMatrix4fv(LitShader.MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
-			glUniformMatrix4fv(LitShader.MxViewID, 1, GL_FALSE, &View[0][0]);
-			glUniformMatrix4fv(LitShader.MxModelID, 1, GL_FALSE, &Model[0][0]);
+			glUniformMatrix4fv(LitShader.MxProjectionID, 1, GL_FALSE, world.get_projection_matrix_address());
+			glUniformMatrix4fv(LitShader.MxViewID, 1, GL_FALSE, world.get_view_matrix_address());
+			glUniformMatrix4fv(LitShader.MxModelID, 1, GL_FALSE, world.get_model_matrix_address());
 			
 			glUniform3f(LitShader.ShaderColorID, color[0], color[1], color[2]);
-			glUniform3f(LitShader.LightPositionID, Light.x, Light.y, Light.z);
+			//glUniform3f(LitShader.LightPositionID, Light.x, Light.y, Light.z);
+			glUniform3fv(LitShader.LightPositionID, 1, world.get_light_vector_address());
 		}
 		else {
 			glUseProgram(UnlitShader.ShaderID);
-			glUniformMatrix4fv(UnlitShader.MxProjectionID, 1, GL_FALSE, &Projection[0][0]);
-			glUniformMatrix4fv(UnlitShader.MxViewID, 1, GL_FALSE, &View[0][0]);
-			glUniformMatrix4fv(UnlitShader.MxModelID, 1, GL_FALSE, &Model[0][0]);
+			glUniformMatrix4fv(LitShader.MxProjectionID, 1, GL_FALSE, world.get_projection_matrix_address());
+			glUniformMatrix4fv(LitShader.MxViewID, 1, GL_FALSE, world.get_view_matrix_address());
+			glUniformMatrix4fv(LitShader.MxModelID, 1, GL_FALSE, world.get_model_matrix_address());
 
 			glUniform3f(UnlitShader.ShaderColorID, color[0], color[1], color[2]);
 		}

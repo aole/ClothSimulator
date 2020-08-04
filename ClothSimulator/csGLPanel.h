@@ -19,6 +19,9 @@ public:
 public:
 	void OnSize(wxSizeEvent& event);
 	void OnPaint(wxPaintEvent& event);
+	void OnMouseMove(wxMouseEvent& event);
+	void OnLeftMouseDown(wxMouseEvent& event);
+	void OnLeftMouseUp(wxMouseEvent& event);
 
 	void updated();
 private:

@@ -1,10 +1,11 @@
 #define PI 3.14159265358979323846
 
-#include "Model.h"
 #include <algorithm>
 #include "wx/wx.h"
 #include <OpenGLContext.h>
 #include <glm/gtx/closest_point.hpp>
+
+#include "Model.h"
 
 #define DEBUG_CONVEXIFY FALSE
 
@@ -388,6 +389,11 @@ float Model::getNearestEdgePoint(float x, float y, Vector2IP* mip)
 	}
 
 	return min;
+}
+
+void Model::unproject(int x, int y, double* ux, double* uy, double*uz)
+{
+	world.unproject(x, y, ux, uy, uz);
 }
 
 void Vector2::setPin(bool p)
