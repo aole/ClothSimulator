@@ -352,15 +352,22 @@ void ClothMesh::update()
 		if (v->m_pinned)
 			continue;
 
-		glm::vec3 temp = *v;
+		float x = v->x + (v->x - v->m_previous.x)* (1 - DAMPING) + m_acceleration.x;
+		float y = v->y + (v->y - v->m_previous.y)* (1 - DAMPING) + m_acceleration.y;
+		float z = v->z + (v->z - v->m_previous.z)* (1 - DAMPING) + m_acceleration.z;
 
-		v->x += (v->x - v->m_previous.x)* (1 - DAMPING) + m_acceleration.x;
-		v->y += (v->y - v->m_previous.y)* (1 - DAMPING) + m_acceleration.y;
-		v->z += (v->z - v->m_previous.z)* (1 - DAMPING) + m_acceleration.z;
+		v->m_previous.x = v->x;
+		v->m_previous.y = v->y;
+		v->m_previous.z = v->z;
 
-		v->m_previous.x = temp.x;
-		v->m_previous.y = temp.y;
-		v->m_previous.z = temp.z;
+		// check if x, y, z is inside collision object
+		// checking for floor
+		if (y < 0)
+			y = v->y;
+
+		v->x = x;
+		v->y = y;
+		v->z = z;
 	}
 
 	m_acceleration = glm::vec3();
