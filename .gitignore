@@ -41,4 +41,7 @@
 
 # Ignore Debug folder
 Debug
+/.tools/
+/build/
+/vcpkg_installed/
 /.vs/ClothSimulator/v16/TestStore/0

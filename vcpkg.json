@@ -1,0 +1,10 @@
+{
+  "name": "cloth-simulator",
+  "version-string": "1.0.0",
+  "builtin-baseline": "a4f7741c53c97354fc43222fea17955c657dd549",
+  "dependencies": [
+    "glew",
+    "glm",
+    { "name": "wxwidgets", "default-features": false }
+  ]
+}

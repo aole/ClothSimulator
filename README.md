@@ -27,3 +27,25 @@ Compile Dependency
 - wxWidgets
 - glew
 - glm
+
+Build and Run on Windows
+------------------------
+Install Visual Studio 2022/2026 or its Build Tools with **Desktop development with
+C++**, a Windows SDK, and **C++ CMake tools for Windows**. Git must be on PATH.
+
+From PowerShell in this folder:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\build.ps1
+powershell -ExecutionPolicy Bypass -File .\run.ps1
+```
+
+The first build downloads vcpkg and builds the pinned wxWidgets, GLEW, and GLM
+dependencies. Later builds reuse them. The default is a 64-bit Release build;
+pass `-Configuration Debug` to both scripts for a Debug build.
+
+The executable is `build\Release\ClothSimulator.exe`. Use `run.ps1` to start it
+with the correct working directory for shaders and sample objects. OpenGL 3.2
+driver support is required. The generated `build\ClothSimulator.sln` can also be
+opened in Visual Studio; use this instead of the legacy root solution, which
+references an older toolset and hard-coded SDK paths.
